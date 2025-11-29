@@ -1,4 +1,6 @@
 #region USINGS
+using BibliotecaAPI.Context;
+using Microsoft.EntityFrameworkCore;
 #endregion
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
+
+#region DATABASE & DI
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDbContext>(op => op.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+#endregion
 #endregion
 
 #region APP
