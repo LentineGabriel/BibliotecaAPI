@@ -3,6 +3,8 @@
 namespace BibliotecaAPI.DTOs;
 public class LivrosDTO
 {
+    public int IdLivro { get; set; }
+
     [Required]
     [StringLength(150 , MinimumLength = 4 , ErrorMessage = "O valor permitido de caracteres deve estar entre {2} e {1}")]
     public string? NomeLivro { get; set; }
