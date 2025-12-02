@@ -1,6 +1,7 @@
 ﻿#region USINGS
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 #endregion
 
 namespace BibliotecaAPI.Models;
@@ -28,6 +29,13 @@ public class Livros : IValidatableObject
     [Required]
     [Range(1500 , 2100 , ErrorMessage = "O ano de publicação deve estar entre {1} e {2}")]
     public int AnoPublicacao { get; set; }
+
+    // Chave estrangeira
+    [ForeignKey("CategoriaLivro")]
+    public int IdCategoria { get; set; }
+
+    [JsonIgnore]
+    public Categorias? CategoriaLivro { get; set; }
     #endregion
 
     #region METHODS

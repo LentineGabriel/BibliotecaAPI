@@ -7,6 +7,7 @@ public class UnityOfWork : IUnityOfWork
 {
     #region PROPS/CTOR
     private ILivrosRepositorio? _livrosRepositorio;
+    private ICategoriaLivrosRepositorio? _categoriaLivrosRepositorio;
     public AppDbContext _context;
 
     public UnityOfWork(AppDbContext context)
@@ -17,6 +18,7 @@ public class UnityOfWork : IUnityOfWork
 
     #region METHODS
     public ILivrosRepositorio LivrosRepositorio => _livrosRepositorio = _livrosRepositorio ?? new LivrosRepositorio(_context);
+    public ICategoriaLivrosRepositorio CategoriaLivrosRepositorio => _categoriaLivrosRepositorio = _categoriaLivrosRepositorio ?? new CategoriaLivrosRepositorio(_context);
     public async Task CommitAsync() => await _context.SaveChangesAsync();
     public async Task DisposeAsync() => await _context.DisposeAsync();
     #endregion

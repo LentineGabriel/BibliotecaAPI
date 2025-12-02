@@ -8,6 +8,7 @@ namespace BibliotecaAPI.DTOs.Mappings
         public MappingProfile()
         {
             CreateMap<Livros , LivrosDTO>().ReverseMap();
+            CreateMap<Categorias , CategoriasDTO>().ReverseMap();
         }
     }
 }

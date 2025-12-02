@@ -22,6 +22,7 @@ builder.Services.AddDbContext<AppDbContext>(op => op.UseMySql(connectionString, 
 builder.Services.AddScoped(typeof(IRepositorio<>) , typeof(Repositorio<>));
 builder.Services.AddScoped<IUnityOfWork , UnityOfWork>();
 builder.Services.AddScoped<ILivrosRepositorio , LivrosRepositorio>();
+builder.Services.AddScoped<ICategoriaLivrosRepositorio, CategoriaLivrosRepositorio>();
 builder.Services.AddAutoMapper(cfg => { } , typeof(MappingProfile));
 #endregion
 #endregion
