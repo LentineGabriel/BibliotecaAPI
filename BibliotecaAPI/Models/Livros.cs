@@ -31,10 +31,10 @@ public class Livros : IValidatableObject
     public int AnoPublicacao { get; set; }
 
     // Chave estrangeira
-    [ForeignKey("CategoriaLivro")]
     public int IdCategoria { get; set; }
 
     [JsonIgnore]
+    [ForeignKey("IdCategoria")]
     public Categorias? CategoriaLivro { get; set; }
     #endregion
 
