@@ -54,7 +54,7 @@ public class CategoriasController : ControllerBase
         await _uof.CommitAsync();
 
         var categoriaDTO = _mapper.Map<CategoriasDTO>(categoriaCriada);
-        return new CreatedAtRouteResult("ObterIdCategoria" , new { id = categoriasDTO.IdCategoria } , categoriasDTO);
+        return new CreatedAtRouteResult("ObterIdCategoria" , new { id = categoriaDTO.IdCategoria } , categoriaDTO);
     }
     #endregion
 
@@ -74,11 +74,12 @@ public class CategoriasController : ControllerBase
     #endregion
 
     #region DELETE
+    [HttpDelete("DeletarCategoria/{id:int:min(1)}")]
     public async Task<ActionResult<CategoriasDTO>> DeleteAsync(int id)
     {
         var deletarCategoria = await _uof.CategoriaLivrosRepositorio.GetIdAsync(c => c.IdCategoria == id);
 
-        if(deletarCategoria == null) return NotFound("Livro não localizada! Verifique o ID digitado");
+        if(deletarCategoria == null) return NotFound("Categoria não localizada! Verifique o ID digitado");
 
         var categoriaExcluida = _uof.CategoriaLivrosRepositorio.Delete(deletarCategoria);
         await _uof.CommitAsync();

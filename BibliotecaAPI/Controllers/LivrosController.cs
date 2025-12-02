@@ -32,7 +32,7 @@ public class LivrosController : ControllerBase
         return Ok(livrosDTO);
     }
 
-    [HttpGet("{id:int:min(1)}", Name = "ObterId")]
+    [HttpGet("{id:int:min(1)}", Name = "ObterIdLivro")]
     public async Task<ActionResult<LivrosDTO>> GetByIdAsync(int id)
     {
         var livro = await _uof.LivrosRepositorio.GetIdAsync(l => l.IdLivro == id);
@@ -54,7 +54,7 @@ public class LivrosController : ControllerBase
         await _uof.CommitAsync();
 
         var livroDTO = _mapper.Map<LivrosDTO>(livroCriado);
-        return new CreatedAtRouteResult("ObterId" , new { id = livroDTO.IdLivro } , livroDTO);
+        return new CreatedAtRouteResult("ObterIdLivro" , new { id = livroDTO.IdLivro } , livroDTO);
     }
     #endregion
 
@@ -74,7 +74,7 @@ public class LivrosController : ControllerBase
     #endregion
 
     #region DELETE
-    [HttpDelete]
+    [HttpDelete("DeletarLivros/{id:int:min(1)}")]
     public async Task<ActionResult<LivrosDTO>> DeleteAsync(int id)
     {
         var deletarLivro = await _uof.LivrosRepositorio.GetIdAsync(l => l.IdLivro == id);
@@ -84,8 +84,8 @@ public class LivrosController : ControllerBase
         var livroExcluido = _uof.LivrosRepositorio.Delete(deletarLivro);
         await _uof.CommitAsync();
 
-        var categoriaExcluidaDTO = _mapper.Map<LivrosDTO>(livroExcluido);
-        return Ok(categoriaExcluidaDTO);
+        var livroExcluidoDTO = _mapper.Map<LivrosDTO>(livroExcluido);
+        return Ok(livroExcluidoDTO);
     }
     #endregion
 }
