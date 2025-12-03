@@ -8,7 +8,21 @@ public class LivrosRepositorio : Repositorio<Livros>, ILivrosRepositorio
 {
     public LivrosRepositorio(AppDbContext context) : base(context) { }
 
-    public async Task<IEnumerable<Livros>> GetLivrosComAutorAsync() => await _context.Livros.Include(l => l.Autor).ToListAsync();
+    public async Task<IEnumerable<Livros?>> GetLivroCompletoAsync()
+    {
+        return await _context.Livros
+            .Include(l => l.Autor)
+            .Include(l => l.Editora)
+            .Include(l => l.CategoriaLivro)
+            .ToListAsync();
+    }
 
-    public async Task<Livros?> GetLivroComAutorAsync(int id) => await _context.Livros.Include(l => l.Autor).FirstOrDefaultAsync(l => l.IdLivro == id);
+    public async Task<Livros?> GetLivroCompletoAsync(int id)
+    {
+        return await _context.Livros
+            .Include(l => l.Autor)
+            .Include(l => l.Editora)
+            .Include(l => l.CategoriaLivro)
+            .FirstOrDefaultAsync(l => l.IdLivro == id);
+    }
 }

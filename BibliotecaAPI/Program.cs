@@ -23,21 +23,22 @@ builder.Services.AddSwaggerGen();
 #region DATABASE & DI
 // DATABASE
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<AppDbContext>(op => op.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+builder.Services.AddDbContext<AppDbContext>(op => op.UseMySql(connectionString , ServerVersion.AutoDetect(connectionString)));
 
 // DI
 builder.Services.AddScoped(typeof(IRepositorio<>) , typeof(Repositorio<>));
 builder.Services.AddScoped<IUnityOfWork , UnityOfWork>();
 builder.Services.AddScoped<ILivrosRepositorio , LivrosRepositorio>();
 builder.Services.AddScoped<IAutorRepositorio , AutorRepositorio>();
-builder.Services.AddScoped<ICategoriaLivrosRepositorio, CategoriaLivrosRepositorio>();
+builder.Services.AddScoped<IEditorasRepositorio , EditorasRepositorio>();
+builder.Services.AddScoped<ICategoriaLivrosRepositorio , CategoriaLivrosRepositorio>();
 builder.Services.AddAutoMapper(cfg => { } , typeof(MappingProfile));
 #endregion
 #endregion
 
 #region APP
 var app = builder.Build();
-if (app.Environment.IsDevelopment())
+if(app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseSwagger();

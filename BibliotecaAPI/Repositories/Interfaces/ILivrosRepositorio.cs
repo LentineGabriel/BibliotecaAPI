@@ -3,6 +3,6 @@
 namespace BibliotecaAPI.Repositories.Interfaces;
 public interface ILivrosRepositorio : IRepositorio<Livros>
 {
-    Task<IEnumerable<Livros>> GetLivrosComAutorAsync();
-    Task<Livros?> GetLivroComAutorAsync(int id);
+    Task<IEnumerable<Livros?>> GetLivroCompletoAsync();
+    Task<Livros?> GetLivroCompletoAsync(int id);
 }

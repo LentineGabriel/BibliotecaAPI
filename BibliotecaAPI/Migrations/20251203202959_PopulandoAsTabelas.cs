@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BibliotecaAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class FixErroComFKs : Migration
+    public partial class PopulandoAsTabelas : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,7 +27,7 @@ namespace BibliotecaAPI.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Nacionalidade = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    DataNascimento = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    DataNascimento = table.Column<DateOnly>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -53,6 +53,26 @@ namespace BibliotecaAPI.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Editoras",
+                columns: table => new
+                {
+                    IdEditora = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    NomeEditora = table.Column<string>(type: "varchar(80)", maxLength: 80, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PaisOrigem = table.Column<string>(type: "varchar(15)", maxLength: 15, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    AnoFundacao = table.Column<int>(type: "int", nullable: false),
+                    SiteOficial = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Editoras", x => x.IdEditora);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Livros",
                 columns: table => new
                 {
@@ -61,8 +81,7 @@ namespace BibliotecaAPI.Migrations
                     NomeLivro = table.Column<string>(type: "varchar(150)", maxLength: 150, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IdAutor = table.Column<int>(type: "int", nullable: false),
-                    NomeEditora = table.Column<string>(type: "varchar(80)", maxLength: 80, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IdEditora = table.Column<int>(type: "int", nullable: false),
                     AnoPublicacao = table.Column<int>(type: "int", nullable: false),
                     IdCategoria = table.Column<int>(type: "int", nullable: false)
                 },
@@ -81,6 +100,12 @@ namespace BibliotecaAPI.Migrations
                         principalTable: "Categorias",
                         principalColumn: "IdCategoria",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Livros_Editoras_IdEditora",
+                        column: x => x.IdEditora,
+                        principalTable: "Editoras",
+                        principalColumn: "IdEditora",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -93,6 +118,11 @@ namespace BibliotecaAPI.Migrations
                 name: "IX_Livros_IdCategoria",
                 table: "Livros",
                 column: "IdCategoria");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Livros_IdEditora",
+                table: "Livros",
+                column: "IdEditora");
         }
 
         /// <inheritdoc />
@@ -106,6 +136,9 @@ namespace BibliotecaAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "Categorias");
+
+            migrationBuilder.DropTable(
+                name: "Editoras");
         }
     }
 }

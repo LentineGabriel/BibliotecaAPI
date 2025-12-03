@@ -25,8 +25,8 @@ public class LivrosController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<LivrosDTO>>> GetAsync()
     {
-        var livros = await _uof.LivrosRepositorio.GetLivrosComAutorAsync();
-        if(livros == null) return NotFound("Livros não encontrados. Por favor, tente novamente!");
+        var livros = await _uof.LivrosRepositorio.GetLivroCompletoAsync();
+        if(livros == null || !livros.Any()) return NotFound("Livros não encontrados. Por favor, tente novamente!");
 
         var livrosDTO = _mapper.Map<IEnumerable<LivrosDTO>>(livros);
         return Ok(livrosDTO);
@@ -35,7 +35,7 @@ public class LivrosController : ControllerBase
     [HttpGet("{id:int:min(1)}", Name = "ObterIdLivro")]
     public async Task<ActionResult<LivrosDTO>> GetByIdAsync(int id)
     {
-        var livro = await _uof.LivrosRepositorio.GetLivroComAutorAsync(id);
+        var livro = await _uof.LivrosRepositorio.GetLivroCompletoAsync(id);
         if(livro == null) return NotFound($"Livro por ID = {id} não encontrado. Por favor, tente novamente!");
         
         var livroDTO = _mapper.Map<LivrosDTO>(livro);
@@ -53,10 +53,9 @@ public class LivrosController : ControllerBase
         var livroCriado = _uof.LivrosRepositorio.Create(livroNovo);
         await _uof.CommitAsync();
 
-        // populando o autor
-        var livroComAutor = await _uof.LivrosRepositorio.GetLivroComAutorAsync(livroCriado.IdLivro);
+        var livroCompleto = await _uof.LivrosRepositorio.GetLivroCompletoAsync(livroCriado.IdLivro);
 
-        var livroDTO = _mapper.Map<LivrosDTO>(livroComAutor);
+        var livroDTO = _mapper.Map<LivrosDTO>(livroCompleto);
         return new CreatedAtRouteResult("ObterIdLivro" , new { id = livroDTO.IdLivro } , livroDTO);
     }
     #endregion

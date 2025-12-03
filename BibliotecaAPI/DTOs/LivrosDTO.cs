@@ -11,11 +11,10 @@ public class LivrosDTO
 
     [Required]
     public int IdAutor { get; set; }
-
     public string? NomeAutor { get; set; }
 
     [Required]
-    [StringLength(80 , MinimumLength = 2 , ErrorMessage = "O valor permitido de caracteres deve estar entre {2} e {1}")]
+    public int IdEditora { get; set; }
     public string? NomeEditora { get; set; }
 
     [Required]

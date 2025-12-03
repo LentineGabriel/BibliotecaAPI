@@ -28,7 +28,7 @@ public class CategoriasController : ControllerBase
         var categorias = await _uof.CategoriaLivrosRepositorio.GetAllAsync();
         if(categorias == null) return NotFound("Categorias não encontrados. Por favor, tente novamente!");
 
-        var categoriasDTO = _mapper.Map<IEnumerable<LivrosDTO>>(categorias);
+        var categoriasDTO = _mapper.Map<IEnumerable<CategoriasDTO>>(categorias);
         return Ok(categoriasDTO);
     }
 

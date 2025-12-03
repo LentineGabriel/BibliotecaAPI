@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BibliotecaAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251203145354_AjustandoDataNascimentoAutor")]
-    partial class AjustandoDataNascimentoAutor
+    [Migration("20251203202959_PopulandoAsTabelas")]
+    partial class PopulandoAsTabelas
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -79,6 +79,35 @@ namespace BibliotecaAPI.Migrations
                     b.ToTable("Categorias");
                 });
 
+            modelBuilder.Entity("BibliotecaAPI.Models.Editoras", b =>
+                {
+                    b.Property<int>("IdEditora")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdEditora"));
+
+                    b.Property<int>("AnoFundacao")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NomeEditora")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)");
+
+                    b.Property<string>("PaisOrigem")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("varchar(15)");
+
+                    b.Property<string>("SiteOficial")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("IdEditora");
+
+                    b.ToTable("Editoras");
+                });
+
             modelBuilder.Entity("BibliotecaAPI.Models.Livros", b =>
                 {
                     b.Property<int>("IdLivro")
@@ -96,10 +125,8 @@ namespace BibliotecaAPI.Migrations
                     b.Property<int>("IdCategoria")
                         .HasColumnType("int");
 
-                    b.Property<string>("NomeEditora")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("varchar(80)");
+                    b.Property<int>("IdEditora")
+                        .HasColumnType("int");
 
                     b.Property<string>("NomeLivro")
                         .IsRequired()
@@ -111,6 +138,8 @@ namespace BibliotecaAPI.Migrations
                     b.HasIndex("IdAutor");
 
                     b.HasIndex("IdCategoria");
+
+                    b.HasIndex("IdEditora");
 
                     b.ToTable("Livros");
                 });
@@ -129,9 +158,17 @@ namespace BibliotecaAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BibliotecaAPI.Models.Editoras", "Editora")
+                        .WithMany("Livros")
+                        .HasForeignKey("IdEditora")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Autor");
 
                     b.Navigation("CategoriaLivro");
+
+                    b.Navigation("Editora");
                 });
 
             modelBuilder.Entity("BibliotecaAPI.Models.Autor", b =>
@@ -140,6 +177,11 @@ namespace BibliotecaAPI.Migrations
                 });
 
             modelBuilder.Entity("BibliotecaAPI.Models.Categorias", b =>
+                {
+                    b.Navigation("Livros");
+                });
+
+            modelBuilder.Entity("BibliotecaAPI.Models.Editoras", b =>
                 {
                     b.Navigation("Livros");
                 });
