@@ -7,7 +7,10 @@ namespace BibliotecaAPI.DTOs.Mappings
     {
         public MappingProfile()
         {
-            CreateMap<Livros , LivrosDTO>().ReverseMap();
+            CreateMap<Livros , LivrosDTO>().ForMember(dest => dest.NomeAutor ,
+                                                      opt => opt.MapFrom
+                                                      (src => src.Autor!.PrimeiroNome + " " + src.Autor.Sobrenome)).ReverseMap();
+            CreateMap<Autor , AutorDTO>().ReverseMap();
             CreateMap<Categorias , CategoriasDTO>().ReverseMap();
         }
     }

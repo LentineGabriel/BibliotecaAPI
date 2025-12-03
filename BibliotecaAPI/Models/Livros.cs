@@ -18,9 +18,11 @@ public class Livros : IValidatableObject
     [StringLength(150 , MinimumLength = 4 , ErrorMessage = "O valor permitido de caracteres deve estar entre {2} e {1}")]
     public string? NomeLivro { get; set; }
 
-    [Required]
-    [StringLength(100 , MinimumLength = 2 , ErrorMessage = "O valor permitido de caracteres deve estar entre {2} e {1}")]
-    public string? NomeAutor { get; set; }
+    // Chave estrangeira - Autor
+    public int IdAutor { get; set; }
+
+    [ForeignKey("IdAutor")]
+    public Autor? Autor { get; set; }
 
     [Required]
     [StringLength(80 , MinimumLength = 2 , ErrorMessage = "O valor permitido de caracteres deve estar entre {2} e {1}")]
@@ -30,7 +32,7 @@ public class Livros : IValidatableObject
     [Range(1500 , 2100 , ErrorMessage = "O ano de publicação deve estar entre {1} e {2}")]
     public int AnoPublicacao { get; set; }
 
-    // Chave estrangeira
+    // Chave estrangeira - Categoria
     public int IdCategoria { get; set; }
 
     [JsonIgnore]
@@ -45,7 +47,7 @@ public class Livros : IValidatableObject
         var campos = new Dictionary<string , string?>
         {
             { nameof(NomeLivro), NomeLivro },
-            { nameof(NomeAutor), NomeAutor },
+            { nameof(Autor).ToString(), Autor?.ToString() },
             { nameof(NomeEditora), NomeEditora }
         };
 

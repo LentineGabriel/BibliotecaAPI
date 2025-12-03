@@ -4,6 +4,13 @@ using BibliotecaAPI.DTOs.Mappings;
 using BibliotecaAPI.Repositories;
 using BibliotecaAPI.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
+#endregion
+
+#region CULTURE PT-BR
+var culture = new CultureInfo("pt-BR");
+CultureInfo.DefaultThreadCurrentCulture = culture;
+CultureInfo.DefaultThreadCurrentUICulture = culture;
 #endregion
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +29,7 @@ builder.Services.AddDbContext<AppDbContext>(op => op.UseMySql(connectionString, 
 builder.Services.AddScoped(typeof(IRepositorio<>) , typeof(Repositorio<>));
 builder.Services.AddScoped<IUnityOfWork , UnityOfWork>();
 builder.Services.AddScoped<ILivrosRepositorio , LivrosRepositorio>();
+builder.Services.AddScoped<IAutorRepositorio , AutorRepositorio>();
 builder.Services.AddScoped<ICategoriaLivrosRepositorio, CategoriaLivrosRepositorio>();
 builder.Services.AddAutoMapper(cfg => { } , typeof(MappingProfile));
 #endregion

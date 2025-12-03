@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BibliotecaAPI.DTOs;
 public class LivrosDTO
@@ -11,7 +10,8 @@ public class LivrosDTO
     public string? NomeLivro { get; set; }
 
     [Required]
-    [StringLength(100 , MinimumLength = 2 , ErrorMessage = "O valor permitido de caracteres deve estar entre {2} e {1}")]
+    public int IdAutor { get; set; }
+
     public string? NomeAutor { get; set; }
 
     [Required]
