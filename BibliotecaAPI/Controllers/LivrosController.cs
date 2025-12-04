@@ -2,6 +2,7 @@
 using BibliotecaAPI.DTOs;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Repositories.Interfaces;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BibliotecaAPI.Controllers;
@@ -75,13 +76,37 @@ public class LivrosController : ControllerBase
     }
     #endregion
 
+    #region PATCH
+    [HttpPatch("AtualizarParcialLivro/{id:int:min(1)}")]
+    public async Task<ActionResult<LivrosDTO>> PatchAsync(int id , JsonPatchDocument<LivrosDTO> patchDoc) 
+    {
+        if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
+
+        var livro = await _uof.LivrosRepositorio.GetIdAsync(l => l.IdLivro == id);
+        if(livro == null) return NotFound($"Livro por ID = {id} não encontrado. Por favor, tente novamente!");
+
+        var livroDTO = _mapper.Map<LivrosDTO>(livro);
+        patchDoc.ApplyTo(livroDTO , ModelState);
+        if(!ModelState.IsValid) return BadRequest(ModelState);
+
+        _mapper.Map(livroDTO , livro);
+        _uof.LivrosRepositorio.Update(livro);
+        await _uof.CommitAsync();
+
+        var livroCompleto = await _uof.LivrosRepositorio.GetLivroCompletoAsync(id);
+        var livroCompletoDTO = _mapper.Map<LivrosDTO>(livroCompleto);
+
+        return Ok(livroCompletoDTO);
+    }
+    #endregion
+
     #region DELETE
     [HttpDelete("DeletarLivros/{id:int:min(1)}")]
     public async Task<ActionResult<LivrosDTO>> DeleteAsync(int id)
     {
         var deletarLivro = await _uof.LivrosRepositorio.GetIdAsync(l => l.IdLivro == id);
 
-        if(deletarLivro == null) return NotFound("Livro não localizada! Verifique o ID digitado");
+        if(deletarLivro == null) return NotFound("Livro não localizado! Verifique o ID digitado");
 
         var livroExcluido = _uof.LivrosRepositorio.Delete(deletarLivro);
         await _uof.CommitAsync();

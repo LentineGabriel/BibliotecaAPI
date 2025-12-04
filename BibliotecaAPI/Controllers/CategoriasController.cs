@@ -2,6 +2,7 @@
 using BibliotecaAPI.DTOs;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Repositories.Interfaces;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BibliotecaAPI.Controllers;
@@ -69,6 +70,27 @@ public class CategoriasController : ControllerBase
         await _uof.CommitAsync();
 
         var categoriaDTO = _mapper.Map<CategoriasDTO>(categoriaExistente);
+        return Ok(categoriaDTO);
+    }
+    #endregion
+
+    #region PATCH
+    [HttpPatch("AtualizarParcialCategoria/{id:int:min(1)}")]
+    public async Task<ActionResult<CategoriasDTO>> PatchAsync(int id , JsonPatchDocument<CategoriasDTO> patchDoc)
+    {
+        if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
+
+        var categoria = await _uof.CategoriaLivrosRepositorio.GetIdAsync(c => c.IdCategoria == id);
+        if(categoria == null) return NotFound($"Categoria com ID {id} não encontrada. Por favor, verifique o ID digitado e tente novamente!");
+
+        var categoriaDTO = _mapper.Map<CategoriasDTO>(categoria);
+        patchDoc.ApplyTo(categoriaDTO , ModelState);
+        if(!ModelState.IsValid) return BadRequest(ModelState);
+
+        _mapper.Map(categoriaDTO , categoria);
+        _uof.CategoriaLivrosRepositorio.Update(categoria);
+        await _uof.CommitAsync();
+
         return Ok(categoriaDTO);
     }
     #endregion

@@ -33,6 +33,7 @@ builder.Services.AddScoped<IAutorRepositorio , AutorRepositorio>();
 builder.Services.AddScoped<IEditorasRepositorio , EditorasRepositorio>();
 builder.Services.AddScoped<ICategoriaLivrosRepositorio , CategoriaLivrosRepositorio>();
 builder.Services.AddAutoMapper(cfg => { } , typeof(MappingProfile));
+builder.Services.AddControllers().AddNewtonsoftJson();
 #endregion
 #endregion
 

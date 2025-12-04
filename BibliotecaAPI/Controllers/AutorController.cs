@@ -2,6 +2,7 @@
 using BibliotecaAPI.DTOs;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Repositories.Interfaces;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BibliotecaAPI.Controllers;
@@ -70,6 +71,27 @@ public class AutorController : ControllerBase
 
         var autorRetornoDTO = _mapper.Map<AutorDTO>(autorExistente);
         return Ok(autorRetornoDTO);
+    }
+    #endregion
+
+    #region PATCH
+    [HttpPatch("AtualizarParcialAutor/{id:int:min(1)}")]
+    public async Task<ActionResult<AutorDTO>> PatchAsync(int id , JsonPatchDocument<AutorDTO> patchDoc)
+    {
+        if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
+
+        var autor = await _uof.AutorRepositorio.GetIdAsync(a => a.IdAutor == id);
+        if(autor == null) return NotFound($"Autor com ID {id} não encontrado. Por favor, verifique o ID e tente novamente!");
+
+        var autorDTO = _mapper.Map<AutorDTO>(autor);
+        patchDoc.ApplyTo(autorDTO , ModelState);
+        if(!ModelState.IsValid) return BadRequest(ModelState);
+
+        _mapper.Map(autorDTO , autor);
+        _uof.AutorRepositorio.Update(autor);
+        await _uof.CommitAsync();
+
+        return Ok(autorDTO);
     }
     #endregion
 

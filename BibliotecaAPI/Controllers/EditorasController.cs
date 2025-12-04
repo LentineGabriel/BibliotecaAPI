@@ -2,6 +2,7 @@
 using BibliotecaAPI.DTOs;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Repositories.Interfaces;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BibliotecaAPI.Controllers;
@@ -26,7 +27,7 @@ public class EditorasController : ControllerBase
     public async Task<ActionResult<IEnumerable<EditorasDTO>>> GetAsync()
     {
         var editoras = await _uof.EditorasRepositorio.GetAllAsync();
-        if(editoras == null) return BadRequest("Editoras não encontradas. Por favor, tente novamente!");
+        if(editoras == null || !editoras.Any()) return BadRequest("Editoras não encontradas. Por favor, tente novamente!");
 
         var editorasDTO = _mapper.Map<IEnumerable<EditorasDTO>>(editoras);
         return Ok(editorasDTO);
@@ -73,6 +74,27 @@ public class EditorasController : ControllerBase
 
         var editoraRetornoDTO = _mapper.Map<EditorasDTO>(editoraAtual);
         return Ok(editoraRetornoDTO);
+    }
+    #endregion
+
+    #region PATCH
+    [HttpPatch("AtualizarParcialEditora/{id:int:min(1)}")]
+    public async Task<ActionResult<EditorasDTO>> PatchAsync(int id , JsonPatchDocument<EditorasDTO> patchDoc)
+    {
+        if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
+
+        var editora = await _uof.EditorasRepositorio.GetIdAsync(e => e.IdEditora == id);
+        if(editora == null) return NotFound($"Editora por ID = {id} não encontrada. Por favor, tente novamente!");
+
+        var editoraDTO = _mapper.Map<EditorasDTO>(editora);
+        patchDoc.ApplyTo(editoraDTO , ModelState);
+        if(!ModelState.IsValid) return BadRequest(ModelState);
+
+        _mapper.Map(editoraDTO , editora);
+        _uof.EditorasRepositorio.Update(editora);
+        await _uof.CommitAsync();
+
+        return Ok(editoraDTO);
     }
     #endregion
 
