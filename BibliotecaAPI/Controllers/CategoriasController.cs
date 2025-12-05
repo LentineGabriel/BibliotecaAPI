@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using BibliotecaAPI.DTOs;
+using BibliotecaAPI.DTOs.CategoriaDTOs;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Repositories.Interfaces;
 using Microsoft.AspNetCore.JsonPatch;
@@ -24,29 +24,29 @@ public class CategoriasController : ControllerBase
 
     #region GET
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CategoriasDTO>>> GetAsync()
+    public async Task<ActionResult<IEnumerable<CategoriasDTOResponse>>> GetAsync()
     {
         var categorias = await _uof.CategoriaLivrosRepositorio.GetAllAsync();
-        if(categorias == null) return NotFound("Categorias não encontrados. Por favor, tente novamente!");
+        if(categorias == null || !categorias.Any()) return NotFound("Categorias não encontradas. Por favor, tente novamente!");
 
-        var categoriasDTO = _mapper.Map<IEnumerable<CategoriasDTO>>(categorias);
+        var categoriasDTO = _mapper.Map<IEnumerable<CategoriasDTOResponse>>(categorias);
         return Ok(categoriasDTO);
     }
 
     [HttpGet("{id:int:min(1)}", Name = "ObterIdCategoria")]
-    public async Task<ActionResult<CategoriasDTO>> GetByIdAsync(int id)
+    public async Task<ActionResult<CategoriasDTOResponse>> GetByIdAsync(int id)
     {
         var categoria = await _uof.CategoriaLivrosRepositorio.GetIdAsync(c => c.IdCategoria == id);
         if(categoria == null) return NotFound($"Categoria por ID = {id} não encontrado. Por favor, tente novamente!");
         
-        var categoriaDTO = _mapper.Map<CategoriasDTO>(categoria);
+        var categoriaDTO = _mapper.Map<CategoriasDTOResponse>(categoria);
         return Ok(categoriaDTO);
     }
     #endregion
 
     #region POST
     [HttpPost("AdicionarCategorias")]
-    public async Task<ActionResult<CategoriasDTO>> PostAsync(CategoriasDTO categoriasDTO)
+    public async Task<ActionResult<CategoriasDTOResponse>> PostAsync(CategoriasDTORequest categoriasDTO)
     {
         if(categoriasDTO == null) return BadRequest("Não foi possível adicionar uma nova categoria. Tente novamente mais tarde!");
 
@@ -54,14 +54,14 @@ public class CategoriasController : ControllerBase
         var categoriaCriada = _uof.CategoriaLivrosRepositorio.Create(categoriaNova);
         await _uof.CommitAsync();
 
-        var categoriaDTO = _mapper.Map<CategoriasDTO>(categoriaCriada);
-        return new CreatedAtRouteResult("ObterIdCategoria" , new { id = categoriaDTO.IdCategoria } , categoriaDTO);
+        var categoriaDTO = _mapper.Map<CategoriasDTOResponse>(categoriaCriada);
+        return new CreatedAtRouteResult("ObterIdCategoria" , new { id = categoriaCriada.IdCategoria } , categoriaDTO);
     }
     #endregion
 
     #region PUT
     [HttpPut("AtualizarCategoria/{id:int:min(1)}")]
-    public async Task<ActionResult<CategoriasDTO>> PutAsync(int id , CategoriasDTO categoriasDTO)
+    public async Task<ActionResult<CategoriasDTOResponse>> PutAsync(int id , CategoriasDTORequest categoriasDTO)
     {
         if(id != categoriasDTO.IdCategoria) return BadRequest($"Não foi possível encontrar a categoria com ID {id}. Por favor, verifique o ID digitado e tente novamente!");
 
@@ -69,21 +69,21 @@ public class CategoriasController : ControllerBase
         var categoriaExistente = _uof.CategoriaLivrosRepositorio.Update(categoria);
         await _uof.CommitAsync();
 
-        var categoriaDTO = _mapper.Map<CategoriasDTO>(categoriaExistente);
-        return Ok(categoriaDTO);
+        var categoriaRetornoDTO = _mapper.Map<CategoriasDTOResponse>(categoriaExistente);
+        return Ok(categoriaRetornoDTO);
     }
     #endregion
 
     #region PATCH
     [HttpPatch("AtualizarParcialCategoria/{id:int:min(1)}")]
-    public async Task<ActionResult<CategoriasDTO>> PatchAsync(int id , JsonPatchDocument<CategoriasDTO> patchDoc)
+    public async Task<ActionResult<CategoriasDTOResponse>> PatchAsync(int id , JsonPatchDocument<CategoriasDTORequest> patchDoc)
     {
         if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
 
         var categoria = await _uof.CategoriaLivrosRepositorio.GetIdAsync(c => c.IdCategoria == id);
         if(categoria == null) return NotFound($"Categoria com ID {id} não encontrada. Por favor, verifique o ID digitado e tente novamente!");
 
-        var categoriaDTO = _mapper.Map<CategoriasDTO>(categoria);
+        var categoriaDTO = _mapper.Map<CategoriasDTORequest>(categoria);
         patchDoc.ApplyTo(categoriaDTO , ModelState);
         if(!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -91,22 +91,22 @@ public class CategoriasController : ControllerBase
         _uof.CategoriaLivrosRepositorio.Update(categoria);
         await _uof.CommitAsync();
 
-        return Ok(categoriaDTO);
+        var categoriaRetornoDTO = _mapper.Map<CategoriasDTOResponse>(categoria);
+        return Ok(categoriaRetornoDTO);
     }
     #endregion
 
     #region DELETE
     [HttpDelete("DeletarCategoria/{id:int:min(1)}")]
-    public async Task<ActionResult<CategoriasDTO>> DeleteAsync(int id)
+    public async Task<ActionResult<CategoriasDTOResponse>> DeleteAsync(int id)
     {
         var deletarCategoria = await _uof.CategoriaLivrosRepositorio.GetIdAsync(c => c.IdCategoria == id);
-
         if(deletarCategoria == null) return NotFound("Categoria não localizada! Verifique o ID digitado");
 
         var categoriaExcluida = _uof.CategoriaLivrosRepositorio.Delete(deletarCategoria);
         await _uof.CommitAsync();
 
-        var categoriaExcluidaDTO = _mapper.Map<CategoriasDTO>(categoriaExcluida);
+        var categoriaExcluidaDTO = _mapper.Map<CategoriasDTOResponse>(categoriaExcluida);
         return Ok(categoriaExcluidaDTO);
     }
     #endregion

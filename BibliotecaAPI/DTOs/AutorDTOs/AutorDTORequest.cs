@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BibliotecaAPI.DTOs;
-public class AutorDTO
+namespace BibliotecaAPI.DTOs.AutorDTOs;
+public class AutorDTORequest
 {
     public int IdAutor { get; set; }
 

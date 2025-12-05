@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BibliotecaAPI.DTOs;
-public class LivrosDTO
+namespace BibliotecaAPI.DTOs.LivrosDTOs;
+public class LivrosDTORequest
 {
     public int IdLivro { get; set; }
 
@@ -21,5 +21,7 @@ public class LivrosDTO
     [Range(1500 , 2100 , ErrorMessage = "O ano de publicação deve estar entre {1} e {2}")]
     public int AnoPublicacao { get; set; }
 
+    [Required]
     public int IdCategoria { get; set; }
+    public string? NomeCategoria { get; set; }
 }

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using BibliotecaAPI.DTOs;
+using BibliotecaAPI.DTOs.EditoraDTOs;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Repositories.Interfaces;
 using Microsoft.AspNetCore.JsonPatch;
@@ -24,29 +24,29 @@ public class EditorasController : ControllerBase
 
     #region GET
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<EditorasDTO>>> GetAsync()
+    public async Task<ActionResult<IEnumerable<EditorasDTOResponse>>> GetAsync()
     {
         var editoras = await _uof.EditorasRepositorio.GetAllAsync();
         if(editoras == null || !editoras.Any()) return BadRequest("Editoras não encontradas. Por favor, tente novamente!");
 
-        var editorasDTO = _mapper.Map<IEnumerable<EditorasDTO>>(editoras);
+        var editorasDTO = _mapper.Map<IEnumerable<EditorasDTOResponse>>(editoras);
         return Ok(editorasDTO);
     }
 
     [HttpGet("{id:int:min(1)}", Name = "ObterIdEditora")]
-    public async Task<ActionResult<EditorasDTO>> GetByIdAsync(int id)
+    public async Task<ActionResult<EditorasDTOResponse>> GetByIdAsync(int id)
     {
         var editora = await _uof.EditorasRepositorio.GetIdAsync(e => e.IdEditora == id);
         if(editora == null) return NotFound($"Editora por ID = {id} não encontrada. Por favor, tente novamente!");
         
-        var editoraDTO = _mapper.Map<EditorasDTO>(editora);
+        var editoraDTO = _mapper.Map<EditorasDTOResponse>(editora);
         return Ok(editoraDTO);
     }
     #endregion
 
     #region POST
     [HttpPost("AdicionarEditoras")]
-    public async Task<ActionResult<EditorasDTO>> PostAsync(EditorasDTO editorasDTO)
+    public async Task<ActionResult<EditorasDTOResponse>> PostAsync(EditorasDTORequest editorasDTO)
     {
         if(editorasDTO == null) return BadRequest("Não foi possível adicionar uma nova editora. Tente novamente mais tarde!");
 
@@ -54,39 +54,36 @@ public class EditorasController : ControllerBase
         var editoraCriada = _uof.EditorasRepositorio.Create(editoraNova);
         await _uof.CommitAsync();
         
-        var editoraRetornoDTO = _mapper.Map<EditorasDTO>(editoraCriada);
-        return new CreatedAtRouteResult("ObterIdEditora" , new { id = editoraRetornoDTO.IdEditora } , editoraRetornoDTO);
+        var editoraRetornoDTO = _mapper.Map<EditorasDTOResponse>(editoraCriada);
+        return new CreatedAtRouteResult("ObterIdEditora" , new { id = editoraCriada.IdEditora } , editoraRetornoDTO);
     }
     #endregion
 
     #region PUT
     [HttpPut("AtualizarEditora/{id:int:min(1)}")]
-    public async Task<ActionResult<EditorasDTO>> PutAsync(int id , EditorasDTO editorasDTO)
+    public async Task<ActionResult<EditorasDTOResponse>> PutAsync(int id , EditorasDTORequest editorasDTO)
     {
         if(id != editorasDTO.IdEditora) return BadRequest($"Não foi possível encontrar a editora com ID {id}. Por favor, verifique o ID e tente novamente!");
         
-        var editora = await _uof.EditorasRepositorio.GetIdAsync(e => e.IdEditora == id);
-        if(editora == null) return NotFound($"Editora por ID = {id} não encontrada. Por favor, tente novamente!");
-        
-        var editoraAtual = _mapper.Map(editorasDTO , editora);
-        _uof.EditorasRepositorio.Update(editoraAtual);
+        var editora = _mapper.Map<Editoras>(editorasDTO);
+        var editoraExistente = _uof.EditorasRepositorio.Update(editora);
         await _uof.CommitAsync();
 
-        var editoraRetornoDTO = _mapper.Map<EditorasDTO>(editoraAtual);
+        var editoraRetornoDTO = _mapper.Map<EditorasDTOResponse>(editoraExistente);
         return Ok(editoraRetornoDTO);
     }
     #endregion
 
     #region PATCH
     [HttpPatch("AtualizarParcialEditora/{id:int:min(1)}")]
-    public async Task<ActionResult<EditorasDTO>> PatchAsync(int id , JsonPatchDocument<EditorasDTO> patchDoc)
+    public async Task<ActionResult<EditorasDTOResponse>> PatchAsync(int id , JsonPatchDocument<EditorasDTORequest> patchDoc)
     {
         if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
 
         var editora = await _uof.EditorasRepositorio.GetIdAsync(e => e.IdEditora == id);
         if(editora == null) return NotFound($"Editora por ID = {id} não encontrada. Por favor, tente novamente!");
 
-        var editoraDTO = _mapper.Map<EditorasDTO>(editora);
+        var editoraDTO = _mapper.Map<EditorasDTORequest>(editora);
         patchDoc.ApplyTo(editoraDTO , ModelState);
         if(!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -94,22 +91,23 @@ public class EditorasController : ControllerBase
         _uof.EditorasRepositorio.Update(editora);
         await _uof.CommitAsync();
 
+        var autorRetornoDTO = _mapper.Map<EditorasDTOResponse>(editora);
         return Ok(editoraDTO);
     }
     #endregion
 
     #region DELETE
     [HttpDelete("DeletarEditora/{id:int:min(1)}")]
-    public async Task<ActionResult<EditorasDTO>> DeleteAsync(int id)
+    public async Task<ActionResult<EditorasDTOResponse>> DeleteAsync(int id)
     {
         var deletarEditora = await _uof.EditorasRepositorio.GetIdAsync(e => e.IdEditora == id);
-        if(deletarEditora == null) return NotFound($"Editora por ID = {id} não encontrada. Por favor, tente novamente!");
+        if(deletarEditora == null) return NotFound($"Editora não localizada! Verifique o ID digitado");
         
-        _uof.EditorasRepositorio.Delete(deletarEditora);
+        var editoraExcluida = _uof.EditorasRepositorio.Delete(deletarEditora);
         await _uof.CommitAsync();
         
-        var editoraRetornoDTO = _mapper.Map<EditorasDTO>(deletarEditora);
-        return Ok(editoraRetornoDTO);
+        var editoraExcluidaDTO = _mapper.Map<EditorasDTOResponse>(editoraExcluida);
+        return Ok(editoraExcluidaDTO);
     }
     #endregion
 }

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BibliotecaAPI.DTOs;
-public class CategoriasDTO
+namespace BibliotecaAPI.DTOs.CategoriaDTOs;
+public class CategoriasDTORequest
 {
     public int IdCategoria { get; set; }
 
