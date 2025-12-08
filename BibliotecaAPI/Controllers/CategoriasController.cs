@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using BibliotecaAPI.DTOs.CategoriaDTOs;
 using BibliotecaAPI.Models;
+using BibliotecaAPI.Pagination.Categorias;
 using BibliotecaAPI.Repositories.Interfaces;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using X.PagedList;
 
 namespace BibliotecaAPI.Controllers;
 
@@ -23,6 +26,7 @@ public class CategoriasController : ControllerBase
     #endregion
 
     #region GET
+    // GET: /Categorias
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CategoriasDTOResponse>>> GetAsync()
     {
@@ -33,6 +37,7 @@ public class CategoriasController : ControllerBase
         return Ok(categoriasDTO);
     }
 
+    // GET: /Categorias/{id}
     [HttpGet("{id:int:min(1)}", Name = "ObterIdCategoria")]
     public async Task<ActionResult<CategoriasDTOResponse>> GetByIdAsync(int id)
     {
@@ -41,6 +46,22 @@ public class CategoriasController : ControllerBase
         
         var categoriaDTO = _mapper.Map<CategoriasDTOResponse>(categoria);
         return Ok(categoriaDTO);
+    }
+
+    // GET: /Categorias/Paginacao
+    [HttpGet("Paginacao")]
+    public async Task<ActionResult<IEnumerable<Categorias>>> GetPaginationAsync([FromQuery] CategoriaParameters categoriaParameters)
+    {
+        var categorias = await _uof.CategoriaLivrosRepositorio.GetCategoriasAsync(categoriaParameters);
+        return ObterCategorias(categorias);
+    }
+
+    // GET: /Categorias/PesquisaPorNome
+    [HttpGet("PesquisaPorNome")]
+    public async Task<ActionResult<IEnumerable<Categorias>>> GetFilterNamePaginationAsync([FromQuery] CategoriasFiltroNome categoriasFiltroNome)
+    {
+        var categorias = await _uof.CategoriaLivrosRepositorio.GetCategoriasFiltrandoPeloNome(categoriasFiltroNome);
+        return ObterCategorias(categorias);
     }
     #endregion
 
@@ -108,6 +129,25 @@ public class CategoriasController : ControllerBase
 
         var categoriaExcluidaDTO = _mapper.Map<CategoriasDTOResponse>(categoriaExcluida);
         return Ok(categoriaExcluidaDTO);
+    }
+    #endregion
+
+    #region METHODS
+    private ActionResult<IEnumerable<Categorias>> ObterCategorias(IPagedList<Categorias> categorias)
+    {
+        var metadados = new
+        {
+            categorias.Count ,
+            categorias.PageSize ,
+            categorias.PageCount ,
+            categorias.TotalItemCount ,
+            categorias.HasNextPage ,
+            categorias.HasPreviousPage
+        };
+        Response.Headers.Append("X-Pagination" , JsonConvert.SerializeObject(metadados));
+
+        var categoriaDTO = _mapper.Map<IEnumerable<CategoriasDTOResponse>>(categorias);
+        return Ok(categoriaDTO);
     }
     #endregion
 }
