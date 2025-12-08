@@ -1,10 +1,12 @@
 #region USINGS
 using BibliotecaAPI.Context;
 using BibliotecaAPI.DTOs.Mappings;
+using BibliotecaAPI.Filters;
 using BibliotecaAPI.Repositories;
 using BibliotecaAPI.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using System.Text.Json.Serialization;
 #endregion
 
 #region CULTURE PT-BR
@@ -16,7 +18,13 @@ CultureInfo.DefaultThreadCurrentUICulture = culture;
 var builder = WebApplication.CreateBuilder(args);
 
 #region SERVICES
-builder.Services.AddControllers();
+builder.Services.AddControllers(op =>
+{
+    op.Filters.Add(typeof(ApiExceptionFilter));
+}).AddJsonOptions(op =>
+{
+    op.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
