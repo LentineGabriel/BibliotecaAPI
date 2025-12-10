@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using BibliotecaAPI.DTOs.AutorDTOs;
 using BibliotecaAPI.Models;
+using BibliotecaAPI.Pagination.AutoresFiltro;
 using BibliotecaAPI.Repositories.Interfaces;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using X.PagedList;
 
 namespace BibliotecaAPI.Controllers;
 
@@ -23,6 +26,7 @@ public class AutorController : ControllerBase
     #endregion
 
     #region GET
+    // GET: Autor
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AutorDTOResponse>>> GetAsync()
     {
@@ -33,6 +37,7 @@ public class AutorController : ControllerBase
         return Ok(autoresDTO);
     }
 
+    // GET: Autor/{id}
     [HttpGet("{id:int:min(1)}", Name = "ObterIdAutor")]
     public async Task<ActionResult<AutorDTOResponse>> GetByIdAsync(int id)
     {
@@ -41,6 +46,30 @@ public class AutorController : ControllerBase
         
         var autorDTO = _mapper.Map<AutorDTOResponse>(autor);
         return Ok(autorDTO);
+    }
+
+    // GET: Autor/Paginacao
+    [HttpGet("Paginacao")]
+    public async Task<ActionResult<IEnumerable<Autor>>> GetPaginationAsync([FromQuery] AutoresParameters autoresParameters)
+    {
+        var autores = await _uof.AutorRepositorio.GetAutoresAsync(autoresParameters);
+        return ObterAutores(autores);
+    }
+
+    // GET: Autor/PesquisaPorNome
+    [HttpGet("PesquisaPorNome")]
+    public async Task<ActionResult<IEnumerable<Autor>>> GetFilterNamePaginationAsync([FromQuery] AutoresFiltroNome autoresFiltroNome)
+    {
+        var autores = await _uof.AutorRepositorio.GetAutoresFiltrandoPeloNome(autoresFiltroNome);
+        return ObterAutores(autores);
+    }
+
+    // GET: Autor/PesquisaPorNacionalidade
+    [HttpGet("PesquisaPorNacionalidade")]
+    public async Task<ActionResult<IEnumerable<Autor>>> GetFilterNationalityPaginationAsync([FromQuery] AutoresFiltroNacionalidade autoresFiltroNacionalidade)
+    {
+        var autores = await _uof.AutorRepositorio.GetAutoresFiltrandoPelaNacionalidade(autoresFiltroNacionalidade);
+        return ObterAutores(autores);
     }
     #endregion
 
@@ -108,6 +137,25 @@ public class AutorController : ControllerBase
 
         var autorExcluidoDTO = _mapper.Map<AutorDTOResponse>(autorExcluido);
         return Ok(autorExcluidoDTO);
+    }
+    #endregion
+
+    #region METHODS
+    private ActionResult<IEnumerable<Autor>> ObterAutores(IPagedList<Autor> autores)
+    {
+        var metadados = new
+        {
+            autores.Count ,
+            autores.PageSize ,
+            autores.PageCount ,
+            autores.TotalItemCount ,
+            autores.HasNextPage ,
+            autores.HasPreviousPage
+        };
+        Response.Headers.Append("X-Pagination" , JsonConvert.SerializeObject(metadados));
+
+        var autoresDTO = _mapper.Map<IEnumerable<AutorDTOResponse>>(autores);
+        return Ok(autoresDTO);
     }
     #endregion
 }

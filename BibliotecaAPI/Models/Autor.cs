@@ -16,6 +16,8 @@ public class Autor : IValidatableObject
     [StringLength(40 , MinimumLength = 2 , ErrorMessage = "O valor permitido de caracteres deve estar entre {2} e {1}")]
     public string? Sobrenome { get; set; }
 
+    public string? NomeCompleto { get => PrimeiroNome + " " + Sobrenome; }
+
     [Required]
     [StringLength(20 , MinimumLength = 2 , ErrorMessage = "O valor permitido de caracteres deve estar entre {2} e {1}")]
     public string? Nacionalidade { get; set; }

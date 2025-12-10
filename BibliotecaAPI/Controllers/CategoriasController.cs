@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using BibliotecaAPI.DTOs.CategoriaDTOs;
 using BibliotecaAPI.Models;
-using BibliotecaAPI.Pagination.Categorias;
+using BibliotecaAPI.Pagination.CategoriasFiltro;
 using BibliotecaAPI.Repositories.Interfaces;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -50,7 +50,7 @@ public class CategoriasController : ControllerBase
 
     // GET: /Categorias/Paginacao
     [HttpGet("Paginacao")]
-    public async Task<ActionResult<IEnumerable<Categorias>>> GetPaginationAsync([FromQuery] CategoriaParameters categoriaParameters)
+    public async Task<ActionResult<IEnumerable<Categorias>>> GetPaginationAsync([FromQuery] CategoriasParameters categoriaParameters)
     {
         var categorias = await _uof.CategoriaLivrosRepositorio.GetCategoriasAsync(categoriaParameters);
         return ObterCategorias(categorias);

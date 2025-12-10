@@ -1,6 +1,6 @@
 ﻿using BibliotecaAPI.Context;
 using BibliotecaAPI.Models;
-using BibliotecaAPI.Pagination.Categorias;
+using BibliotecaAPI.Pagination.CategoriasFiltro;
 using BibliotecaAPI.Repositories.Interfaces;
 using X.PagedList;
 
@@ -12,7 +12,8 @@ public class CategoriaLivrosRepositorio : Repositorio<Categorias>, ICategoriaLiv
     public CategoriaLivrosRepositorio(AppDbContext context) : base(context) { }
     #endregion
 
-    public async Task<IPagedList<Categorias>> GetCategoriasAsync(CategoriaParameters categoriaParameters)
+    #region METHODS
+    public async Task<IPagedList<Categorias>> GetCategoriasAsync(CategoriasParameters categoriaParameters)
     {
         var categorias = await GetAllAsync();
         var categoriasOrdenadas = categorias.OrderBy(c => c.IdCategoria).AsQueryable();
@@ -29,4 +30,5 @@ public class CategoriaLivrosRepositorio : Repositorio<Categorias>, ICategoriaLiv
         var categoriasFiltradas = await categoria.ToPagedListAsync(categoriasFiltroNome.PageNumber, categoriasFiltroNome.PageSize);
         return categoriasFiltradas;
     }
+    #endregion
 }

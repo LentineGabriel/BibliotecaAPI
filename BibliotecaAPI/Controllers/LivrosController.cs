@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using BibliotecaAPI.DTOs.LivrosDTOs;
 using BibliotecaAPI.Models;
+using BibliotecaAPI.Pagination.LivrosFiltro;
 using BibliotecaAPI.Repositories.Interfaces;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using X.PagedList;
 
 namespace BibliotecaAPI.Controllers;
 
@@ -23,6 +26,7 @@ public class LivrosController : ControllerBase
     #endregion
 
     #region GET
+    // GET: /Livros
     [HttpGet]
     public async Task<ActionResult<IEnumerable<LivrosDTOResponse>>> GetAsync()
     {
@@ -33,6 +37,7 @@ public class LivrosController : ControllerBase
         return Ok(livrosDTO);
     }
 
+    // GET: /Livros/{id}
     [HttpGet("{id:int:min(1)}", Name = "ObterIdLivro")]
     public async Task<ActionResult<LivrosDTOResponse>> GetByIdAsync(int id)
     {
@@ -41,6 +46,54 @@ public class LivrosController : ControllerBase
         
         var livroDTO = _mapper.Map<LivrosDTOResponse>(livro);
         return Ok(livroDTO);
+    }
+
+    // GET: /Livros/Paginacao
+    [HttpGet("Paginacao")]
+    public async Task<ActionResult<IEnumerable<Livros>>> GetPaginationAsync([FromQuery] LivrosParameters livrosParameters)
+    {
+        var livros = await _uof.LivrosRepositorio.GetLivrosAsync(livrosParameters);
+        return ObterLivros(livros);
+    }
+
+    // GET: /Livros/PesquisaPorNome
+    [HttpGet("PesquisaPorNome")]
+    public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByNameAsync([FromQuery] LivrosFiltroNome livrosFiltroNome)
+    {
+        var livros = await _uof.LivrosRepositorio.GetLivrosFiltrandoPeloNome(livrosFiltroNome);
+        return ObterLivros(livros);
+    }
+
+    // GET: /Livros/PesquisaPorAutor
+    [HttpGet("PesquisaPorAutor")]
+    public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByAutorAsync([FromQuery] LivrosFiltroAutor livrosFiltroAutor)
+    {
+        var livros = await _uof.LivrosRepositorio.GetLivrosFiltrandoPeloAutor(livrosFiltroAutor);
+        return ObterLivros(livros);
+    }
+
+    // GET: /Livros/PesquisaPorEditora
+    [HttpGet("PesquisaPorEditora")]
+    public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByEditoraAsync([FromQuery] LivrosFiltroEditora livrosFiltroEditora)
+    {
+        var livros = await _uof.LivrosRepositorio.GetLivrosFiltrandoPelaEditora(livrosFiltroEditora);
+        return ObterLivros(livros);
+    }
+
+    // GET: /Livros/PesquisaPorAnoPublicacao
+    [HttpGet("PesquisaPorAnoPublicacao")]
+    public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByAnoPublicacaoAsync([FromQuery] LivrosFiltroAnoPublicacao livrosFiltroAnoPublicacao)
+    {
+        var livros = await _uof.LivrosRepositorio.GetLivrosFiltrandoPorAnoPublicacao(livrosFiltroAnoPublicacao);
+        return ObterLivros(livros);
+    }
+
+    // GET: /Livros/PesquisaPorCategoria
+    [HttpGet("PesquisaPorCategoria")]
+    public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByCategoriaAsync([FromQuery] LivrosFiltroCategoria livrosFiltroCategoria)
+    {
+        var livros = await _uof.LivrosRepositorio.GetLivrosFiltrandoPorCategoria(livrosFiltroCategoria);
+        return ObterLivros(livros);
     }
     #endregion
 
@@ -117,6 +170,25 @@ public class LivrosController : ControllerBase
 
         var livroExcluidoDTO = _mapper.Map<LivrosDTOResponse>(livroExcluido);
         return Ok(livroExcluidoDTO);
+    }
+    #endregion
+
+    #region METHODS
+    private ActionResult<IEnumerable<Livros>> ObterLivros(IPagedList<Livros?> livros)
+    {
+        var metadados = new
+        {
+            livros.Count,
+            livros.PageSize,
+            livros.PageCount,
+            livros.TotalItemCount,
+            livros.HasNextPage,
+            livros.HasPreviousPage
+        };
+        Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadados));
+
+        var livrosDTO = _mapper.Map<IEnumerable<LivrosDTOResponse>>(livros);
+        return Ok(livrosDTO);
     }
     #endregion
 }

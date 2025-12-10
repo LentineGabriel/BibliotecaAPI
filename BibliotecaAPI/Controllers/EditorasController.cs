@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using BibliotecaAPI.DTOs.EditoraDTOs;
 using BibliotecaAPI.Models;
+using BibliotecaAPI.Pagination.EditorasFiltro;
 using BibliotecaAPI.Repositories.Interfaces;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using X.PagedList;
 
 namespace BibliotecaAPI.Controllers;
 
@@ -23,6 +26,7 @@ public class EditorasController : ControllerBase
     #endregion
 
     #region GET
+    // GET: /Editoras
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EditorasDTOResponse>>> GetAsync()
     {
@@ -33,6 +37,7 @@ public class EditorasController : ControllerBase
         return Ok(editorasDTO);
     }
 
+    // GET: /Editoras/{id}
     [HttpGet("{id:int:min(1)}", Name = "ObterIdEditora")]
     public async Task<ActionResult<EditorasDTOResponse>> GetByIdAsync(int id)
     {
@@ -41,6 +46,30 @@ public class EditorasController : ControllerBase
         
         var editoraDTO = _mapper.Map<EditorasDTOResponse>(editora);
         return Ok(editoraDTO);
+    }
+
+    // GET: /Editoras/Paginacao
+    [HttpGet("Paginacao")]
+    public async Task<ActionResult<IEnumerable<Editoras>>> GetPaginationAsync([FromQuery] EditorasParameters editorasParameters)
+    {
+        var editoras = await _uof.EditorasRepositorio.GetEditorasAsync(editorasParameters);
+        return ObterEditoras(editoras);
+    }
+
+    // GET: /Editoras/PesquisaPorNome
+    [HttpGet("PesquisaPorNome")]
+    public async Task<ActionResult<IEnumerable<Editoras>>> GetFilterNamePaginationAsync([FromQuery] EditorasFiltroNome editorasFiltroNome)
+    {
+        var editoras = await _uof.EditorasRepositorio.GetEditorasFiltrandoPeloNome(editorasFiltroNome);
+        return ObterEditoras(editoras);
+    }
+
+    // GET: /Editoras/PesquisaPorPaisDeOrigem
+    [HttpGet("PesquisaPorNacionalidade")]
+    public async Task<ActionResult<IEnumerable<Editoras>>> GetFilterNationalityPaginationAsync([FromQuery] EditorasFiltroPaisOrigem editorasFiltroPaisOrigem)
+    {
+        var editoras = await _uof.EditorasRepositorio.GetEditorasFiltrandoPorPaisDeOrigem(editorasFiltroPaisOrigem);
+        return ObterEditoras(editoras);
     }
     #endregion
 
@@ -108,6 +137,25 @@ public class EditorasController : ControllerBase
         
         var editoraExcluidaDTO = _mapper.Map<EditorasDTOResponse>(editoraExcluida);
         return Ok(editoraExcluidaDTO);
+    }
+    #endregion
+
+    #region METHODS
+    private ActionResult<IEnumerable<Editoras>> ObterEditoras(IPagedList<Editoras> editoras)
+    {
+        var metadados = new
+        {
+            editoras.Count ,
+            editoras.PageSize ,
+            editoras.PageCount ,
+            editoras.TotalItemCount ,
+            editoras.HasNextPage ,
+            editoras.HasPreviousPage
+        };
+        Response.Headers.Append("X-Pagination" , JsonConvert.SerializeObject(metadados));
+
+        var editorasDTO = _mapper.Map<IEnumerable<EditorasDTOResponse>>(editoras);
+        return Ok(editorasDTO);
     }
     #endregion
 }
