@@ -1,6 +1,5 @@
 ﻿using BibliotecaAPI.Models;
 using BibliotecaAPI.Pagination.AutoresFiltro;
-using BibliotecaAPI.Pagination.CategoriasFiltro;
 using X.PagedList;
 
 namespace BibliotecaAPI.Repositories.Interfaces;

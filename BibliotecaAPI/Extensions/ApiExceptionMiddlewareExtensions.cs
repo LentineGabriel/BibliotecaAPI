@@ -1,6 +1,5 @@
 ﻿using BibliotecaAPI.Models;
 using Microsoft.AspNetCore.Diagnostics;
-using System.Diagnostics;
 
 namespace BibliotecaAPI.Extensions;
 public static class ApiExceptionMiddlewareExtensions
