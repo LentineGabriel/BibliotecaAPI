@@ -36,12 +36,13 @@ public class Livros : IValidatableObject
     [Range(1500 , 2100 , ErrorMessage = "O ano de publicação deve estar entre {1} e {2}")]
     public int AnoPublicacao { get; set; }
 
-    // Chave estrangeira - Categoria
-    public int IdCategoria { get; set; }
-
     [JsonIgnore]
-    [ForeignKey("IdCategoria")]
-    public Categorias? CategoriaLivro { get; set; }
+    public ICollection<LivroCategoria>? LivrosCategorias { get; set; }
+
+    public Livros()
+    {
+        LivrosCategorias = new List<LivroCategoria>();
+    }
     #endregion
 
     #region METHODS

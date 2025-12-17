@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace BibliotecaAPI.DTOs.LivrosDTOs;
 public class LivrosDTORequest
@@ -11,10 +12,14 @@ public class LivrosDTORequest
 
     [Required]
     public int IdAutor { get; set; }
+
+    [JsonIgnore]
     public string? NomeAutor { get; set; }
 
     [Required]
     public int IdEditora { get; set; }
+
+    [JsonIgnore]
     public string? NomeEditora { get; set; }
 
     [Required]
@@ -22,6 +27,5 @@ public class LivrosDTORequest
     public int AnoPublicacao { get; set; }
 
     [Required]
-    public int IdCategoria { get; set; }
-    public string? NomeCategoria { get; set; }
+    public List<int> IdsCategorias { get; set; } = new();
 }

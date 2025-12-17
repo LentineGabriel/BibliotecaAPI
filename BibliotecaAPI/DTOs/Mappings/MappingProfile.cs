@@ -15,15 +15,11 @@ namespace BibliotecaAPI.DTOs.Mappings
             // Livros -> Response
             CreateMap<Livros , LivrosDTOResponse>().ForMember(dest => dest.NomeAutor , opt => opt.MapFrom(src => src.Autor != null ? src.Autor!.PrimeiroNome + " " + src.Autor.Sobrenome : null))
                                                    .ForMember(dest => dest.NomeEditora , opt => opt.MapFrom(src => src.Editora != null ? src.Editora!.NomeEditora : null))
-                                                   .ForMember(dest => dest.NomeCategoria , opt => opt.MapFrom(src => src.CategoriaLivro != null ? src.CategoriaLivro!.NomeCategoria : null));
-
-            // Livros -> Request
-            CreateMap<Livros , LivrosDTORequest>().ForMember(dest => dest.NomeAutor , opt => opt.MapFrom(src => src.Autor != null ? src.Autor.PrimeiroNome + " " + src.Autor.Sobrenome : null))
-                                                  .ForMember(dest => dest.NomeEditora , opt => opt.MapFrom(src => src.Editora != null ? src.Editora.NomeEditora : null))
-                                                  .ForMember(dest => dest.NomeCategoria , opt => opt.MapFrom(src => src.CategoriaLivro != null ? src.CategoriaLivro.NomeCategoria : null));
+                                                   .ForMember(dest => dest.Categorias , opt => opt.MapFrom(src => src.LivrosCategorias!.Select(lc => lc.Categorias.NomeCategoria)));
+            // Request -> Livros
             CreateMap<LivrosDTORequest , Livros>().ForMember(dest => dest.Autor , opt => opt.Ignore())
                                                   .ForMember(dest => dest.Editora , opt => opt.Ignore())
-                                                  .ForMember(dest => dest.CategoriaLivro , opt => opt.Ignore());
+                                                  .ForMember(dest => dest.LivrosCategorias , opt => opt.Ignore());
             #endregion
 
             #region AUTOR

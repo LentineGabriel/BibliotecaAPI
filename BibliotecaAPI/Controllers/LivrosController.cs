@@ -156,6 +156,32 @@ public class LivrosController : ControllerBase
 
         return Ok(livroCompletoDTO);
     }
+
+    [HttpPatch("AtualizarCategorias/{id:int:min(1)}")]
+    public async Task<IActionResult> PatchCategoriasAsync(int id, [FromBody] LivrosCategoriasPatchDTO dto)
+    {
+        if(!ModelState.IsValid) return BadRequest(ModelState);
+
+        var livro = await _uof.LivrosRepositorio.GetLivroCompletoAsync(id);
+        if(livro == null) return NotFound($"Livro por ID = {id} não encontrado. Por favor, tente novamente!");
+
+        // limpando todas as categorias presentes
+        if(!dto.IdsCategorias.Any()) livro.LivrosCategorias!.Clear();
+
+        foreach(var categoriaId in dto.IdsCategorias)
+        {
+            livro.LivrosCategorias!.Add(new LivroCategoria
+            {
+                LivroId = livro.IdLivro ,
+                CategoriaId = categoriaId
+            });
+        }
+
+        _uof.LivrosRepositorio.Update(livro);
+        await _uof.CommitAsync();
+
+        return Ok(new { Message = "Categorias atualizadas com sucesso!" });
+    }
     #endregion
 
     #region DELETE

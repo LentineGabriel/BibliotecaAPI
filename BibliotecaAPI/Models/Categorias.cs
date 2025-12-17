@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace BibliotecaAPI.Models;
 
@@ -19,11 +20,12 @@ public class Categorias : IValidatableObject
     [StringLength(80 , MinimumLength = 2 , ErrorMessage = "O valor permitido de caracteres deve estar entre {2} e {1}")]
     public string? DescricaoCategoria { get; set; }
 
-    public ICollection<Livros>? Livros { get; set; }
+    [JsonIgnore]
+    public ICollection<LivroCategoria>? LivrosCategorias { get; set; }
 
     public Categorias()
     {
-        Livros = new Collection<Livros>();
+        LivrosCategorias = new Collection<LivroCategoria>();
     }
     #endregion
 

@@ -5,5 +5,5 @@ public class LivrosDTOResponse
     public string? NomeAutor { get; set; }
     public string? NomeEditora { get; set; }
     public int AnoPublicacao { get; set; }
-    public string? NomeCategoria { get; set; }
+    public List<string>? Categorias { get; set; } = new();
 }

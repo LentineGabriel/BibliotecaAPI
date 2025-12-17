@@ -21,6 +21,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers(op =>
 {
     op.Filters.Add(typeof(ApiExceptionFilter));
+}).AddNewtonsoftJson(op =>
+{
+    op.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 }).AddJsonOptions(op =>
 {
     op.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace BibliotecaAPI.Models;
 public class Autor : IValidatableObject
@@ -25,6 +26,7 @@ public class Autor : IValidatableObject
     [Required]
     public DateOnly? DataNascimento { get; set; }
 
+    [JsonIgnore]
     public ICollection<Livros>? Livros { get; set; }
     #endregion
 

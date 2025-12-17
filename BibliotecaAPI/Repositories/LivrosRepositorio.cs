@@ -18,7 +18,7 @@ public class LivrosRepositorio : Repositorio<Livros>, ILivrosRepositorio
         return await _context.Livros
             .Include(l => l.Autor)
             .Include(l => l.Editora)
-            .Include(l => l.CategoriaLivro)
+            .Include(l => l.LivrosCategorias!).ThenInclude(lc => lc.Categorias)
             .ToListAsync();
     }
 
@@ -27,7 +27,7 @@ public class LivrosRepositorio : Repositorio<Livros>, ILivrosRepositorio
         return await _context.Livros
             .Include(l => l.Autor)
             .Include(l => l.Editora)
-            .Include(l => l.CategoriaLivro)
+            .Include(l => l.LivrosCategorias!).ThenInclude(lc => lc.Categorias)
             .FirstOrDefaultAsync(l => l.IdLivro == id);
     }
 
@@ -94,7 +94,7 @@ public class LivrosRepositorio : Repositorio<Livros>, ILivrosRepositorio
         if(!string.IsNullOrWhiteSpace(livrosFiltroCategoria.Categorias))
         {
             var filtro = livrosFiltroCategoria.Categorias.Trim().ToLower();
-            livros = livros.Where(l => l?.CategoriaLivro != null && l.CategoriaLivro.NomeCategoria!.ToLower().Contains(filtro)).ToList();
+            livros = livros.Where(l => l?.LivrosCategorias != null && l.LivrosCategorias.Any(lc => lc.Categorias.NomeCategoria!.ToLower().Contains(filtro)));
         }
 
         var livrosFiltrados = await livros.ToPagedListAsync(livrosFiltroCategoria.PageNumber, livrosFiltroCategoria.PageSize);
