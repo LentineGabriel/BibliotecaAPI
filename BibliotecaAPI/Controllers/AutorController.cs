@@ -26,6 +26,10 @@ public class AutorController : ControllerBase
     #endregion
 
     #region GET
+    /// <summary>
+    /// Retorna todos os autores cadastrados no sistema.
+    /// </summary>
+    /// <returns>Lista de Autores</returns>
     // GET: Autor
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AutorDTOResponse>>> GetAsync()
@@ -37,6 +41,10 @@ public class AutorController : ControllerBase
         return Ok(autoresDTO);
     }
 
+    /// <summary>
+    /// Retorna um autor específico pelo ID.
+    /// </summary>
+    /// <returns>Autor encontrado</returns>
     // GET: Autor/{id}
     [HttpGet("{id:int:min(1)}", Name = "ObterIdAutor")]
     public async Task<ActionResult<AutorDTOResponse>> GetByIdAsync(int id)
@@ -48,6 +56,10 @@ public class AutorController : ControllerBase
         return Ok(autorDTO);
     }
 
+    /// <summary>
+    /// Retorna os autores cadastrados no sistema via paginação.
+    /// </summary>
+    /// <returns>Lista de Autores paginadas</returns>
     // GET: Autor/Paginacao
     [HttpGet("Paginacao")]
     public async Task<ActionResult<IEnumerable<Autor>>> GetPaginationAsync([FromQuery] AutoresParameters autoresParameters)
@@ -56,6 +68,10 @@ public class AutorController : ControllerBase
         return ObterAutores(autores);
     }
 
+    /// <summary>
+    /// Retorna os autores filtrando pelo seu nome (via paginação).
+    /// </summary>
+    /// <returns>Autor encontrado pelo seu nome</returns>
     // GET: Autor/PesquisaPorNome
     [HttpGet("PesquisaPorNome")]
     public async Task<ActionResult<IEnumerable<Autor>>> GetFilterNamePaginationAsync([FromQuery] AutoresFiltroNome autoresFiltroNome)
@@ -64,6 +80,10 @@ public class AutorController : ControllerBase
         return ObterAutores(autores);
     }
 
+    /// <summary>
+    /// Retorna um autor filtrando pela nacionalidade (via paginação).
+    /// </summary>
+    /// <returns>Autor encontrado por sua nacionalidade</returns>
     // GET: Autor/PesquisaPorNacionalidade
     [HttpGet("PesquisaPorNacionalidade")]
     public async Task<ActionResult<IEnumerable<Autor>>> GetFilterNationalityPaginationAsync([FromQuery] AutoresFiltroNacionalidade autoresFiltroNacionalidade)
@@ -74,6 +94,10 @@ public class AutorController : ControllerBase
     #endregion
 
     #region POST
+    /// <summary>
+    /// Adiciona um novo autor ao sistema.
+    /// </summary>
+    /// <returns>Autor criado</returns>
     [HttpPost("AdicionarAutores")]
     public async Task<ActionResult<AutorDTOResponse>> PostAsync(AutorDTORequest autorDTO)
     {
@@ -89,6 +113,10 @@ public class AutorController : ControllerBase
     #endregion
 
     #region PUT
+    /// <summary>
+    /// Atualiza um autor existente no sistema.
+    /// </summary>
+    /// <returns>Autor atualizado</returns>
     [HttpPut("AtualizarAutor/{id:int:min(1)}")]
     public async Task<ActionResult<AutorDTOResponse>> PutAsync(int id , AutorDTORequest autorDTO)
     {
@@ -104,6 +132,10 @@ public class AutorController : ControllerBase
     #endregion
 
     #region PATCH
+    /// <summary>
+    /// Atualiza partes de um autor existente no sistema.
+    /// </summary>
+    /// <returns>Autor atualizado</returns>
     [HttpPatch("AtualizarParcialAutor/{id:int:min(1)}")]
     public async Task<ActionResult<AutorDTOResponse>> PatchAsync(int id , JsonPatchDocument<AutorDTORequest> patchDoc)
     {
@@ -126,6 +158,10 @@ public class AutorController : ControllerBase
     #endregion
 
     #region DELETE
+    /// <summary>
+    /// Deleta um autor existente no sistema.
+    /// </summary>
+    /// <returns>Autor deletado</returns>
     [HttpDelete("DeletarAutor/{id:int:min(1)}")]
     public async Task<ActionResult<AutorDTOResponse>> DeleteAsync(int id)
     {

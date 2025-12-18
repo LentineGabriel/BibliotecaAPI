@@ -6,6 +6,7 @@ using BibliotecaAPI.Repositories;
 using BibliotecaAPI.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using System.Reflection;
 using System.Text.Json.Serialization;
 #endregion
 
@@ -29,7 +30,12 @@ builder.Services.AddControllers(op =>
     op.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 builder.Services.AddOpenApi();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(op =>
+{
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    op.IncludeXmlComments(xmlPath);
+});
 
 #region DATABASE & DI
 // DATABASE

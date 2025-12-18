@@ -26,6 +26,10 @@ public class EditorasController : ControllerBase
     #endregion
 
     #region GET
+    /// <summary>
+    /// Retorna todas as editoras cadastradas no sistema.
+    /// </summary>
+    /// <returns>Lista de editoras</returns>
     // GET: /Editoras
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EditorasDTOResponse>>> GetAsync()
@@ -37,6 +41,10 @@ public class EditorasController : ControllerBase
         return Ok(editorasDTO);
     }
 
+    /// <summary>
+    /// Retorna uma editora específica pelo ID.
+    /// </summary>
+    /// <returns>Editora via ID</returns>
     // GET: /Editoras/{id}
     [HttpGet("{id:int:min(1)}", Name = "ObterIdEditora")]
     public async Task<ActionResult<EditorasDTOResponse>> GetByIdAsync(int id)
@@ -48,6 +56,10 @@ public class EditorasController : ControllerBase
         return Ok(editoraDTO);
     }
 
+    /// <summary>
+    /// Retorna as editoras cadastrados no sistema via paginação.
+    /// </summary>
+    /// <returns>Lista de Editoras paginadas</returns>
     // GET: /Editoras/Paginacao
     [HttpGet("Paginacao")]
     public async Task<ActionResult<IEnumerable<Editoras>>> GetPaginationAsync([FromQuery] EditorasParameters editorasParameters)
@@ -56,6 +68,10 @@ public class EditorasController : ControllerBase
         return ObterEditoras(editoras);
     }
 
+    /// <summary>
+    /// Retorna as editoras filtrando pelo nome (via paginação).
+    /// </summary>
+    /// <returns>Editoras por nome</returns>
     // GET: /Editoras/PesquisaPorNome
     [HttpGet("PesquisaPorNome")]
     public async Task<ActionResult<IEnumerable<Editoras>>> GetFilterNamePaginationAsync([FromQuery] EditorasFiltroNome editorasFiltroNome)
@@ -64,6 +80,10 @@ public class EditorasController : ControllerBase
         return ObterEditoras(editoras);
     }
 
+    /// <summary>
+    /// Retorna as editoras filtrando pelo país de origem (via paginação).
+    /// </summary>
+    /// <returns>Editoras por nacionalidade</returns>
     // GET: /Editoras/PesquisaPorPaisDeOrigem
     [HttpGet("PesquisaPorNacionalidade")]
     public async Task<ActionResult<IEnumerable<Editoras>>> GetFilterNationalityPaginationAsync([FromQuery] EditorasFiltroPaisOrigem editorasFiltroPaisOrigem)
@@ -74,6 +94,10 @@ public class EditorasController : ControllerBase
     #endregion
 
     #region POST
+    /// <summary>
+    /// Adiciona uma nova editora ao sistema.
+    /// </summary>
+    /// <returns>Categoria criada</returns>
     [HttpPost("AdicionarEditoras")]
     public async Task<ActionResult<EditorasDTOResponse>> PostAsync(EditorasDTORequest editorasDTO)
     {
@@ -89,6 +113,10 @@ public class EditorasController : ControllerBase
     #endregion
 
     #region PUT
+    /// <summary>
+    /// Atualiza uma editora existente no sistema.
+    /// </summary>
+    /// <returns></returns>
     [HttpPut("AtualizarEditora/{id:int:min(1)}")]
     public async Task<ActionResult<EditorasDTOResponse>> PutAsync(int id , EditorasDTORequest editorasDTO)
     {
@@ -104,6 +132,10 @@ public class EditorasController : ControllerBase
     #endregion
 
     #region PATCH
+    /// <summary>
+    /// Atualiza partes de uma editora existente no sistema.
+    /// </summary>
+    /// <returns>Editora atualizada</returns>
     [HttpPatch("AtualizarParcialEditora/{id:int:min(1)}")]
     public async Task<ActionResult<EditorasDTOResponse>> PatchAsync(int id , JsonPatchDocument<EditorasDTORequest> patchDoc)
     {
@@ -126,6 +158,10 @@ public class EditorasController : ControllerBase
     #endregion
 
     #region DELETE
+    /// <summary>
+    /// Deleta uma editora existente no sistema.
+    /// </summary>
+    /// <returns>Editora deletada</returns>
     [HttpDelete("DeletarEditora/{id:int:min(1)}")]
     public async Task<ActionResult<EditorasDTOResponse>> DeleteAsync(int id)
     {

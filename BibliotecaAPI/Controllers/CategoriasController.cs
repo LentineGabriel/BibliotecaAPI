@@ -26,6 +26,10 @@ public class CategoriasController : ControllerBase
     #endregion
 
     #region GET
+    /// <summary>
+    /// Retorna todas as categorias de livros cadastradas no sistema.
+    /// </summary>
+    /// <returns>Lista de categorias</returns>
     // GET: /Categorias
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CategoriasDTOResponse>>> GetAsync()
@@ -37,6 +41,10 @@ public class CategoriasController : ControllerBase
         return Ok(categoriasDTO);
     }
 
+    /// <summary>
+    /// Retorna uma categoria de livro específica pelo ID.
+    /// </summary>
+    /// <returns>Categoria de livros via ID</returns>
     // GET: /Categorias/{id}
     [HttpGet("{id:int:min(1)}", Name = "ObterIdCategoria")]
     public async Task<ActionResult<CategoriasDTOResponse>> GetByIdAsync(int id)
@@ -48,6 +56,10 @@ public class CategoriasController : ControllerBase
         return Ok(categoriaDTO);
     }
 
+    /// <summary>
+    /// Retorna as categorias de livros cadastrados no sistema via paginação.
+    /// </summary>
+    /// <returns>Lista de Editoras paginadas</returns>
     // GET: /Categorias/Paginacao
     [HttpGet("Paginacao")]
     public async Task<ActionResult<IEnumerable<Categorias>>> GetPaginationAsync([FromQuery] CategoriasParameters categoriaParameters)
@@ -56,6 +68,10 @@ public class CategoriasController : ControllerBase
         return ObterCategorias(categorias);
     }
 
+    /// <summary>
+    /// Retorna uma categoria de livros filtrando pelo nome (via paginação).
+    /// </summary>
+    /// <returns>Categorias por nome</returns>
     // GET: /Categorias/PesquisaPorNome
     [HttpGet("PesquisaPorNome")]
     public async Task<ActionResult<IEnumerable<Categorias>>> GetFilterNamePaginationAsync([FromQuery] CategoriasFiltroNome categoriasFiltroNome)
@@ -66,6 +82,10 @@ public class CategoriasController : ControllerBase
     #endregion
 
     #region POST
+    /// <summary>
+    /// Adiciona uma nova categoria de livro ao sistema.
+    /// </summary>
+    /// <returns>Categoria criada</returns>
     [HttpPost("AdicionarCategorias")]
     public async Task<ActionResult<CategoriasDTOResponse>> PostAsync(CategoriasDTORequest categoriasDTO)
     {
@@ -81,6 +101,10 @@ public class CategoriasController : ControllerBase
     #endregion
 
     #region PUT
+    /// <summary>
+    /// Atualiza uma categoria de livro existente no sistema.
+    /// </summary>
+    /// <returns></returns>
     [HttpPut("AtualizarCategoria/{id:int:min(1)}")]
     public async Task<ActionResult<CategoriasDTOResponse>> PutAsync(int id , CategoriasDTORequest categoriasDTO)
     {
@@ -96,6 +120,10 @@ public class CategoriasController : ControllerBase
     #endregion
 
     #region PATCH
+    /// <summary>
+    /// Atualiza partes de uma categoria de livros existente no sistema.
+    /// </summary>
+    /// <returns>Categoria atualizada</returns>
     [HttpPatch("AtualizarParcialCategoria/{id:int:min(1)}")]
     public async Task<ActionResult<CategoriasDTOResponse>> PatchAsync(int id , JsonPatchDocument<CategoriasDTORequest> patchDoc)
     {
@@ -118,6 +146,10 @@ public class CategoriasController : ControllerBase
     #endregion
 
     #region DELETE
+    /// <summary>
+    /// Deleta uma categoria de livros existente no sistema.
+    /// </summary>
+    /// <returns>Categoria deletada</returns>
     [HttpDelete("DeletarCategoria/{id:int:min(1)}")]
     public async Task<ActionResult<CategoriasDTOResponse>> DeleteAsync(int id)
     {

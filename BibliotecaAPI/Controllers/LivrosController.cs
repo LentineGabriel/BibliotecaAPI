@@ -26,6 +26,10 @@ public class LivrosController : ControllerBase
     #endregion
 
     #region GET
+    /// <summary>
+    /// Retorna todas os livros cadastradas no sistema.
+    /// </summary>
+    /// <returns>Lista de editoras</returns>
     // GET: /Livros
     [HttpGet]
     public async Task<ActionResult<IEnumerable<LivrosDTOResponse>>> GetAsync()
@@ -37,6 +41,10 @@ public class LivrosController : ControllerBase
         return Ok(livrosDTO);
     }
 
+    /// <summary>
+    /// Retorna um livro específico pelo ID.
+    /// </summary>
+    /// <returns>Livro via ID</returns>
     // GET: /Livros/{id}
     [HttpGet("{id:int:min(1)}", Name = "ObterIdLivro")]
     public async Task<ActionResult<LivrosDTOResponse>> GetByIdAsync(int id)
@@ -48,6 +56,10 @@ public class LivrosController : ControllerBase
         return Ok(livroDTO);
     }
 
+    /// <summary>
+    /// Retorna os livros cadastrados no sistema via paginação.
+    /// </summary>
+    /// <returns>Lista de Livros paginadas</returns>
     // GET: /Livros/Paginacao
     [HttpGet("Paginacao")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetPaginationAsync([FromQuery] LivrosParameters livrosParameters)
@@ -56,6 +68,10 @@ public class LivrosController : ControllerBase
         return ObterLivros(livros);
     }
 
+    /// <summary>
+    /// Retorna os livros filtrando pelo nome (via paginação).
+    /// </summary>
+    /// <returns>Livros por nome</returns>
     // GET: /Livros/PesquisaPorNome
     [HttpGet("PesquisaPorNome")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByNameAsync([FromQuery] LivrosFiltroNome livrosFiltroNome)
@@ -64,6 +80,10 @@ public class LivrosController : ControllerBase
         return ObterLivros(livros);
     }
 
+    /// <summary>
+    /// Retorna os livros filtrando pelo nome de seu autor (via paginação).
+    /// </summary>
+    /// <returns>Livros por nome do autor</returns>
     // GET: /Livros/PesquisaPorAutor
     [HttpGet("PesquisaPorAutor")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByAutorAsync([FromQuery] LivrosFiltroAutor livrosFiltroAutor)
@@ -72,6 +92,10 @@ public class LivrosController : ControllerBase
         return ObterLivros(livros);
     }
 
+    /// <summary>
+    /// Retorna os livros filtrando pelo nome de sua editora (via paginação).
+    /// </summary>
+    /// <returns>Livros por nome da editora</returns>
     // GET: /Livros/PesquisaPorEditora
     [HttpGet("PesquisaPorEditora")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByEditoraAsync([FromQuery] LivrosFiltroEditora livrosFiltroEditora)
@@ -80,6 +104,10 @@ public class LivrosController : ControllerBase
         return ObterLivros(livros);
     }
 
+    /// <summary>
+    /// Retorna os livros filtrando pelo ano de publicação (via paginação).
+    /// </summary>
+    /// <returns>Livros pelo ano de publicação</returns>
     // GET: /Livros/PesquisaPorAnoPublicacao
     [HttpGet("PesquisaPorAnoPublicacao")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByAnoPublicacaoAsync([FromQuery] LivrosFiltroAnoPublicacao livrosFiltroAnoPublicacao)
@@ -88,6 +116,10 @@ public class LivrosController : ControllerBase
         return ObterLivros(livros);
     }
 
+    /// <summary>
+    /// Retorna os livros filtrando pelo seu gênero (via paginação).
+    /// </summary>
+    /// <returns>Livros pelo seu gênero</returns>
     // GET: /Livros/PesquisaPorCategoria
     [HttpGet("PesquisaPorCategoria")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByCategoriaAsync([FromQuery] LivrosFiltroCategoria livrosFiltroCategoria)
@@ -98,6 +130,10 @@ public class LivrosController : ControllerBase
     #endregion
 
     #region POST
+    /// <summary>
+    /// Adiciona um novo livro no sistema.
+    /// </summary>
+    /// <returns></returns>
     [HttpPost("AdicionarLivro")]
     public async Task<ActionResult<LivrosDTOResponse>> PostAsync(LivrosDTORequest livrosDTO)
     {
@@ -115,6 +151,10 @@ public class LivrosController : ControllerBase
     #endregion
 
     #region PUT
+    /// <summary>
+    /// Atualiza um livro existente no sistema.
+    /// </summary>
+    /// <returns></returns>
     [HttpPut("AtualizarLivro/{id:int:min(1)}")]
     public async Task<ActionResult<LivrosDTOResponse>> PutAsync(int id, LivrosDTORequest livrosDTO)
     {
@@ -135,6 +175,10 @@ public class LivrosController : ControllerBase
     #endregion
 
     #region PATCH
+    /// <summary>
+    /// Atualiza partes de um livro existente no sistema.
+    /// </summary>
+    /// <returns>Livro atualizada</returns>
     [HttpPatch("AtualizarParcialLivro/{id:int:min(1)}")]
     public async Task<ActionResult<LivrosDTOResponse>> PatchAsync(int id , JsonPatchDocument<LivrosDTORequest> patchDoc) 
     {
@@ -157,6 +201,10 @@ public class LivrosController : ControllerBase
         return Ok(livroCompletoDTO);
     }
 
+    /// <summary>
+    /// Atualiza as categorias para os livros do sistema.
+    /// </summary>
+    /// <returns>Categoria(s) do Livro atualizada</returns>
     [HttpPatch("AtualizarCategorias/{id:int:min(1)}")]
     public async Task<IActionResult> PatchCategoriasAsync(int id, [FromBody] LivrosCategoriasPatchDTO dto)
     {
@@ -185,6 +233,10 @@ public class LivrosController : ControllerBase
     #endregion
 
     #region DELETE
+    /// <summary>
+    /// Deleta um livro existente no sistema.
+    /// </summary>
+    /// <returns>Livro deletado</returns>
     [HttpDelete("DeletarLivros/{id:int:min(1)}")]
     public async Task<ActionResult<LivrosDTOResponse>> DeleteAsync(int id)
     {
