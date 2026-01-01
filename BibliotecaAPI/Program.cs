@@ -4,6 +4,7 @@ using BibliotecaAPI.DTOs.Mappings;
 using BibliotecaAPI.Filters;
 using BibliotecaAPI.Repositories;
 using BibliotecaAPI.Repositories.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using System.Reflection;
@@ -51,6 +52,7 @@ builder.Services.AddScoped<IEditorasRepositorio , EditorasRepositorio>();
 builder.Services.AddScoped<ICategoriaLivrosRepositorio , CategoriaLivrosRepositorio>();
 builder.Services.AddAutoMapper(cfg => { } , typeof(MappingProfile));
 builder.Services.AddControllers().AddNewtonsoftJson();
+builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 #endregion
 #endregion
 

@@ -1,10 +1,11 @@
 ﻿#region USINGS
 using BibliotecaAPI.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 #endregion
 
 namespace BibliotecaAPI.Context;
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext
 {
     #region PROPS/CTOR
     public DbSet<Livros> Livros { get; set; }
@@ -18,6 +19,7 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        // Configuração da relação muitos-para-muitos entre Livros e Categorias
         modelBuilder.Entity<LivroCategoria>().HasKey(lc => new { lc.LivroId, lc.CategoriaId });
         modelBuilder.Entity<LivroCategoria>().HasOne(lc => lc.Livros).WithMany(l => l.LivrosCategorias).HasForeignKey(lc => lc.LivroId);
         modelBuilder.Entity<LivroCategoria>().HasOne(lc => lc.Categorias).WithMany(c => c.LivrosCategorias).HasForeignKey(lc => lc.CategoriaId);
