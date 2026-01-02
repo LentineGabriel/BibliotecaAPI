@@ -4,6 +4,8 @@ using BibliotecaAPI.DTOs.Mappings;
 using BibliotecaAPI.Filters;
 using BibliotecaAPI.Repositories;
 using BibliotecaAPI.Repositories.Interfaces;
+using BibliotecaAPI.Settings;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -53,6 +55,37 @@ builder.Services.AddScoped<ICategoriaLivrosRepositorio , CategoriaLivrosReposito
 builder.Services.AddAutoMapper(cfg => { } , typeof(MappingProfile));
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+#endregion
+
+#region JWT TOKEN
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JWT"));
+
+var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? throw new ArgumentException("Chave secreta inválida!");
+builder.Services.Configure<JwtSettings>(op =>
+{
+    op.SecretKey = secretKey!;
+});
+
+builder.Services.AddAuthentication(op =>
+{
+    op.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    op.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(op =>
+{
+    op.SaveToken = true;
+    op.RequireHttpsMetadata = true;
+    op.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+    {
+        ValidateIssuer = true ,
+        ValidateAudience = true ,
+        ValidateLifetime = true ,
+        ValidateIssuerSigningKey = true ,
+        ClockSkew = TimeSpan.Zero ,
+        ValidAudience = builder.Configuration["JWT:ValidAudience"] ,
+        ValidIssuer = builder.Configuration["JWT:ValidIssuer"] ,
+        IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(secretKey!))
+    };
+});
 #endregion
 #endregion
 
