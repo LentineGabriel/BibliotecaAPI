@@ -2,10 +2,10 @@
 using BibliotecaAPI.Context;
 using BibliotecaAPI.DTOs.Mappings;
 using BibliotecaAPI.Filters;
+using BibliotecaAPI.Models;
 using BibliotecaAPI.Repositories;
 using BibliotecaAPI.Repositories.Interfaces;
 using BibliotecaAPI.Settings;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -32,7 +32,6 @@ builder.Services.AddControllers(op =>
 {
     op.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
-builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen(op =>
 {
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -54,7 +53,7 @@ builder.Services.AddScoped<IEditorasRepositorio , EditorasRepositorio>();
 builder.Services.AddScoped<ICategoriaLivrosRepositorio , CategoriaLivrosRepositorio>();
 builder.Services.AddAutoMapper(cfg => { } , typeof(MappingProfile));
 builder.Services.AddControllers().AddNewtonsoftJson();
-builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 #endregion
 
 #region JWT TOKEN
@@ -68,12 +67,12 @@ builder.Services.Configure<JwtSettings>(op =>
 
 builder.Services.AddAuthentication(op =>
 {
-    op.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    op.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    op.DefaultAuthenticateScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
+    op.DefaultChallengeScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(op =>
 {
     op.SaveToken = true;
-    op.RequireHttpsMetadata = true;
+    op.RequireHttpsMetadata = false;
     op.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
     {
         ValidateIssuer = true ,
@@ -93,7 +92,6 @@ builder.Services.AddAuthentication(op =>
 var app = builder.Build();
 if(app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
 }

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 #endregion
 
 namespace BibliotecaAPI.Context;
-public class AppDbContext : IdentityDbContext
+public class AppDbContext : IdentityDbContext<ApplicationUser>
 {
     #region PROPS/CTOR
     public DbSet<Livros> Livros { get; set; }
