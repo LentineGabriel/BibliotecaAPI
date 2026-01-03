@@ -5,11 +5,16 @@ using BibliotecaAPI.Filters;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Repositories;
 using BibliotecaAPI.Repositories.Interfaces;
+using BibliotecaAPI.Services;
+using BibliotecaAPI.Services.Interfaces;
 using BibliotecaAPI.Settings;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
 using System.Reflection;
+using System.Text;
 using System.Text.Json.Serialization;
 #endregion
 
@@ -54,36 +59,45 @@ builder.Services.AddScoped<ICategoriaLivrosRepositorio , CategoriaLivrosReposito
 builder.Services.AddAutoMapper(cfg => { } , typeof(MappingProfile));
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+builder.Services.AddScoped<ITokenService , TokenService>();
 #endregion
 
 #region JWT TOKEN
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JWT"));
+var jwtSection = builder.Configuration.GetSection("JWT");
 
-// a chave secreta está sendo obtida de uma variável de ambiente
-var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? throw new ArgumentException("Chave secreta inválida!");
+// obtém a chave do ambiente
+var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? throw new InvalidOperationException("JWT_SECRET não definida!");
+
 builder.Services.Configure<JwtSettings>(op =>
 {
-    op.SecretKey = secretKey!;
+    jwtSection.Bind(op);
+    op.SecretKey = secretKey;
 });
+
+// validando tudo na inicialização
+builder.Services.AddOptions<JwtSettings>().Validate(x => !string.IsNullOrWhiteSpace(x.SecretKey) &&
+                                                   !string.IsNullOrWhiteSpace(x.ValidIssuer) &&
+                                                   !string.IsNullOrWhiteSpace(x.ValidAudience) &&
+                                                   x.TokenValidityInMinutes > 0, "Configuração JWT inválida!").ValidateOnStart();
 
 builder.Services.AddAuthentication(op =>
 {
-    op.DefaultAuthenticateScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
-    op.DefaultChallengeScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
+    op.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    op.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(op =>
 {
     op.SaveToken = true;
     op.RequireHttpsMetadata = false;
-    op.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+    op.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true ,
         ValidateAudience = true ,
         ValidateLifetime = true ,
         ValidateIssuerSigningKey = true ,
         ClockSkew = TimeSpan.Zero ,
-        ValidAudience = builder.Configuration["JWT:ValidAudience"] ,
-        ValidIssuer = builder.Configuration["JWT:ValidIssuer"] ,
-        IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(secretKey!))
+        ValidIssuer = jwtSection["ValidIssuer"] ,
+        ValidAudience = jwtSection["ValidAudience"] ,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
     };
 });
 #endregion
