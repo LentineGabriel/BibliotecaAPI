@@ -59,6 +59,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFramework
 #region JWT TOKEN
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JWT"));
 
+// a chave secreta está sendo obtida de uma variável de ambiente
 var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? throw new ArgumentException("Chave secreta inválida!");
 builder.Services.Configure<JwtSettings>(op =>
 {
