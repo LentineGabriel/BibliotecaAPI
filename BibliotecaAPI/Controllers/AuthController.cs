@@ -36,7 +36,7 @@ public class AuthController : ControllerBase
     [HttpPost("Login")]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
-        if(!ModelState.IsValid) return BadRequest();
+        if(!ModelState.IsValid) return BadRequest(ModelState);
 
         var user = await _userManager.FindByNameAsync(model.NomeUsuario!);
         if(user is not null && await _userManager.CheckPasswordAsync(user, model.Password!))
@@ -50,10 +50,10 @@ public class AuthController : ControllerBase
                 new Claim(ClaimTypes.Email, user.Email!), // email usuário
             };
 
-            foreach(var userRole in userRoles)
-            {
-                authClaims.Add(new Claim(ClaimTypes.Role , userRole));
-            }
+            //foreach(var userRole in userRoles)
+            //{
+            //    authClaims.Add(new Claim(ClaimTypes.Role , userRole));
+            //}
 
             var token = _tokenService.GenerateAccessToken(authClaims);
             var refreshToken = _tokenService.GenerateRefreshToken();
@@ -84,5 +84,25 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <returns>Cadastro do usuário criado</returns>
     // POST: /AuthController/Register
+    [HttpPost("Register")]
+    public async Task<IActionResult> Register([FromBody] RegisterModel model)
+    {
+        if(!ModelState.IsValid) return BadRequest(ModelState);
+
+        if(await _userManager.FindByNameAsync(model.NomeUsuario!) != null) return Conflict(new Response { Status = "Error" , Message = "Usuário já existe!" });
+        if(await _userManager.FindByEmailAsync(model.EmailUsuario!) != null) return Conflict(new Response { Status = "Error" , Message = "Email já está em uso!" });
+
+        var user = new ApplicationUser
+        {
+            UserName = model.NomeUsuario!.Trim() ,
+            Email = model.EmailUsuario!.Trim().ToLowerInvariant() ,
+            SecurityStamp = Guid.NewGuid().ToString()
+        };
+
+        var result = await _userManager.CreateAsync(user , model.Password!);
+        if(!result.Succeeded) return StatusCode(StatusCodes.Status500InternalServerError , new Response { Status = "Error" , Message = "Falha ao criar o usuário!" });
+
+        return Created(string.Empty , new Response { Status = "Success" , Message = "Usuário criado com sucesso!" });
+    }
     #endregion
 }
