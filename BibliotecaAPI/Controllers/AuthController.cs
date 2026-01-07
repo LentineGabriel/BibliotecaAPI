@@ -105,4 +105,41 @@ public class AuthController : ControllerBase
         return Created(string.Empty , new Response { Status = "Success" , Message = "Usuário criado com sucesso!" });
     }
     #endregion
+
+    #region RefreshToken
+    /// <summary>
+    /// Cria um novo token de acesso usando o refresh token.
+    /// </summary>
+    /// <returns>Refresh Token</returns>
+    // POST: /AuthController/RefreshToken
+    [HttpPost("RefreshToken")]
+    public async Task<IActionResult> RefreshToken(TokenModel model)
+    {
+        if(model is null) return BadRequest("Requisição inválida!");
+
+        // obtém os tokens expirados e suas claims
+        string? accessToken = model.AccessToken ?? throw new ArgumentException(nameof(model));
+        string? refreshToken = model.RefreshToken ?? throw new ArgumentException(nameof(model));
+        
+        var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
+        if(principal == null) return BadRequest("Token de Acesso/Refresh Token inválido(s)!");
+
+        string? username = principal.Identity?.Name;
+        var user = await _userManager.FindByNameAsync(username!);
+        if(user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow) return BadRequest("Token de Acesso/Refresh Token inválido(s)!");
+
+        var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims.ToList());
+        var newRefreshToken = _tokenService.GenerateRefreshToken();
+
+        // atualiza o refresh token no banco de dados
+        user.RefreshToken = newRefreshToken;
+        await _userManager.UpdateAsync(user);
+
+        return new ObjectResult(new 
+        {
+            accessToken = new JwtSecurityTokenHandler().WriteToken(newAccessToken) ,
+            refreshToken = newRefreshToken,
+        });
+    }
+    #endregion
 }
