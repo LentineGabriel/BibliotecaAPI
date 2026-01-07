@@ -5,5 +5,5 @@ public class ApplicationUser : IdentityUser
 {
     // registrando o Refresh Token e seu tempo de expiração
     public string? RefreshToken { get; set; }
-    public DateTime RefreshTokenExpiryTime { get; set; }
+    public DateTime? RefreshTokenExpiryTime { get; set; }
 }

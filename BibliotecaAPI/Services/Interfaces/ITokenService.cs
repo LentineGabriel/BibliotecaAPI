@@ -9,4 +9,5 @@ public interface ITokenService
     JwtSecurityToken GenerateAccessToken(IEnumerable<Claim> claims);
     string GenerateRefreshToken();
     ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
+    DateTime GetRefreshTokenExpiry();
 }

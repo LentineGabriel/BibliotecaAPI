@@ -77,4 +77,6 @@ public class TokenService : ITokenService
 
         return principal;
     }
+
+    public DateTime GetRefreshTokenExpiry() => DateTime.UtcNow.AddMinutes(_jwt.TokenValidityInMinutes);
 }

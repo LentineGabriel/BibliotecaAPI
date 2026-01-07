@@ -114,51 +114,58 @@ public class AuthController : ControllerBase
     /// <returns>Refresh Token</returns>
     // POST: /AuthController/RefreshToken
     [HttpPost("RefreshToken")]
-    public async Task<IActionResult> RefreshToken(TokenModel model)
+    public async Task<IActionResult> RefreshToken([FromBody] TokenModel model)
     {
-        if(model is null) return BadRequest("Requisição inválida!");
-
-        // obtém os tokens expirados e suas claims
-        string? accessToken = model.AccessToken ?? throw new ArgumentException(nameof(model));
-        string? refreshToken = model.RefreshToken ?? throw new ArgumentException(nameof(model));
+        if(!ModelState.IsValid) return BadRequest(ModelState);
         
-        var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
-        if(principal == null) return BadRequest("Token de Acesso/Refresh Token inválido(s)!");
+        var accessToken = model.AccessToken;
+        var refreshToken = model.RefreshToken;
+        if(string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken)) return BadRequest("Token inválido.");
 
-        string? username = principal.Identity?.Name;
-        var user = await _userManager.FindByNameAsync(username!);
-        if(user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow) return BadRequest("Token de Acesso/Refresh Token inválido(s)!");
+        var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
+        if(principal == null) return Unauthorized("Token inválido.");
+
+        var userId = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        if(string.IsNullOrWhiteSpace(userId)) return Unauthorized("Token inválido.");
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if(user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow) return Unauthorized("Token inválido ou expirado.");
 
         var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims.ToList());
         var newRefreshToken = _tokenService.GenerateRefreshToken();
 
-        // atualiza o refresh token no banco de dados
         user.RefreshToken = newRefreshToken;
+        user.RefreshTokenExpiryTime = _tokenService.GetRefreshTokenExpiry();
         await _userManager.UpdateAsync(user);
 
-        return new ObjectResult(new 
+        return Ok(new
         {
-            accessToken = new JwtSecurityTokenHandler().WriteToken(newAccessToken) ,
-            refreshToken = newRefreshToken,
+            AccessToken = new JwtSecurityTokenHandler().WriteToken(newAccessToken) ,
+            RefreshToken = newRefreshToken
         });
     }
     #endregion
 
     #region REVOKE
+
     /// <summary>
     /// Revoga o token do usuário.
     /// </summary>
     /// returns>Revoke Token</returns>
     // POST: /AuthController/Revoke
-    [HttpPost("Revoke/{username}")]
+    [HttpPost("Revoke")]
+#pragma warning restore CS1570 // O comentário XML tem XML possui formato incorreto
     [Authorize]
     public async Task<IActionResult> Revoke(string username)
     {
-        var user = await _userManager.FindByNameAsync(username);
-        if(user == null) return NotFound("Usuário não encontrado!");
+        var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        if(string.IsNullOrWhiteSpace(userId)) return Unauthorized();
 
-        // revoga o refresh token
+        var user = await _userManager.FindByIdAsync(userId);
+        if(user == null) return NotFound("Usuário não encontrado");
+
         user.RefreshToken = null;
+        user.RefreshTokenExpiryTime = null;
         await _userManager.UpdateAsync(user);
 
         return NoContent();
