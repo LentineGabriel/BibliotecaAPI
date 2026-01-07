@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -37,11 +38,45 @@ builder.Services.AddControllers(op =>
 {
     op.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
-builder.Services.AddSwaggerGen(op =>
+builder.Services.AddSwaggerGen(c =>
 {
+    // documentação swagger
+    c.SwaggerDoc("v1" , new OpenApiInfo
+    {
+        Title = "BibliotecaAPI" ,
+        Version = "v1"
+    });
+
+    // comentários XML
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    op.IncludeXmlComments(xmlPath);
+    var xmlPath = Path.Combine(AppContext.BaseDirectory , xmlFile);
+    c.IncludeXmlComments(xmlPath);
+
+    // JWT Bearer
+    c.AddSecurityDefinition("Bearer" , new OpenApiSecurityScheme
+    {
+        Name = "Authorization" ,
+        Type = SecuritySchemeType.Http ,
+        Scheme = "bearer" ,
+        BearerFormat = "JWT" ,
+        In = ParameterLocation.Header ,
+        Description = "Informe o token no formato: Bearer {seu_token}"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 
 #region DATABASE & DI
@@ -58,7 +93,7 @@ builder.Services.AddScoped<IEditorasRepositorio , EditorasRepositorio>();
 builder.Services.AddScoped<ICategoriaLivrosRepositorio , CategoriaLivrosRepositorio>();
 builder.Services.AddAutoMapper(cfg => { } , typeof(MappingProfile));
 builder.Services.AddControllers().AddNewtonsoftJson();
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+builder.Services.AddIdentity<ApplicationUser , IdentityRole>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 builder.Services.AddScoped<ITokenService , TokenService>();
 #endregion
 
@@ -78,7 +113,7 @@ builder.Services.Configure<JwtSettings>(op =>
 builder.Services.AddOptions<JwtSettings>().Validate(x => !string.IsNullOrWhiteSpace(x.SecretKey) &&
                                                    !string.IsNullOrWhiteSpace(x.ValidIssuer) &&
                                                    !string.IsNullOrWhiteSpace(x.ValidAudience) &&
-                                                   x.TokenValidityInMinutes > 0, "Configuração JWT inválida!").ValidateOnStart();
+                                                   x.TokenValidityInMinutes > 0 , "Configuração JWT inválida!").ValidateOnStart();
 
 builder.Services.AddAuthentication(op =>
 {
@@ -108,7 +143,10 @@ var app = builder.Build();
 if(app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "BibliotecaAPI v1");
+    });
 }
 
 app.UseHttpsRedirection();
