@@ -1,6 +1,7 @@
 ﻿using BibliotecaAPI.DTOs.TokensJWT;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,7 +28,7 @@ public class AuthController : ControllerBase
     }
     #endregion
 
-    #region Login
+    #region LOGIN
     /// <summary>
     /// Retorna o usuário cadastrado no sistema.
     /// </summary>
@@ -78,7 +79,7 @@ public class AuthController : ControllerBase
     }
     #endregion
 
-    #region Register
+    #region REGISTER
     /// <summary>
     /// Cria o usuário no sistema.
     /// </summary>
@@ -106,7 +107,7 @@ public class AuthController : ControllerBase
     }
     #endregion
 
-    #region RefreshToken
+    #region REFRESH TOKEN
     /// <summary>
     /// Cria um novo token de acesso usando o refresh token.
     /// </summary>
@@ -140,6 +141,27 @@ public class AuthController : ControllerBase
             accessToken = new JwtSecurityTokenHandler().WriteToken(newAccessToken) ,
             refreshToken = newRefreshToken,
         });
+    }
+    #endregion
+
+    #region REVOKE
+    /// <summary>
+    /// Revoga o token do usuário.
+    /// </summary>
+    /// returns>Revoke Token</returns>
+    // POST: /AuthController/Revoke
+    [HttpPost("Revoke/{username}")]
+    [Authorize]
+    public async Task<IActionResult> Revoke(string username)
+    {
+        var user = await _userManager.FindByNameAsync(username);
+        if(user == null) return NotFound("Usuário não encontrado!");
+
+        // revoga o refresh token
+        user.RefreshToken = null;
+        await _userManager.UpdateAsync(user);
+
+        return NoContent();
     }
     #endregion
 }
