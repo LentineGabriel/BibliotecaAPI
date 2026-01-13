@@ -101,7 +101,7 @@ public class AuthController : ControllerBase
         };
 
         var result = await _userManager.CreateAsync(user , model.Password!);
-        if(!result.Succeeded) return StatusCode(StatusCodes.Status500InternalServerError , new Response { Status = "Error" , Message = "Falha ao criar o usuário!" });
+        if(!result.Succeeded) return BadRequest(result.Errors);
 
         return Created(string.Empty , new Response { Status = "Success" , Message = "Usuário criado com sucesso!" });
     }
@@ -147,14 +147,12 @@ public class AuthController : ControllerBase
     #endregion
 
     #region REVOKE
-
     /// <summary>
-    /// Revoga o token do usuário.
+    /// Revoga o token de um usuário.
     /// </summary>
-    /// returns>Revoke Token</returns>
+    /// <returns></returns>
     // POST: /AuthController/Revoke
     [HttpPost("Revoke")]
-#pragma warning restore CS1570 // O comentário XML tem XML possui formato incorreto
     [Authorize]
     public async Task<IActionResult> Revoke(string username)
     {
