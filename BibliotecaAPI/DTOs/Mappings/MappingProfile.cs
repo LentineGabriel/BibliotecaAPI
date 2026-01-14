@@ -5,6 +5,7 @@ using BibliotecaAPI.DTOs.CategoriaDTOs;
 using BibliotecaAPI.DTOs.EditoraDTOs;
 using BibliotecaAPI.DTOs.LivrosDTOs;
 using BibliotecaAPI.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace BibliotecaAPI.DTOs.Mappings
 {
@@ -50,6 +51,9 @@ namespace BibliotecaAPI.DTOs.Mappings
             #region AUTH
             // Users -> UsersDTO
             CreateMap<ApplicationUser , UsersDTO>().ReverseMap();
+
+            // Roles -> RolesDTO
+            CreateMap<IdentityRole , RolesDTO>().ReverseMap();
             #endregion
         }
     }

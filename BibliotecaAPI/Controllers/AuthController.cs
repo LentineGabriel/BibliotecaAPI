@@ -224,10 +224,12 @@ public class AuthController : ControllerBase
     // POST: /AuthController/CriarPerfil
     [HttpGet]
     [Route("ObterPerfis")]
-    public async Task<ActionResult> GetRolesAsync()
+    public async Task<ActionResult<IEnumerable<RolesDTO>>> GetRolesAsync()
     {
-        var obterPerfil = await _roleManager.Roles.ToListAsync();
-        return Ok(obterPerfil);
+        var roles = await _roleManager.Roles.ToListAsync();
+        var result = _mapper.Map<List<RolesDTO>>(roles);
+
+        return Ok(result);
     }
     #endregion
 
