@@ -41,7 +41,7 @@ public class AuthController : ControllerBase
     /// <returns>Usuário cadastrado</returns>
     // GET: /AuthController/ObterUsuarios
     [HttpGet]
-    [Route("ObterUsuarios")]
+    [Route("Usuarios")]
     public async Task<ActionResult<IEnumerable<UsersDTO>>> GetUsersAsync()
     {
         var users = await _userManager.Users.ToListAsync();
@@ -223,7 +223,7 @@ public class AuthController : ControllerBase
     /// <returns>Todos os perfis de usuário</returns>
     // POST: /AuthController/CriarPerfil
     [HttpGet]
-    [Route("ObterPerfis")]
+    [Route("Perfis")]
     public async Task<ActionResult<IEnumerable<RolesDTO>>> GetRolesAsync()
     {
         var roles = await _roleManager.Roles.ToListAsync();
