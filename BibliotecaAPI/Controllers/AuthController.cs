@@ -1,4 +1,6 @@
-﻿using BibliotecaAPI.DTOs.TokensJWT;
+﻿using AutoMapper;
+using BibliotecaAPI.DTOs.AuthDTOs;
+using BibliotecaAPI.DTOs.TokensJWT;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -19,13 +21,15 @@ public class AuthController : ControllerBase
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IConfiguration _cfg;
+    private readonly IMapper _mapper;
 
-    public AuthController(ITokenService tokenService , UserManager<ApplicationUser> userManager , RoleManager<IdentityRole> roleManager , IConfiguration cfg)
+    public AuthController(ITokenService tokenService , UserManager<ApplicationUser> userManager , RoleManager<IdentityRole> roleManager , IConfiguration cfg, IMapper mapper)
     {
         _tokenService = tokenService;
         _userManager = userManager;
         _roleManager = roleManager;
         _cfg = cfg;
+        _mapper = mapper;
     }
     #endregion
 
@@ -38,10 +42,12 @@ public class AuthController : ControllerBase
     // GET: /AuthController/ObterUsuarios
     [HttpGet]
     [Route("ObterUsuarios")]
-    public async Task<ActionResult> GetUsersAsync()
+    public async Task<ActionResult<IEnumerable<UsersDTO>>> GetUsersAsync()
     {
         var users = await _userManager.Users.ToListAsync();
-        return Ok(users);
+        var result = _mapper.Map<List<UsersDTO>>(users);
+
+        return Ok(result);
     }
     #endregion
 

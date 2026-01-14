@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BibliotecaAPI.DTOs.AuthDTOs;
 using BibliotecaAPI.DTOs.AutorDTOs;
 using BibliotecaAPI.DTOs.CategoriaDTOs;
 using BibliotecaAPI.DTOs.EditoraDTOs;
@@ -38,12 +39,17 @@ namespace BibliotecaAPI.DTOs.Mappings
             CreateMap<EditorasDTORequest , Editoras>().ReverseMap();
             #endregion
 
-            #region CATEGORIA
+            #region CATEGORIAS
             // Categoria -> Response
             CreateMap<Categorias , CategoriasDTOResponse>();
 
             // Categoria -> Request
             CreateMap<CategoriasDTORequest , Categorias>().ReverseMap();
+            #endregion
+
+            #region AUTH
+            // Users -> UsersDTO
+            CreateMap<ApplicationUser , UsersDTO>().ReverseMap();
             #endregion
         }
     }
