@@ -4,6 +4,7 @@ using BibliotecaAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -25,6 +26,22 @@ public class AuthController : ControllerBase
         _userManager = userManager;
         _roleManager = roleManager;
         _cfg = cfg;
+    }
+    #endregion
+
+    #region USERS
+    #region GET
+    /// <summary>
+    /// Visualiza todos os usuários cadastrados no sistema.
+    /// </summary>
+    /// <returns>Usuário cadastrado</returns>
+    // GET: /AuthController/ObterUsuarios
+    [HttpGet]
+    [Route("ObterUsuarios")]
+    public async Task<ActionResult> GetUsersAsync()
+    {
+        var users = await _userManager.Users.ToListAsync();
+        return Ok(users);
     }
     #endregion
 
@@ -146,51 +163,6 @@ public class AuthController : ControllerBase
     }
     #endregion
 
-    #region ROLES
-    #region CREATE ROLE
-    /// <summary>
-    /// Cria um novo perfil de usuário no sistema.
-    /// </summary>
-    /// <returns>Novo perfil de usuário</returns>
-    // POST: /AuthController/CriarPerfil
-    [HttpPost]
-    [Route("CriarPerfil")]
-    // [Authorize(Policy = "AdminOnly")]
-    public async Task<IActionResult> CreateRole(string roleName) 
-    {
-        var roleExists = await _roleManager.RoleExistsAsync(roleName);
-        if(!roleExists)
-        {
-            var roleResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
-            if(roleResult != null) return StatusCode(StatusCodes.Status200OK, new Response { Status = "Sucesso", Message = $"Role '{roleName}' adicionada com sucesso!" });
-            else return StatusCode(StatusCodes.Status400BadRequest, new Response { Status = "Erro", Message = $"Erro ao adicionar a role '{roleName}'." });
-        }
-        return StatusCode(StatusCodes.Status400BadRequest, new Response { Status = "Erro", Message = $"Role {roleName} já existe." });
-    }
-    #endregion
-
-    #region ADD USER TO ROLE
-    /// <summary>
-    /// Adiciona um usuário a um perfil do sistema.
-    /// </summary>
-    /// <returns>Usuário a um perfil</returns>
-    // POST: /AuthController/AdicionarUsuarioAoPerfil
-    [HttpPost]
-    [Route("AdicionarUsuarioAoPerfil")]
-    public async Task<IActionResult> AddUserToRole(string email, string roleName)
-    {
-        var user = await _userManager.FindByEmailAsync(email);
-        if(user != null)
-        {
-            var result = await _userManager.AddToRoleAsync(user, roleName);
-            if(result.Succeeded) return StatusCode(StatusCodes.Status200OK , new Response { Status = "Sucesso", Message = $"Usuário '{user.Email}' adicionado ao perfil '{roleName}'." });
-            else return StatusCode(StatusCodes.Status400BadRequest , new Response { Status = "Erro", Message = $"Erro ao adicionar o usuário '{user.Email}' ao perfil '{roleName}'." });
-        }
-        return BadRequest(new { Error = "Não foi possível encontrar o usuário. Por favor, tente novamente!" });
-    }
-    #endregion
-    #endregion
-
     #region REVOKE
     /// <summary>
     /// Revoga o token de um usuário.
@@ -213,5 +185,106 @@ public class AuthController : ControllerBase
 
         return NoContent();
     }
+    #endregion
+
+    #region DELETE
+    /// <summary>
+    /// Deleta um usuário do sistema.
+    /// </summary>
+    /// <returns>Usuário deletado</returns>
+    // DELETE: /AuthController/DeletarUsuario/NomeUsuario
+    [HttpDelete]
+    [Route("DeletarUsuario/{nomeUsuario}")]
+    public async Task<IActionResult> DeleteUser(string nomeUsuario)
+    {
+        var user = await _userManager.FindByNameAsync(nomeUsuario);
+        if(user != null)
+        {
+            var result = await _userManager.DeleteAsync(user);
+            if(result.Succeeded) return StatusCode(StatusCodes.Status200OK , new Response { Status = "Sucesso", Message = $"Usuário '{nomeUsuario}' deletado com sucesso." });
+            else return StatusCode(StatusCodes.Status400BadRequest , new Response { Status = "Erro", Message = $"Erro ao deletar o usuário '{nomeUsuario}'." });
+        }
+        return BadRequest(new { Error = "Não foi possível encontrar o usuário. Por favor, tente novamente!" });
+    }
+    #endregion
+    #endregion
+
+    #region ROLES
+    #region GET
+    /// <summary>
+    /// Visualiza os perfis de usuário no sistema.
+    /// </summary>
+    /// <returns>Todos os perfis de usuário</returns>
+    // POST: /AuthController/CriarPerfil
+    [HttpGet]
+    [Route("ObterPerfis")]
+    public async Task<ActionResult> GetRolesAsync()
+    {
+        var obterPerfil = await _roleManager.Roles.ToListAsync();
+        return Ok(obterPerfil);
+    }
+    #endregion
+
+    #region POST
+    /// <summary>
+    /// Cria um novo perfil de usuário no sistema.
+    /// </summary>
+    /// <returns>Novo perfil de usuário</returns>
+    // POST: /AuthController/CriarPerfil
+    [HttpPost]
+    [Route("CriarPerfil")]
+    // [Authorize(Policy = "AdminOnly")]
+    public async Task<IActionResult> CreateRole(string roleName) 
+    {
+        var roleExists = await _roleManager.RoleExistsAsync(roleName);
+        if(!roleExists)
+        {
+            var roleResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
+            if(roleResult != null) return StatusCode(StatusCodes.Status200OK, new Response { Status = "Sucesso", Message = $"Role '{roleName}' adicionada com sucesso!" });
+            else return StatusCode(StatusCodes.Status400BadRequest, new Response { Status = "Erro", Message = $"Erro ao adicionar a role '{roleName}'." });
+        }
+        return StatusCode(StatusCodes.Status400BadRequest, new Response { Status = "Erro", Message = $"Role {roleName} já existe." });
+    }
+
+    /// <summary>
+    /// Adiciona um usuário a um perfil do sistema.
+    /// </summary>
+    /// <returns>Usuário a um perfil</returns>
+    // POST: /AuthController/AdicionarUsuarioAoPerfil
+    [HttpPost]
+    [Route("AdicionarUsuarioAoPerfil")]
+    public async Task<IActionResult> AddUserToRole(string email, string roleName)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if(user != null)
+        {
+            var result = await _userManager.AddToRoleAsync(user, roleName);
+            if(result.Succeeded) return StatusCode(StatusCodes.Status200OK , new Response { Status = "Sucesso", Message = $"Usuário '{user.Email}' adicionado ao perfil '{roleName}'." });
+            else return StatusCode(StatusCodes.Status400BadRequest , new Response { Status = "Erro", Message = $"Erro ao adicionar o usuário '{user.Email}' ao perfil '{roleName}'." });
+        }
+        return BadRequest(new { Error = "Não foi possível encontrar o usuário. Por favor, tente novamente!" });
+    }
+    #endregion
+
+    #region DELETE
+    /// <summary>
+    /// Deleta um perfil de usuário no sistema.
+    /// </summary>
+    /// <returns>Perfil de usuário deletado</returns>
+    // DELETE: /AuthController/DeletarPerfil/RoleName
+    [HttpDelete]
+    [Route("DeletarPerfil/{roleName}")]
+    public async Task<IActionResult> DeleteRole(string roleName)
+    {
+        var role = await _roleManager.FindByNameAsync(roleName);
+        if(role != null)
+        {
+            var result = await _roleManager.DeleteAsync(role);
+            if(result.Succeeded) return StatusCode(StatusCodes.Status200OK , new Response { Status = "Sucesso", Message = $"Perfil '{roleName}' deletado com sucesso." });
+            else return StatusCode(StatusCodes.Status400BadRequest , new Response { Status = "Erro", Message = $"Erro ao deletar o perfil '{roleName}'." });
+        }
+        return BadRequest(new { Error = "Não foi possível encontrar o perfil. Por favor, tente novamente!" });
+    }
+    #endregion
     #endregion
 }
