@@ -34,7 +34,7 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <returns>Usuário cadastrado</returns>
     // POST: /AuthController/Login
-    [HttpPost("Login")]
+    [HttpPost("LoginUsuario")]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
         if(!ModelState.IsValid) return BadRequest(ModelState);
@@ -51,10 +51,10 @@ public class AuthController : ControllerBase
                 new Claim(ClaimTypes.Email, user.Email!), // email usuário
             };
 
-            //foreach(var userRole in userRoles)
-            //{
-            //    authClaims.Add(new Claim(ClaimTypes.Role , userRole));
-            //}
+            foreach(var userRole in userRoles)
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role , userRole));
+            }
 
             var token = _tokenService.GenerateAccessToken(authClaims);
             var refreshToken = _tokenService.GenerateRefreshToken();
@@ -85,7 +85,7 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <returns>Cadastro do usuário criado</returns>
     // POST: /AuthController/Register
-    [HttpPost("Register")]
+    [HttpPost("RegistrarUsuario")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
         if(!ModelState.IsValid) return BadRequest(ModelState);
@@ -146,6 +146,51 @@ public class AuthController : ControllerBase
     }
     #endregion
 
+    #region ROLES
+    #region CREATE ROLE
+    /// <summary>
+    /// Cria um novo perfil de usuário no sistema.
+    /// </summary>
+    /// <returns>Novo perfil de usuário</returns>
+    // POST: /AuthController/CriarPerfil
+    [HttpPost]
+    [Route("CriarPerfil")]
+    // [Authorize(Policy = "AdminOnly")]
+    public async Task<IActionResult> CreateRole(string roleName) 
+    {
+        var roleExists = await _roleManager.RoleExistsAsync(roleName);
+        if(!roleExists)
+        {
+            var roleResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
+            if(roleResult != null) return StatusCode(StatusCodes.Status200OK, new Response { Status = "Sucesso", Message = $"Role '{roleName}' adicionada com sucesso!" });
+            else return StatusCode(StatusCodes.Status400BadRequest, new Response { Status = "Erro", Message = $"Erro ao adicionar a role '{roleName}'." });
+        }
+        return StatusCode(StatusCodes.Status400BadRequest, new Response { Status = "Erro", Message = $"Role {roleName} já existe." });
+    }
+    #endregion
+
+    #region ADD USER TO ROLE
+    /// <summary>
+    /// Adiciona um usuário a um perfil do sistema.
+    /// </summary>
+    /// <returns>Usuário a um perfil</returns>
+    // POST: /AuthController/AdicionarUsuarioAoPerfil
+    [HttpPost]
+    [Route("AdicionarUsuarioAoPerfil")]
+    public async Task<IActionResult> AddUserToRole(string email, string roleName)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if(user != null)
+        {
+            var result = await _userManager.AddToRoleAsync(user, roleName);
+            if(result.Succeeded) return StatusCode(StatusCodes.Status200OK , new Response { Status = "Sucesso", Message = $"Usuário '{user.Email}' adicionado ao perfil '{roleName}'." });
+            else return StatusCode(StatusCodes.Status400BadRequest , new Response { Status = "Erro", Message = $"Erro ao adicionar o usuário '{user.Email}' ao perfil '{roleName}'." });
+        }
+        return BadRequest(new { Error = "Não foi possível encontrar o usuário. Por favor, tente novamente!" });
+    }
+    #endregion
+    #endregion
+
     #region REVOKE
     /// <summary>
     /// Revoga o token de um usuário.
@@ -153,7 +198,7 @@ public class AuthController : ControllerBase
     /// <returns></returns>
     // POST: /AuthController/Revoke
     [HttpPost("Revoke")]
-    [Authorize]
+    [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> Revoke(string username)
     {
         var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;

@@ -79,6 +79,11 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddAuthorization(op =>
+{
+    op.AddPolicy("AdminOnly" , policy => policy.RequireRole("Admin"));
+});
+
 #region DATABASE & DI
 // DATABASE
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
