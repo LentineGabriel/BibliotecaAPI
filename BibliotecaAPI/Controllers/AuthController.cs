@@ -126,7 +126,7 @@ public class AuthController : ControllerBase
         var result = await _userManager.CreateAsync(user , model.Password!);
         if(!result.Succeeded) return BadRequest(result.Errors);
 
-        return Created(string.Empty , new Response { Status = "Success" , Message = "Usuário criado com sucesso!" });
+        return Created(string.Empty , new Response { Status = "Successo" , Message = "Usuário criado com sucesso!" });
     }
     #endregion
 
@@ -191,6 +191,31 @@ public class AuthController : ControllerBase
 
         return NoContent();
     }
+    #endregion
+
+    #region PUT
+    [HttpPut("AtualizarUsuario/{id}")]
+    public async Task<ActionResult<UsersDTO>> PutAsync(string id, UsersDTO usersDTO)
+    {
+        if(id != usersDTO.Id) return BadRequest($"Não foi possível encontrar o usuário com o ID {id}. Por favor, verifique o ID e tente novamente!");
+
+        var user = await _userManager.FindByIdAsync(id);
+        if(user == null) return BadRequest($"Não foi possível encontrar o usuário com ID {id}. Por favor, verifique o id digitado e tente novamente!");
+
+        user.UserName = usersDTO.Username;
+        user.Email = usersDTO.Email;
+        user.EmailConfirmed = usersDTO.EmailConfirmed;
+
+        var result = await _userManager.UpdateAsync(user);
+        if(!result.Succeeded) return BadRequest(result.Errors);
+
+        var response = _mapper.Map<UsersDTO>(user);
+
+        return Ok(response);
+    }
+    #endregion
+
+    #region PATCH
     #endregion
 
     #region DELETE

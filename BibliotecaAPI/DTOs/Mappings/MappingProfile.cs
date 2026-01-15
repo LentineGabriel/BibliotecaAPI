@@ -50,7 +50,7 @@ namespace BibliotecaAPI.DTOs.Mappings
 
             #region AUTH
             // Users -> UsersDTO
-            CreateMap<ApplicationUser , UsersDTO>().ReverseMap();
+            CreateMap<IdentityUser , UsersDTO>().ForMember(dest => dest.Username , opt => opt.MapFrom(src => src.UserName));
 
             // Roles -> RolesDTO
             CreateMap<IdentityRole , RolesDTO>().ReverseMap();
