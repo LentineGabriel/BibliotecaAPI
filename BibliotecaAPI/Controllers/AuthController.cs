@@ -5,6 +5,7 @@ using BibliotecaAPI.Models;
 using BibliotecaAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
@@ -194,6 +195,11 @@ public class AuthController : ControllerBase
     #endregion
 
     #region PUT
+    /// <summary>
+    /// Atualiza um usuário existente no sistema.
+    /// </summary>
+    /// <returns></returns>
+    // PUT: /AuthController/AtualizarUsuario/id
     [HttpPut("AtualizarUsuario/{id}")]
     public async Task<ActionResult<UsersDTO>> PutAsync(string id, UsersDTO usersDTO)
     {
@@ -216,6 +222,31 @@ public class AuthController : ControllerBase
     #endregion
 
     #region PATCH
+    /// <summary>
+    /// Atualiza partes de um usuário existente no sistema.
+    /// </summary>
+    /// <returns>Autor atualizado</returns>
+    [HttpPatch("AtualizarParcialUsuario/{id}")]
+    public async Task<ActionResult<UsersDTO>> PatchAsync(string id , JsonPatchDocument<UsersDTO> patchDoc)
+    {
+        // arrumar
+        if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
+        
+        var user = await _userManager.FindByIdAsync(id);
+        if(user == null) return BadRequest($"Não foi possível encontrar o usuário com ID {id}. Por favor, verifique o id digitado e tente novamente!");
+
+        var userToPatch = _mapper.Map<UsersDTO>(user);
+        patchDoc.ApplyTo(userToPatch , ModelState);
+        if(!TryValidateModel(userToPatch)) return BadRequest(ModelState);
+
+        _mapper.Map(userToPatch , user);
+        var result = await _userManager.UpdateAsync(user);
+        if(!result.Succeeded) return BadRequest(result.Errors);
+
+        var response = _mapper.Map<UsersDTO>(user);
+
+        return Ok(response);
+    }
     #endregion
 
     #region DELETE
@@ -300,6 +331,11 @@ public class AuthController : ControllerBase
     #endregion
 
     #region PUT
+    /// <summary>
+    /// Atualiza um perfil existente no sistema.
+    /// </summary>
+    /// <returns></returns>
+    // PUT: /AuthController/AtualizarPerfil/id
     [HttpPut("AtualizarPerfil/{id}")]
     public async Task<ActionResult<RolesDTO>> PutRoleAsync(string id, RolesDTO rolesDTO)
     {
