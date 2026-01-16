@@ -299,6 +299,26 @@ public class AuthController : ControllerBase
     }
     #endregion
 
+    #region PUT
+    [HttpPut("AtualizarPerfil/{id}")]
+    public async Task<ActionResult<RolesDTO>> PutRoleAsync(string id, RolesDTO rolesDTO)
+    {
+        if(id != rolesDTO.Id) return BadRequest($"Não foi possível encontrar o perfil com o nome '{id}'. Por favor, verifique o nome e tente novamente!");
+
+        var role = await _roleManager.FindByIdAsync(id);
+        if(role == null) return BadRequest($"Não foi possível encontrar o perfil com o nome '{id}'. Por favor, verifique o nome digitado e tente novamente!");
+        
+        role.Name = rolesDTO.Name;
+        
+        var result = await _roleManager.UpdateAsync(role);
+        if(!result.Succeeded) return BadRequest(result.Errors);
+        
+        var response = _mapper.Map<RolesDTO>(role);
+        
+        return Ok(response);
+    }
+    #endregion
+
     #region DELETE
     /// <summary>
     /// Deleta um perfil de usuário no sistema.
