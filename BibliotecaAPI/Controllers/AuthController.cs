@@ -227,19 +227,39 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <returns>Autor atualizado</returns>
     [HttpPatch("AtualizarParcialUsuario/{id}")]
-    public async Task<ActionResult<UsersDTO>> PatchAsync(string id , JsonPatchDocument<UsersDTO> patchDoc)
+    public async Task<ActionResult<UsersDTO>> PatchAsync(string id , [FromBody] JsonPatchDocument<UsersDTO> patchDoc)
     {
-        // arrumar
         if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
         
         var user = await _userManager.FindByIdAsync(id);
         if(user == null) return BadRequest($"Não foi possível encontrar o usuário com ID {id}. Por favor, verifique o id digitado e tente novamente!");
 
         var userToPatch = _mapper.Map<UsersDTO>(user);
+
+        // Não deixando o EmailConfirmed ser alterado via patch
+        if(patchDoc.Operations.Any(op => op.path.Equals("/emailConfirmed", StringComparison.OrdinalIgnoreCase))) return BadRequest("A propriedade 'EmailConfirmed' não pode ser alterada via patch.");
+
         patchDoc.ApplyTo(userToPatch , ModelState);
+        if(!ModelState.IsValid) return BadRequest(ModelState);
         if(!TryValidateModel(userToPatch)) return BadRequest(ModelState);
 
+        // Caso o email tenha sido alterado
+        if(!string.Equals(userToPatch.Email, user.Email, StringComparison.OrdinalIgnoreCase)) 
+        {
+            var setEmail = await _userManager.SetEmailAsync(user, userToPatch.Email!);
+            if(!setEmail.Succeeded) return BadRequest(setEmail.Errors);
+        }
+
+        // Caso o username tenha sido alterado
+        if(!string.Equals(userToPatch.Username, user.UserName, StringComparison.OrdinalIgnoreCase)) 
+        {
+            var setUserName = await _userManager.SetUserNameAsync(user, userToPatch.Username!);
+            if(!setUserName.Succeeded) return BadRequest(setUserName.Errors);
+        }
+
+        // P/ outros campos "não sensíveis"
         _mapper.Map(userToPatch , user);
+
         var result = await _userManager.UpdateAsync(user);
         if(!result.Succeeded) return BadRequest(result.Errors);
 
