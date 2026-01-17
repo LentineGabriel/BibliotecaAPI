@@ -276,15 +276,15 @@ public class AuthController : ControllerBase
     /// <returns>Usuário deletado</returns>
     // DELETE: /AuthController/DeletarUsuario/NomeUsuario
     [HttpDelete]
-    [Route("DeletarUsuario/{nomeUsuario}")]
-    public async Task<IActionResult> DeleteUser(string nomeUsuario)
+    [Route("DeletarUsuario/{id}")]
+    public async Task<IActionResult> DeleteUser(string id)
     {
-        var user = await _userManager.FindByNameAsync(nomeUsuario);
+        var user = await _userManager.FindByIdAsync(id);
         if(user != null)
         {
             var result = await _userManager.DeleteAsync(user);
-            if(result.Succeeded) return StatusCode(StatusCodes.Status200OK , new Response { Status = "Sucesso", Message = $"Usuário '{nomeUsuario}' deletado com sucesso." });
-            else return StatusCode(StatusCodes.Status400BadRequest , new Response { Status = "Erro", Message = $"Erro ao deletar o usuário '{nomeUsuario}'." });
+            if(result.Succeeded) return StatusCode(StatusCodes.Status200OK , new Response { Status = "Sucesso", Message = $"Usuário '{user.UserName}' deletado com sucesso." });
+            else return StatusCode(StatusCodes.Status400BadRequest , new Response { Status = "Erro", Message = $"Erro ao deletar o usuário '{user.UserName}'." });
         }
         return BadRequest(new { Error = "Não foi possível encontrar o usuário. Por favor, tente novamente!" });
     }
@@ -382,15 +382,15 @@ public class AuthController : ControllerBase
     /// <returns>Perfil de usuário deletado</returns>
     // DELETE: /AuthController/DeletarPerfil/RoleName
     [HttpDelete]
-    [Route("DeletarPerfil/{roleName}")]
-    public async Task<IActionResult> DeleteRole(string roleName)
+    [Route("DeletarPerfil/{id}")]
+    public async Task<IActionResult> DeleteRole(string id)
     {
-        var role = await _roleManager.FindByNameAsync(roleName);
+        var role = await _roleManager.FindByIdAsync(id);
         if(role != null)
         {
             var result = await _roleManager.DeleteAsync(role);
-            if(result.Succeeded) return StatusCode(StatusCodes.Status200OK , new Response { Status = "Sucesso", Message = $"Perfil '{roleName}' deletado com sucesso." });
-            else return StatusCode(StatusCodes.Status400BadRequest , new Response { Status = "Erro", Message = $"Erro ao deletar o perfil '{roleName}'." });
+            if(result.Succeeded) return StatusCode(StatusCodes.Status200OK , new Response { Status = "Sucesso", Message = $"Perfil '{role.Name}' deletado com sucesso." });
+            else return StatusCode(StatusCodes.Status400BadRequest , new Response { Status = "Erro", Message = $"Erro ao deletar o perfil '{role.Name}'." });
         }
         return BadRequest(new { Error = "Não foi possível encontrar o perfil. Por favor, tente novamente!" });
     }
