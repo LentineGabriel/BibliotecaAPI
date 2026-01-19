@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using BibliotecaAPI.DTOs.AuthDTOs;
+using BibliotecaAPI.DTOs.AuthDTOs.Roles;
+using BibliotecaAPI.DTOs.AuthDTOs.Users;
 using BibliotecaAPI.DTOs.TokensJWT;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Services.Interfaces;
@@ -43,12 +45,13 @@ public class AuthController : ControllerBase
     // GET: /AuthController/ObterUsuarios
     [HttpGet]
     [Route("Usuarios")]
-    public async Task<ActionResult<IEnumerable<UsersDTO>>> GetUsersAsync()
+    public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetUsersAsync()
     {
-        var users = await _userManager.Users.ToListAsync();
-        var result = _mapper.Map<List<UsersDTO>>(users);
+        var usuarios = await _userManager.Users.ToListAsync();
+        if(usuarios == null || !usuarios.Any()) return NotFound("Usuários não encontrados. Por favor, tente novamente!");
 
-        return Ok(result);
+        var usuariosDTO = _mapper.Map<IEnumerable<UsersResponseDTO>>(usuarios);
+        return Ok(usuariosDTO);
     }
     #endregion
 
@@ -201,7 +204,7 @@ public class AuthController : ControllerBase
     /// <returns></returns>
     // PUT: /AuthController/AtualizarUsuario/id
     [HttpPut("AtualizarUsuario/{id}")]
-    public async Task<ActionResult<UsersDTO>> PutAsync(string id, UsersDTO usersDTO)
+    public async Task<ActionResult<UsersResponseDTO>> PutAsync(string id, UsersRequestDTO usersDTO)
     {
         if(id != usersDTO.Id) return BadRequest($"Não foi possível encontrar o usuário com o ID {id}. Por favor, verifique o ID e tente novamente!");
 
@@ -215,7 +218,7 @@ public class AuthController : ControllerBase
         var result = await _userManager.UpdateAsync(user);
         if(!result.Succeeded) return BadRequest(result.Errors);
 
-        var response = _mapper.Map<UsersDTO>(user);
+        var response = _mapper.Map<UsersResponseDTO>(user);
 
         return Ok(response);
     }
@@ -227,14 +230,14 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <returns>Autor atualizado</returns>
     [HttpPatch("AtualizarParcialUsuario/{id}")]
-    public async Task<ActionResult<UsersDTO>> PatchAsync(string id , [FromBody] JsonPatchDocument<UsersDTO> patchDoc)
+    public async Task<ActionResult<UsersResponseDTO>> PatchAsync(string id , [FromBody] JsonPatchDocument<UsersResponseDTO> patchDoc)
     {
         if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
         
         var user = await _userManager.FindByIdAsync(id);
         if(user == null) return BadRequest($"Não foi possível encontrar o usuário com ID {id}. Por favor, verifique o id digitado e tente novamente!");
 
-        var userToPatch = _mapper.Map<UsersDTO>(user);
+        var userToPatch = _mapper.Map<UsersResponseDTO>(user);
 
         // Não deixando o EmailConfirmed ser alterado via patch
         if(patchDoc.Operations.Any(op => op.path.Equals("/emailConfirmed", StringComparison.OrdinalIgnoreCase))) return BadRequest("A propriedade 'EmailConfirmed' não pode ser alterada via patch.");
@@ -263,7 +266,7 @@ public class AuthController : ControllerBase
         var result = await _userManager.UpdateAsync(user);
         if(!result.Succeeded) return BadRequest(result.Errors);
 
-        var response = _mapper.Map<UsersDTO>(user);
+        var response = _mapper.Map<UsersResponseDTO>(user);
 
         return Ok(response);
     }
@@ -300,10 +303,10 @@ public class AuthController : ControllerBase
     // POST: /AuthController/CriarPerfil
     [HttpGet]
     [Route("Perfis")]
-    public async Task<ActionResult<IEnumerable<RolesDTO>>> GetRolesAsync()
+    public async Task<ActionResult<IEnumerable<RolesResponseDTO>>> GetRolesAsync()
     {
         var roles = await _roleManager.Roles.ToListAsync();
-        var result = _mapper.Map<List<RolesDTO>>(roles);
+        var result = _mapper.Map<List<RolesResponseDTO>>(roles);
 
         return Ok(result);
     }
@@ -357,7 +360,7 @@ public class AuthController : ControllerBase
     /// <returns></returns>
     // PUT: /AuthController/AtualizarPerfil/id
     [HttpPut("AtualizarPerfil/{id}")]
-    public async Task<ActionResult<RolesDTO>> PutRoleAsync(string id, RolesDTO rolesDTO)
+    public async Task<ActionResult<RolesResponseDTO>> PutRoleAsync(string id, RolesRequestDTO rolesDTO)
     {
         if(id != rolesDTO.Id) return BadRequest($"Não foi possível encontrar o perfil com o nome '{id}'. Por favor, verifique o nome e tente novamente!");
 
@@ -369,7 +372,7 @@ public class AuthController : ControllerBase
         var result = await _roleManager.UpdateAsync(role);
         if(!result.Succeeded) return BadRequest(result.Errors);
         
-        var response = _mapper.Map<RolesDTO>(role);
+        var response = _mapper.Map<RolesResponseDTO>(role);
         
         return Ok(response);
     }

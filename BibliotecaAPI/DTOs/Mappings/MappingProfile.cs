@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using BibliotecaAPI.DTOs.AuthDTOs;
+using BibliotecaAPI.DTOs.AuthDTOs.Roles;
+using BibliotecaAPI.DTOs.AuthDTOs.Users;
 using BibliotecaAPI.DTOs.AutorDTOs;
 using BibliotecaAPI.DTOs.CategoriaDTOs;
 using BibliotecaAPI.DTOs.EditoraDTOs;
@@ -50,11 +51,12 @@ namespace BibliotecaAPI.DTOs.Mappings
 
             #region AUTH
             // Users -> UsersDTO
-            CreateMap<ApplicationUser , UsersDTO>().ForMember(dest => dest.Username , opt => opt.MapFrom(src => src.UserName));
-            CreateMap<UsersDTO , ApplicationUser>().ForMember(dest => dest.UserName , opt => opt.MapFrom(src => src.Username)).ForAllMembers(o => o.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<ApplicationUser , UsersRequestDTO>().ForMember(dest => dest.Username , opt => opt.MapFrom(src => src.UserName));
+            CreateMap<UsersResponseDTO , ApplicationUser>().ForMember(dest => dest.UserName , opt => opt.MapFrom(src => src.Username)).ReverseMap().ForAllMembers(o => o.Condition((src, dest, srcMember) => srcMember != null));
 
             // Roles -> RolesDTO
-            CreateMap<IdentityRole , RolesDTO>().ReverseMap();
+            CreateMap<IdentityRole , RolesRequestDTO>();
+            CreateMap<RolesResponseDTO , IdentityRole>().ReverseMap();
             #endregion
         }
     }
