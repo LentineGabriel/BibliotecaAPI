@@ -1,5 +1,7 @@
-﻿using BibliotecaAPI.Models;
+﻿#region USINGS
+using BibliotecaAPI.Models;
 using Microsoft.AspNetCore.Diagnostics;
+#endregion
 
 namespace BibliotecaAPI.Extensions;
 public static class ApiExceptionMiddlewareExtensions

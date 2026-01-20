@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using BibliotecaAPI.DTOs.AuthDTOs;
+﻿#region USINGS
+using AutoMapper;
 using BibliotecaAPI.DTOs.AuthDTOs.Roles;
 using BibliotecaAPI.DTOs.AuthDTOs.Users;
 using BibliotecaAPI.DTOs.TokensJWT;
@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+#endregion
 
 namespace BibliotecaAPI.Controllers;
 

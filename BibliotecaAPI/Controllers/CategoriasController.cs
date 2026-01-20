@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿#region USINGS
+using AutoMapper;
 using BibliotecaAPI.DTOs.CategoriaDTOs;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Pagination.CategoriasFiltro;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using X.PagedList;
+#endregion
 
 namespace BibliotecaAPI.Controllers;
 

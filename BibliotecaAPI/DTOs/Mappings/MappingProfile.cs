@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿#region USINGS
+using AutoMapper;
 using BibliotecaAPI.DTOs.AuthDTOs.Roles;
 using BibliotecaAPI.DTOs.AuthDTOs.Users;
 using BibliotecaAPI.DTOs.AutorDTOs;
@@ -7,6 +8,7 @@ using BibliotecaAPI.DTOs.EditoraDTOs;
 using BibliotecaAPI.DTOs.LivrosDTOs;
 using BibliotecaAPI.Models;
 using Microsoft.AspNetCore.Identity;
+#endregion
 
 namespace BibliotecaAPI.DTOs.Mappings
 {
