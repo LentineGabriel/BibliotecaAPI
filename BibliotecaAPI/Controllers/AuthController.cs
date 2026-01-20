@@ -54,6 +54,18 @@ public class AuthController : ControllerBase
         var usuariosDTO = _mapper.Map<IEnumerable<UsersResponseDTO>>(usuarios);
         return Ok(usuariosDTO);
     }
+
+    [HttpGet]
+    [Route("Usuarios/{id}")]
+    public async Task<ActionResult<UsersResponseDTO>> GetUserByIdAsync(string id)
+    {
+        var usuario = await _userManager.FindByIdAsync(id);
+        if(usuario == null) return NotFound($"Não foi possível encontrar o usuário com o ID {id}. Por favor, tente novamente!");
+
+        var usuarioDTO = _mapper.Map<UsersResponseDTO>(usuario);
+
+        return Ok(usuarioDTO);
+    }
     #endregion
 
     #region LOGIN
@@ -307,9 +319,21 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<IEnumerable<RolesResponseDTO>>> GetRolesAsync()
     {
         var roles = await _roleManager.Roles.ToListAsync();
-        var result = _mapper.Map<List<RolesResponseDTO>>(roles);
+        var result = _mapper.Map<IEnumerable<RolesResponseDTO>>(roles);
 
         return Ok(result);
+    }
+
+    [HttpGet]
+    [Route("Perfil/{id}")]
+    public async Task<ActionResult<IEnumerable<RolesResponseDTO>>> GetRoleByIdAsync(string id)
+    {
+        var role = await _roleManager.FindByIdAsync(id);
+        if(role == null) return NotFound($"Não foi possível encontrar o perfil com o ID {id}. Por favor, tente novamente!");
+
+        var roleDTO = _mapper.Map<RolesResponseDTO>(role);
+
+        return Ok(roleDTO);
     }
     #endregion
 
