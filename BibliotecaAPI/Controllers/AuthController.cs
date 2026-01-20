@@ -346,6 +346,11 @@ public class AuthController : ControllerBase
         return Ok(roleDTO);
     }
 
+    /// <summary>
+    /// Retorna os usuários presentes em um perfil.
+    /// </summary>
+    /// <returns>Usuário cadastrado</returns>
+    // GET: /AuthController/Perfil/id
     [HttpGet]
     [Route("UsuariosNoPerfil/{perfil}")]
     public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetUsersInRoleAsync(string perfil)
