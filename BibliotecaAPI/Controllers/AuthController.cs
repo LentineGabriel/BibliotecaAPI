@@ -40,10 +40,10 @@ public class AuthController : ControllerBase
     #region USERS
     #region GET
     /// <summary>
-    /// Visualiza todos os usuários cadastrados no sistema.
+    /// Retorna todos os usuários cadastrados no sistema.
     /// </summary>
     /// <returns>Usuário cadastrado</returns>
-    // GET: /AuthController/ObterUsuarios
+    // GET: /AuthController/Usuarios
     [HttpGet]
     [Route("Usuarios")]
     public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetUsersAsync()
@@ -55,6 +55,11 @@ public class AuthController : ControllerBase
         return Ok(usuariosDTO);
     }
 
+    /// <summary>
+    /// Retorna um usuário específico pelo ID.
+    /// </summary>
+    /// <returns>Usuário cadastrado</returns>
+    // GET: /AuthController/Usuarios/id
     [HttpGet]
     [Route("Usuarios/{id}")]
     public async Task<ActionResult<UsersResponseDTO>> GetUserByIdAsync(string id)
@@ -310,10 +315,10 @@ public class AuthController : ControllerBase
     #region ROLES
     #region GET
     /// <summary>
-    /// Visualiza os perfis de usuário no sistema.
+    /// Retorna todos os perfis cadastrados no sistema.
     /// </summary>
     /// <returns>Todos os perfis de usuário</returns>
-    // POST: /AuthController/CriarPerfil
+    // GET: /AuthController/Perfis
     [HttpGet]
     [Route("Perfis")]
     public async Task<ActionResult<IEnumerable<RolesResponseDTO>>> GetRolesAsync()
@@ -324,6 +329,11 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>
+    /// Retorna um peril específico pelo ID.
+    /// </summary>
+    /// <returns>Usuário cadastrado</returns>
+    // GET: /AuthController/Perfil/id
     [HttpGet]
     [Route("Perfil/{id}")]
     public async Task<ActionResult<IEnumerable<RolesResponseDTO>>> GetRoleByIdAsync(string id)
