@@ -345,6 +345,17 @@ public class AuthController : ControllerBase
 
         return Ok(roleDTO);
     }
+
+    [HttpGet]
+    [Route("UsuariosNoPerfil/{perfil}")]
+    public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetUsersInRoleAsync(string perfil)
+    {
+        var usuariosNoPerfil = await _userManager.GetUsersInRoleAsync(perfil);
+        if(usuariosNoPerfil == null || !usuariosNoPerfil.Any()) return NotFound($"Nenhum usuário encontrado no perfil '{perfil}'. Por favor, tente novamente!");
+
+        var usuariosNoPerfilDTO = _mapper.Map<IEnumerable<UsersResponseDTO>>(usuariosNoPerfil);
+        return Ok(usuariosNoPerfilDTO);
+    }
     #endregion
 
     #region POST
