@@ -81,7 +81,9 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddAuthorization(op =>
 {
-    op.AddPolicy("AdminOnly" , policy => policy.RequireRole("Admin"));
+    op.AddPolicy("AdminsAndUsers", policy => policy.RequireRole("Admins", "Users"));
+    op.AddPolicy("AdminsOnly" , policy => policy.RequireRole("Admins"));
+    op.AddPolicy("UsersOnly", policy => policy.RequireRole("Users"));
 });
 
 #region DATABASE & DI
