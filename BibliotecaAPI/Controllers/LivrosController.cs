@@ -4,6 +4,7 @@ using BibliotecaAPI.DTOs.LivrosDTOs;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Pagination.LivrosFiltro;
 using BibliotecaAPI.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -34,6 +35,7 @@ public class LivrosController : ControllerBase
     /// <returns>Lista de editoras</returns>
     // GET: /Livros
     [HttpGet]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<LivrosDTOResponse>>> GetAsync()
     {
         var livros = await _uof.LivrosRepositorio.GetLivroCompletoAsync();
@@ -49,6 +51,7 @@ public class LivrosController : ControllerBase
     /// <returns>Livro via ID</returns>
     // GET: /Livros/{id}
     [HttpGet("{id:int:min(1)}", Name = "ObterIdLivro")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<LivrosDTOResponse>> GetByIdAsync(int id)
     {
         var livro = await _uof.LivrosRepositorio.GetLivroCompletoAsync(id);
@@ -64,6 +67,7 @@ public class LivrosController : ControllerBase
     /// <returns>Lista de Livros paginadas</returns>
     // GET: /Livros/Paginacao
     [HttpGet("Paginacao")]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetPaginationAsync([FromQuery] LivrosParameters livrosParameters)
     {
         var livros = await _uof.LivrosRepositorio.GetLivrosAsync(livrosParameters);
@@ -76,6 +80,7 @@ public class LivrosController : ControllerBase
     /// <returns>Livros por nome</returns>
     // GET: /Livros/PesquisaPorNome
     [HttpGet("PesquisaPorNome")]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByNameAsync([FromQuery] LivrosFiltroNome livrosFiltroNome)
     {
         var livros = await _uof.LivrosRepositorio.GetLivrosFiltrandoPeloNome(livrosFiltroNome);
@@ -88,6 +93,7 @@ public class LivrosController : ControllerBase
     /// <returns>Livros por nome do autor</returns>
     // GET: /Livros/PesquisaPorAutor
     [HttpGet("PesquisaPorAutor")]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByAutorAsync([FromQuery] LivrosFiltroAutor livrosFiltroAutor)
     {
         var livros = await _uof.LivrosRepositorio.GetLivrosFiltrandoPeloAutor(livrosFiltroAutor);
@@ -100,6 +106,7 @@ public class LivrosController : ControllerBase
     /// <returns>Livros por nome da editora</returns>
     // GET: /Livros/PesquisaPorEditora
     [HttpGet("PesquisaPorEditora")]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByEditoraAsync([FromQuery] LivrosFiltroEditora livrosFiltroEditora)
     {
         var livros = await _uof.LivrosRepositorio.GetLivrosFiltrandoPelaEditora(livrosFiltroEditora);
@@ -112,6 +119,7 @@ public class LivrosController : ControllerBase
     /// <returns>Livros pelo ano de publicação</returns>
     // GET: /Livros/PesquisaPorAnoPublicacao
     [HttpGet("PesquisaPorAnoPublicacao")]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByAnoPublicacaoAsync([FromQuery] LivrosFiltroAnoPublicacao livrosFiltroAnoPublicacao)
     {
         var livros = await _uof.LivrosRepositorio.GetLivrosFiltrandoPorAnoPublicacao(livrosFiltroAnoPublicacao);
@@ -124,6 +132,7 @@ public class LivrosController : ControllerBase
     /// <returns>Livros pelo seu gênero</returns>
     // GET: /Livros/PesquisaPorCategoria
     [HttpGet("PesquisaPorCategoria")]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByCategoriaAsync([FromQuery] LivrosFiltroCategoria livrosFiltroCategoria)
     {
         var livros = await _uof.LivrosRepositorio.GetLivrosFiltrandoPorCategoria(livrosFiltroCategoria);
@@ -137,6 +146,7 @@ public class LivrosController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPost("AdicionarLivro")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<LivrosDTOResponse>> PostAsync(LivrosDTORequest livrosDTO)
     {
         if(livrosDTO == null) return BadRequest("Não foi possível adicionar um novo livro. Tente novamente mais tarde!");
@@ -158,6 +168,7 @@ public class LivrosController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPut("AtualizarLivro/{id:int:min(1)}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<LivrosDTOResponse>> PutAsync(int id, LivrosDTORequest livrosDTO)
     {
         if(id != livrosDTO.IdLivro) return BadRequest($"Não foi possível encontrar o livro com ID {id}. Por favor, verifique o ID digitado e tente novamente!");
@@ -182,6 +193,7 @@ public class LivrosController : ControllerBase
     /// </summary>
     /// <returns>Livro atualizada</returns>
     [HttpPatch("AtualizarParcialLivro/{id:int:min(1)}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<LivrosDTOResponse>> PatchAsync(int id , JsonPatchDocument<LivrosDTORequest> patchDoc) 
     {
         if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
@@ -208,6 +220,7 @@ public class LivrosController : ControllerBase
     /// </summary>
     /// <returns>Categoria(s) do Livro atualizada</returns>
     [HttpPatch("AtualizarCategorias/{id:int:min(1)}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> PatchCategoriasAsync(int id, [FromBody] LivrosCategoriasPatchDTO dto)
     {
         if(!ModelState.IsValid) return BadRequest(ModelState);
@@ -240,6 +253,7 @@ public class LivrosController : ControllerBase
     /// </summary>
     /// <returns>Livro deletado</returns>
     [HttpDelete("DeletarLivros/{id:int:min(1)}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<LivrosDTOResponse>> DeleteAsync(int id)
     {
         var deletarLivro = await _uof.LivrosRepositorio.GetIdAsync(l => l.IdLivro == id);

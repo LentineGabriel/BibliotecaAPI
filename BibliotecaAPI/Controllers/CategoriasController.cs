@@ -4,6 +4,7 @@ using BibliotecaAPI.DTOs.CategoriaDTOs;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Pagination.CategoriasFiltro;
 using BibliotecaAPI.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -34,6 +35,7 @@ public class CategoriasController : ControllerBase
     /// <returns>Lista de categorias</returns>
     // GET: /Categorias
     [HttpGet]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<CategoriasDTOResponse>>> GetAsync()
     {
         var categorias = await _uof.CategoriaLivrosRepositorio.GetAllAsync();
@@ -49,6 +51,7 @@ public class CategoriasController : ControllerBase
     /// <returns>Categoria de livros via ID</returns>
     // GET: /Categorias/{id}
     [HttpGet("{id:int:min(1)}", Name = "ObterIdCategoria")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<CategoriasDTOResponse>> GetByIdAsync(int id)
     {
         var categoria = await _uof.CategoriaLivrosRepositorio.GetIdAsync(c => c.IdCategoria == id);
@@ -64,6 +67,7 @@ public class CategoriasController : ControllerBase
     /// <returns>Lista de Editoras paginadas</returns>
     // GET: /Categorias/Paginacao
     [HttpGet("Paginacao")]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Categorias>>> GetPaginationAsync([FromQuery] CategoriasParameters categoriaParameters)
     {
         var categorias = await _uof.CategoriaLivrosRepositorio.GetCategoriasAsync(categoriaParameters);
@@ -76,6 +80,7 @@ public class CategoriasController : ControllerBase
     /// <returns>Categorias por nome</returns>
     // GET: /Categorias/PesquisaPorNome
     [HttpGet("PesquisaPorNome")]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Categorias>>> GetFilterNamePaginationAsync([FromQuery] CategoriasFiltroNome categoriasFiltroNome)
     {
         var categorias = await _uof.CategoriaLivrosRepositorio.GetCategoriasFiltrandoPeloNome(categoriasFiltroNome);
@@ -89,6 +94,7 @@ public class CategoriasController : ControllerBase
     /// </summary>
     /// <returns>Categoria criada</returns>
     [HttpPost("AdicionarCategorias")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<CategoriasDTOResponse>> PostAsync(CategoriasDTORequest categoriasDTO)
     {
         if(categoriasDTO == null) return BadRequest("Não foi possível adicionar uma nova categoria. Tente novamente mais tarde!");
@@ -108,6 +114,7 @@ public class CategoriasController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPut("AtualizarCategoria/{id:int:min(1)}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<CategoriasDTOResponse>> PutAsync(int id , CategoriasDTORequest categoriasDTO)
     {
         if(id != categoriasDTO.IdCategoria) return BadRequest($"Não foi possível encontrar a categoria com ID {id}. Por favor, verifique o ID digitado e tente novamente!");
@@ -126,7 +133,9 @@ public class CategoriasController : ControllerBase
     /// Atualiza partes de uma categoria de livros existente no sistema.
     /// </summary>
     /// <returns>Categoria atualizada</returns>
+    // PATCH: /Categorias/AtualizarParcialCategoria/{id}
     [HttpPatch("AtualizarParcialCategoria/{id:int:min(1)}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<CategoriasDTOResponse>> PatchAsync(int id , JsonPatchDocument<CategoriasDTORequest> patchDoc)
     {
         if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
@@ -152,7 +161,9 @@ public class CategoriasController : ControllerBase
     /// Deleta uma categoria de livros existente no sistema.
     /// </summary>
     /// <returns>Categoria deletada</returns>
+    // DELETE: /Categorias/DeletarCategoria/{id}
     [HttpDelete("DeletarCategoria/{id:int:min(1)}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<CategoriasDTOResponse>> DeleteAsync(int id)
     {
         var deletarCategoria = await _uof.CategoriaLivrosRepositorio.GetIdAsync(c => c.IdCategoria == id);

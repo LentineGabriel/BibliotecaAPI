@@ -5,6 +5,7 @@ using BibliotecaAPI.DTOs.AuthDTOs.Users;
 using BibliotecaAPI.DTOs.TokensJWT;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +43,7 @@ public class RolesController : ControllerBase
     // GET: /RolesController/Perfis
     [HttpGet]
     [Route("Perfis")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<IEnumerable<RolesResponseDTO>>> GetRolesAsync()
     {
         var roles = await _roleManager.Roles.ToListAsync();
@@ -57,6 +59,7 @@ public class RolesController : ControllerBase
     // GET: /RolesController/Perfil/id
     [HttpGet]
     [Route("Perfil/{id}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<IEnumerable<RolesResponseDTO>>> GetRoleByIdAsync(string id)
     {
         var role = await _roleManager.FindByIdAsync(id);
@@ -74,6 +77,7 @@ public class RolesController : ControllerBase
     // GET: /RolesController/Perfil/id
     [HttpGet]
     [Route("UsuariosNoPerfil/{perfil}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetUsersInRoleAsync(string perfil)
     {
         var usuariosNoPerfil = await _userManager.GetUsersInRoleAsync(perfil);
@@ -92,7 +96,7 @@ public class RolesController : ControllerBase
     // POST: /RolesController/CriarPerfil
     [HttpPost]
     [Route("CriarPerfil")]
-    // [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> CreateRole(string roleName)
     {
         var roleExists = await _roleManager.RoleExistsAsync(roleName);
@@ -112,6 +116,7 @@ public class RolesController : ControllerBase
     // POST: /RolesController/AdicionarUsuarioAoPerfil
     [HttpPost]
     [Route("AdicionarUsuarioAoPerfil")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> AddUserToRole(string email , string roleName)
     {
         var user = await _userManager.FindByEmailAsync(email);
@@ -132,6 +137,7 @@ public class RolesController : ControllerBase
     /// <returns></returns>
     // PUT: /RolesController/AtualizarPerfil/id
     [HttpPut("AtualizarPerfil/{id}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<RolesResponseDTO>> PutRoleAsync(string id , RolesRequestDTO rolesDTO)
     {
         if(id != rolesDTO.Id) return BadRequest($"Não foi possível encontrar o perfil com o nome '{id}'. Por favor, verifique o nome e tente novamente!");
@@ -158,6 +164,7 @@ public class RolesController : ControllerBase
     // DELETE: /RolesController/DeletarPerfil/RoleName
     [HttpDelete]
     [Route("DeletarPerfil/{id}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> DeleteRole(string id)
     {
         var role = await _roleManager.FindByIdAsync(id);

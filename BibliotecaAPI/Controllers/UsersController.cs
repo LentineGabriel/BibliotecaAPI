@@ -45,6 +45,7 @@ public class UsersController : ControllerBase
     // GET: /AuthController/Usuarios
     [HttpGet]
     [Route("Usuarios")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetUsersAsync()
     {
         var usuarios = await _userManager.Users.ToListAsync();
@@ -61,6 +62,7 @@ public class UsersController : ControllerBase
     // GET: /AuthController/Usuarios/id
     [HttpGet]
     [Route("Usuarios/{id}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<UsersResponseDTO>> GetUserByIdAsync(string id)
     {
         var usuario = await _userManager.FindByIdAsync(id);
@@ -79,6 +81,7 @@ public class UsersController : ControllerBase
     /// <returns>Usuário cadastrado</returns>
     // POST: /AuthController/Login
     [HttpPost("LoginUsuario")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
         if(!ModelState.IsValid) return BadRequest(ModelState);
@@ -130,6 +133,7 @@ public class UsersController : ControllerBase
     /// <returns>Cadastro do usuário criado</returns>
     // POST: /AuthController/Register
     [HttpPost("RegistrarUsuario")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
         if(!ModelState.IsValid) return BadRequest(ModelState);
@@ -158,6 +162,7 @@ public class UsersController : ControllerBase
     /// <returns>Refresh Token</returns>
     // POST: /AuthController/RefreshToken
     [HttpPost("RefreshToken")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> RefreshToken([FromBody] TokenModel model)
     {
         if(!ModelState.IsValid) return BadRequest(ModelState);
@@ -197,7 +202,7 @@ public class UsersController : ControllerBase
     /// <returns></returns>
     // POST: /AuthController/Revoke
     [HttpPost("Revoke")]
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> Revoke(string username)
     {
         var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
@@ -221,6 +226,7 @@ public class UsersController : ControllerBase
     /// <returns></returns>
     // PUT: /AuthController/AtualizarUsuario/id
     [HttpPut("AtualizarUsuario/{id}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<UsersResponseDTO>> PutAsync(string id, UsersRequestDTO usersDTO)
     {
         if(id != usersDTO.Id) return BadRequest($"Não foi possível encontrar o usuário com o ID {id}. Por favor, verifique o ID e tente novamente!");
@@ -247,6 +253,7 @@ public class UsersController : ControllerBase
     /// </summary>
     /// <returns>Autor atualizado</returns>
     [HttpPatch("AtualizarParcialUsuario/{id}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<UsersResponseDTO>> PatchAsync(string id , [FromBody] JsonPatchDocument<UsersResponseDTO> patchDoc)
     {
         if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
@@ -297,6 +304,7 @@ public class UsersController : ControllerBase
     // DELETE: /AuthController/DeletarUsuario/NomeUsuario
     [HttpDelete]
     [Route("DeletarUsuario/{id}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> DeleteUser(string id)
     {
         var user = await _userManager.FindByIdAsync(id);

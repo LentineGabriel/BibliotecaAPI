@@ -60,7 +60,7 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "bearer" ,
         BearerFormat = "JWT" ,
         In = ParameterLocation.Header ,
-        Description = "Informe o token no formato: Bearer {seu_token}"
+        Description = "Informe o token no formato: {seu_token}"
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -157,6 +157,7 @@ if(app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

@@ -4,6 +4,7 @@ using BibliotecaAPI.DTOs.EditoraDTOs;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Pagination.EditorasFiltro;
 using BibliotecaAPI.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -34,6 +35,7 @@ public class EditorasController : ControllerBase
     /// <returns>Lista de editoras</returns>
     // GET: /Editoras
     [HttpGet]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<EditorasDTOResponse>>> GetAsync()
     {
         var editoras = await _uof.EditorasRepositorio.GetAllAsync();
@@ -49,6 +51,7 @@ public class EditorasController : ControllerBase
     /// <returns>Editora via ID</returns>
     // GET: /Editoras/{id}
     [HttpGet("{id:int:min(1)}", Name = "ObterIdEditora")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> GetByIdAsync(int id)
     {
         var editora = await _uof.EditorasRepositorio.GetIdAsync(e => e.IdEditora == id);
@@ -64,6 +67,7 @@ public class EditorasController : ControllerBase
     /// <returns>Lista de Editoras paginadas</returns>
     // GET: /Editoras/Paginacao
     [HttpGet("Paginacao")]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Editoras>>> GetPaginationAsync([FromQuery] EditorasParameters editorasParameters)
     {
         var editoras = await _uof.EditorasRepositorio.GetEditorasAsync(editorasParameters);
@@ -76,6 +80,7 @@ public class EditorasController : ControllerBase
     /// <returns>Editoras por nome</returns>
     // GET: /Editoras/PesquisaPorNome
     [HttpGet("PesquisaPorNome")]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Editoras>>> GetFilterNamePaginationAsync([FromQuery] EditorasFiltroNome editorasFiltroNome)
     {
         var editoras = await _uof.EditorasRepositorio.GetEditorasFiltrandoPeloNome(editorasFiltroNome);
@@ -88,6 +93,7 @@ public class EditorasController : ControllerBase
     /// <returns>Editoras por nacionalidade</returns>
     // GET: /Editoras/PesquisaPorPaisDeOrigem
     [HttpGet("PesquisaPorNacionalidade")]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Editoras>>> GetFilterNationalityPaginationAsync([FromQuery] EditorasFiltroPaisOrigem editorasFiltroPaisOrigem)
     {
         var editoras = await _uof.EditorasRepositorio.GetEditorasFiltrandoPorPaisDeOrigem(editorasFiltroPaisOrigem);
@@ -101,6 +107,7 @@ public class EditorasController : ControllerBase
     /// </summary>
     /// <returns>Categoria criada</returns>
     [HttpPost("AdicionarEditoras")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> PostAsync(EditorasDTORequest editorasDTO)
     {
         if(editorasDTO == null) return BadRequest("Não foi possível adicionar uma nova editora. Tente novamente mais tarde!");
@@ -120,6 +127,7 @@ public class EditorasController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPut("AtualizarEditora/{id:int:min(1)}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> PutAsync(int id , EditorasDTORequest editorasDTO)
     {
         if(id != editorasDTO.IdEditora) return BadRequest($"Não foi possível encontrar a editora com ID {id}. Por favor, verifique o ID e tente novamente!");
@@ -139,6 +147,7 @@ public class EditorasController : ControllerBase
     /// </summary>
     /// <returns>Editora atualizada</returns>
     [HttpPatch("AtualizarParcialEditora/{id:int:min(1)}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> PatchAsync(int id , JsonPatchDocument<EditorasDTORequest> patchDoc)
     {
         if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
@@ -165,6 +174,7 @@ public class EditorasController : ControllerBase
     /// </summary>
     /// <returns>Editora deletada</returns>
     [HttpDelete("DeletarEditora/{id:int:min(1)}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> DeleteAsync(int id)
     {
         var deletarEditora = await _uof.EditorasRepositorio.GetIdAsync(e => e.IdEditora == id);

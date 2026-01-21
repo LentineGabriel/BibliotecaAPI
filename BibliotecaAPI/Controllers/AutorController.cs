@@ -4,6 +4,7 @@ using BibliotecaAPI.DTOs.AutorDTOs;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Pagination.AutoresFiltro;
 using BibliotecaAPI.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -34,6 +35,7 @@ public class AutorController : ControllerBase
     /// <returns>Lista de Autores</returns>
     // GET: Autor
     [HttpGet]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<AutorDTOResponse>>> GetAsync()
     {
         var autores = await _uof.AutorRepositorio.GetAllAsync();
@@ -49,6 +51,7 @@ public class AutorController : ControllerBase
     /// <returns>Autor encontrado</returns>
     // GET: Autor/{id}
     [HttpGet("{id:int:min(1)}", Name = "ObterIdAutor")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> GetByIdAsync(int id)
     {
         var autor = await _uof.AutorRepositorio.GetIdAsync(a => a.IdAutor == id);
@@ -64,6 +67,7 @@ public class AutorController : ControllerBase
     /// <returns>Lista de Autores paginadas</returns>
     // GET: Autor/Paginacao
     [HttpGet("Paginacao")]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Autor>>> GetPaginationAsync([FromQuery] AutoresParameters autoresParameters)
     {
         var autores = await _uof.AutorRepositorio.GetAutoresAsync(autoresParameters);
@@ -76,6 +80,7 @@ public class AutorController : ControllerBase
     /// <returns>Autor encontrado pelo seu nome</returns>
     // GET: Autor/PesquisaPorNome
     [HttpGet("PesquisaPorNome")]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Autor>>> GetFilterNamePaginationAsync([FromQuery] AutoresFiltroNome autoresFiltroNome)
     {
         var autores = await _uof.AutorRepositorio.GetAutoresFiltrandoPeloNome(autoresFiltroNome);
@@ -88,6 +93,7 @@ public class AutorController : ControllerBase
     /// <returns>Autor encontrado por sua nacionalidade</returns>
     // GET: Autor/PesquisaPorNacionalidade
     [HttpGet("PesquisaPorNacionalidade")]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Autor>>> GetFilterNationalityPaginationAsync([FromQuery] AutoresFiltroNacionalidade autoresFiltroNacionalidade)
     {
         var autores = await _uof.AutorRepositorio.GetAutoresFiltrandoPelaNacionalidade(autoresFiltroNacionalidade);
@@ -101,6 +107,7 @@ public class AutorController : ControllerBase
     /// </summary>
     /// <returns>Autor criado</returns>
     [HttpPost("AdicionarAutores")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> PostAsync(AutorDTORequest autorDTO)
     {
         if(autorDTO == null) return BadRequest("Não foi possível adicionar um novo autor. Tente novamente mais tarde!");
@@ -120,6 +127,7 @@ public class AutorController : ControllerBase
     /// </summary>
     /// <returns>Autor atualizado</returns>
     [HttpPut("AtualizarAutor/{id:int:min(1)}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> PutAsync(int id , AutorDTORequest autorDTO)
     {
         if(id != autorDTO.IdAutor) return BadRequest($"Não foi possível encontrar o autor com ID {id}. Por favor, verifique o ID e tente novamente!");
@@ -139,6 +147,7 @@ public class AutorController : ControllerBase
     /// </summary>
     /// <returns>Autor atualizado</returns>
     [HttpPatch("AtualizarParcialAutor/{id:int:min(1)}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> PatchAsync(int id , JsonPatchDocument<AutorDTORequest> patchDoc)
     {
         if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
@@ -165,6 +174,7 @@ public class AutorController : ControllerBase
     /// </summary>
     /// <returns>Autor deletado</returns>
     [HttpDelete("DeletarAutor/{id:int:min(1)}")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> DeleteAsync(int id)
     {
         var deletarAutor = await _uof.AutorRepositorio.GetIdAsync(a => a.IdAutor == id);
