@@ -3,14 +3,17 @@ using AutoMapper;
 using BibliotecaAPI.DTOs.AuthDTOs.Users;
 using BibliotecaAPI.DTOs.TokensJWT;
 using BibliotecaAPI.Models;
+using BibliotecaAPI.Pagination.UsuariosFiltro;
 using BibliotecaAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using X.PagedList;
 #endregion
 
 namespace BibliotecaAPI.Controllers;
@@ -71,6 +74,22 @@ public class UsersController : ControllerBase
         var usuarioDTO = _mapper.Map<UsersResponseDTO>(usuario);
 
         return Ok(usuarioDTO);
+    }
+
+    /// <summary>
+    /// Retorna os usuários cadastrados no sistema via paginação.
+    /// </summary>
+    /// <returns>Lista de Autores paginadas</returns>
+    // GET: Usuarios/Paginacao
+    [HttpGet("Paginacao")]
+    [Authorize(Policy = "AdminsAndUsers")]
+    public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetPaginationAsync([FromQuery] UsuariosParameters usuariosParameters)
+    {
+        var usuarios = await _userManager.Users.ToListAsync();
+        if(usuarios == null || !usuarios.Any()) return NotFound("Usuários não encontrados. Por favor, tente novamente!");
+
+        var usuariosPaged = await usuarios.ToPagedListAsync(usuariosParameters.PageNumber , usuariosParameters.PageSize);
+        return ObterUsuarios(usuariosPaged);
     }
     #endregion
 
@@ -317,5 +336,24 @@ public class UsersController : ControllerBase
         return BadRequest(new { Error = "Não foi possível encontrar o usuário. Por favor, tente novamente!" });
     }
     #endregion
+    #endregion
+
+    #region METHODS
+    private ActionResult<IEnumerable<UsersResponseDTO>> ObterUsuarios(IPagedList<ApplicationUser> usuarios)
+    {
+        var metadados = new
+        {
+            usuarios.Count ,
+            usuarios.PageSize ,
+            usuarios.PageCount ,
+            usuarios.TotalItemCount ,
+            usuarios.HasNextPage ,
+            usuarios.HasPreviousPage
+        };
+        Response.Headers.Append("X-Pagination" , JsonConvert.SerializeObject(metadados));
+
+        var usuariosDTO = _mapper.Map<IEnumerable<UsersResponseDTO>>(usuarios);
+        return Ok(usuariosDTO);
+    }
     #endregion
 }

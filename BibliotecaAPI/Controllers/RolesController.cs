@@ -4,11 +4,14 @@ using BibliotecaAPI.DTOs.AuthDTOs.Roles;
 using BibliotecaAPI.DTOs.AuthDTOs.Users;
 using BibliotecaAPI.DTOs.TokensJWT;
 using BibliotecaAPI.Models;
+using BibliotecaAPI.Pagination.PerfilFiltro;
 using BibliotecaAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using X.PagedList;
 #endregion
 
 namespace BibliotecaAPI.Controllers;
@@ -85,6 +88,22 @@ public class RolesController : ControllerBase
 
         var usuariosNoPerfilDTO = _mapper.Map<IEnumerable<UsersResponseDTO>>(usuariosNoPerfil);
         return Ok(usuariosNoPerfilDTO);
+    }
+
+    /// <summary>
+    /// Retorna os perfis cadastrados no sistema via paginação.
+    /// </summary>
+    /// <returns>Lista de Autores paginadas</returns>
+    // GET: Perfil/Paginacao
+    [HttpGet("Paginacao")]
+    // [Authorize(Policy = "AdminsAndUsers")]
+    public async Task<ActionResult<IEnumerable<RolesResponseDTO>>> GetPaginationAsync([FromQuery] PerfilParameters perfilParameters)
+    {
+        var perfis = await _roleManager.Roles.ToListAsync();
+        if(perfis == null || !perfis.Any()) return NotFound("Perfis não encontrados. Por favor, tente novamente!");
+
+        var perfisPaginados = await perfis.ToPagedListAsync(perfilParameters.PageNumber , perfilParameters.PageSize);
+        return ObterPerfis(perfisPaginados);
     }
     #endregion
 
@@ -177,5 +196,24 @@ public class RolesController : ControllerBase
         return BadRequest(new { Error = "Não foi possível encontrar o perfil. Por favor, tente novamente!" });
     }
     #endregion
+    #endregion
+
+    #region METHODS
+    private ActionResult<IEnumerable<RolesResponseDTO>> ObterPerfis(IPagedList<IdentityRole> perfil)
+    {
+        var metadados = new
+        {
+            perfil.Count ,
+            perfil.PageSize ,
+            perfil.PageCount ,
+            perfil.TotalItemCount ,
+            perfil.HasNextPage ,
+            perfil.HasPreviousPage
+        };
+        Response.Headers.Append("X-Pagination" , JsonConvert.SerializeObject(metadados));
+
+        var perfilDTO = _mapper.Map<IEnumerable<RolesResponseDTO>>(perfil);
+        return Ok(perfilDTO);
+    }
     #endregion
 }
