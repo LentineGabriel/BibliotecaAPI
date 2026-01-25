@@ -161,6 +161,16 @@ builder.Services.AddAuthentication(op =>
 
 #region APP
 var app = builder.Build();
+
+// seed de novos livros, autores, etc.
+using(var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    await db.Database.MigrateAsync();
+    await BibliotecaAPI.Data.DbSeeder.SeedAsync(db);
+}
+
 if(app.Environment.IsDevelopment())
 {
     app.UseSwagger();
