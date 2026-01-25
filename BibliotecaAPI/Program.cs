@@ -1,4 +1,6 @@
 #region USINGS
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 using BibliotecaAPI.Context;
 using BibliotecaAPI.DTOs.Mappings;
 using BibliotecaAPI.Filters;
@@ -8,11 +10,14 @@ using BibliotecaAPI.Repositories.Interfaces;
 using BibliotecaAPI.Services;
 using BibliotecaAPI.Services.Interfaces;
 using BibliotecaAPI.Settings;
+using BibliotecaAPI.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -38,15 +43,25 @@ builder.Services.AddControllers(op =>
 {
     op.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
+
+// versionamento do projeto
+builder.Services.AddApiVersioning(op =>
+{
+    op.DefaultApiVersion = new ApiVersion(1 , 0);
+    op.AssumeDefaultVersionWhenUnspecified = true;
+    op.ReportApiVersions = true;
+    op.ApiVersionReader = new UrlSegmentApiVersionReader();
+})
+.AddApiExplorer(op =>
+{
+    op.GroupNameFormat = "'v'VVV";
+    op.SubstituteApiVersionInUrl = true;
+});
+
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions> , ConfigureSwaggerOptions>();
+
 builder.Services.AddSwaggerGen(c =>
 {
-    // documentação swagger
-    c.SwaggerDoc("v1" , new OpenApiInfo
-    {
-        Title = "BibliotecaAPI" ,
-        Version = "v1"
-    });
-
     // comentários XML
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory , xmlFile);
@@ -81,9 +96,9 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddAuthorization(op =>
 {
-    op.AddPolicy("AdminsAndUsers", policy => policy.RequireRole("Admins", "Users"));
+    op.AddPolicy("AdminsAndUsers" , policy => policy.RequireRole("Admins" , "Users"));
     op.AddPolicy("AdminsOnly" , policy => policy.RequireRole("Admins"));
-    op.AddPolicy("UsersOnly", policy => policy.RequireRole("Users"));
+    op.AddPolicy("UsersOnly" , policy => policy.RequireRole("Users"));
 });
 
 #region DATABASE & DI
@@ -99,7 +114,6 @@ builder.Services.AddScoped<IAutorRepositorio , AutorRepositorio>();
 builder.Services.AddScoped<IEditorasRepositorio , EditorasRepositorio>();
 builder.Services.AddScoped<ICategoriaLivrosRepositorio , CategoriaLivrosRepositorio>();
 builder.Services.AddAutoMapper(cfg => { } , typeof(MappingProfile));
-builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddIdentity<ApplicationUser , IdentityRole>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 builder.Services.AddScoped<ITokenService , TokenService>();
 #endregion
@@ -150,9 +164,14 @@ var app = builder.Build();
 if(app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
+    app.UseSwaggerUI(op =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "BibliotecaAPI v1");
+        var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+
+        foreach(var desc in provider.ApiVersionDescriptions)
+        {
+            op.SwaggerEndpoint($"/swagger/{desc.GroupName}/swagger.json" , $"BibliotecaAPI {desc.GroupName.ToUpperInvariant()}");
+        }
     });
 }
 

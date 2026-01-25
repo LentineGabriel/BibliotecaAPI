@@ -1,4 +1,5 @@
 ﻿#region USINGS
+using Asp.Versioning;
 using AutoMapper;
 using BibliotecaAPI.DTOs.EditoraDTOs;
 using BibliotecaAPI.Models;
@@ -35,6 +36,8 @@ public class EditorasController : ControllerBase
     /// <returns>Lista de editoras</returns>
     // GET: /Editoras
     [HttpGet]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<EditorasDTOResponse>>> GetAsync()
     {
@@ -51,6 +54,8 @@ public class EditorasController : ControllerBase
     /// <returns>Editora via ID</returns>
     // GET: /Editoras/{id}
     [HttpGet("{id:int:min(1)}", Name = "ObterIdEditora")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> GetByIdAsync(int id)
     {
@@ -67,6 +72,8 @@ public class EditorasController : ControllerBase
     /// <returns>Lista de Editoras paginadas</returns>
     // GET: /Editoras/Paginacao
     [HttpGet("Paginacao")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Editoras>>> GetPaginationAsync([FromQuery] EditorasParameters editorasParameters)
     {
@@ -80,6 +87,8 @@ public class EditorasController : ControllerBase
     /// <returns>Editoras por nome</returns>
     // GET: /Editoras/PesquisaPorNome
     [HttpGet("PesquisaPorNome")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Editoras>>> GetFilterNamePaginationAsync([FromQuery] EditorasFiltroNome editorasFiltroNome)
     {
@@ -93,6 +102,8 @@ public class EditorasController : ControllerBase
     /// <returns>Editoras por nacionalidade</returns>
     // GET: /Editoras/PesquisaPorPaisDeOrigem
     [HttpGet("PesquisaPorNacionalidade")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Editoras>>> GetFilterNationalityPaginationAsync([FromQuery] EditorasFiltroPaisOrigem editorasFiltroPaisOrigem)
     {
@@ -107,6 +118,8 @@ public class EditorasController : ControllerBase
     /// </summary>
     /// <returns>Categoria criada</returns>
     [HttpPost("AdicionarEditoras")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> PostAsync(EditorasDTORequest editorasDTO)
     {
@@ -127,6 +140,8 @@ public class EditorasController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPut("AtualizarEditora/{id:int:min(1)}")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> PutAsync(int id , EditorasDTORequest editorasDTO)
     {
@@ -147,6 +162,8 @@ public class EditorasController : ControllerBase
     /// </summary>
     /// <returns>Editora atualizada</returns>
     [HttpPatch("AtualizarParcialEditora/{id:int:min(1)}")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> PatchAsync(int id , JsonPatchDocument<EditorasDTORequest> patchDoc)
     {
@@ -174,6 +191,8 @@ public class EditorasController : ControllerBase
     /// </summary>
     /// <returns>Editora deletada</returns>
     [HttpDelete("DeletarEditora/{id:int:min(1)}")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> DeleteAsync(int id)
     {

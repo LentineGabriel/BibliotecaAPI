@@ -1,4 +1,5 @@
 ﻿#region USINGS
+using Asp.Versioning;
 using AutoMapper;
 using BibliotecaAPI.DTOs.AutorDTOs;
 using BibliotecaAPI.Models;
@@ -35,6 +36,8 @@ public class AutorController : ControllerBase
     /// <returns>Lista de Autores</returns>
     // GET: Autor
     [HttpGet]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<AutorDTOResponse>>> GetAsync()
     {
@@ -51,6 +54,8 @@ public class AutorController : ControllerBase
     /// <returns>Autor encontrado</returns>
     // GET: Autor/{id}
     [HttpGet("{id:int:min(1)}", Name = "ObterIdAutor")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> GetByIdAsync(int id)
     {
@@ -67,6 +72,8 @@ public class AutorController : ControllerBase
     /// <returns>Lista de Autores paginadas</returns>
     // GET: Autor/Paginacao
     [HttpGet("Paginacao")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Autor>>> GetPaginationAsync([FromQuery] AutoresParameters autoresParameters)
     {
@@ -80,6 +87,8 @@ public class AutorController : ControllerBase
     /// <returns>Autor encontrado pelo seu nome</returns>
     // GET: Autor/PesquisaPorNome
     [HttpGet("PesquisaPorNome")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Autor>>> GetFilterNamePaginationAsync([FromQuery] AutoresFiltroNome autoresFiltroNome)
     {
@@ -93,6 +102,8 @@ public class AutorController : ControllerBase
     /// <returns>Autor encontrado por sua nacionalidade</returns>
     // GET: Autor/PesquisaPorNacionalidade
     [HttpGet("PesquisaPorNacionalidade")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Autor>>> GetFilterNationalityPaginationAsync([FromQuery] AutoresFiltroNacionalidade autoresFiltroNacionalidade)
     {
@@ -107,6 +118,8 @@ public class AutorController : ControllerBase
     /// </summary>
     /// <returns>Autor criado</returns>
     [HttpPost("AdicionarAutores")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> PostAsync(AutorDTORequest autorDTO)
     {
@@ -127,6 +140,8 @@ public class AutorController : ControllerBase
     /// </summary>
     /// <returns>Autor atualizado</returns>
     [HttpPut("AtualizarAutor/{id:int:min(1)}")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> PutAsync(int id , AutorDTORequest autorDTO)
     {
@@ -147,6 +162,8 @@ public class AutorController : ControllerBase
     /// </summary>
     /// <returns>Autor atualizado</returns>
     [HttpPatch("AtualizarParcialAutor/{id:int:min(1)}")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> PatchAsync(int id , JsonPatchDocument<AutorDTORequest> patchDoc)
     {
@@ -174,6 +191,8 @@ public class AutorController : ControllerBase
     /// </summary>
     /// <returns>Autor deletado</returns>
     [HttpDelete("DeletarAutor/{id:int:min(1)}")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> DeleteAsync(int id)
     {

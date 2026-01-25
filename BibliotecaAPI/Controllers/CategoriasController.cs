@@ -1,4 +1,5 @@
 ﻿#region USINGS
+using Asp.Versioning;
 using AutoMapper;
 using BibliotecaAPI.DTOs.CategoriaDTOs;
 using BibliotecaAPI.Models;
@@ -35,6 +36,8 @@ public class CategoriasController : ControllerBase
     /// <returns>Lista de categorias</returns>
     // GET: /Categorias
     [HttpGet]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<CategoriasDTOResponse>>> GetAsync()
     {
@@ -51,6 +54,8 @@ public class CategoriasController : ControllerBase
     /// <returns>Categoria de livros via ID</returns>
     // GET: /Categorias/{id}
     [HttpGet("{id:int:min(1)}", Name = "ObterIdCategoria")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<CategoriasDTOResponse>> GetByIdAsync(int id)
     {
@@ -67,6 +72,8 @@ public class CategoriasController : ControllerBase
     /// <returns>Lista de Editoras paginadas</returns>
     // GET: /Categorias/Paginacao
     [HttpGet("Paginacao")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Categorias>>> GetPaginationAsync([FromQuery] CategoriasParameters categoriaParameters)
     {
@@ -80,6 +87,8 @@ public class CategoriasController : ControllerBase
     /// <returns>Categorias por nome</returns>
     // GET: /Categorias/PesquisaPorNome
     [HttpGet("PesquisaPorNome")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Categorias>>> GetFilterNamePaginationAsync([FromQuery] CategoriasFiltroNome categoriasFiltroNome)
     {
@@ -94,6 +103,8 @@ public class CategoriasController : ControllerBase
     /// </summary>
     /// <returns>Categoria criada</returns>
     [HttpPost("AdicionarCategorias")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<CategoriasDTOResponse>> PostAsync(CategoriasDTORequest categoriasDTO)
     {
@@ -114,6 +125,8 @@ public class CategoriasController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPut("AtualizarCategoria/{id:int:min(1)}")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<CategoriasDTOResponse>> PutAsync(int id , CategoriasDTORequest categoriasDTO)
     {
@@ -135,6 +148,8 @@ public class CategoriasController : ControllerBase
     /// <returns>Categoria atualizada</returns>
     // PATCH: /Categorias/AtualizarParcialCategoria/{id}
     [HttpPatch("AtualizarParcialCategoria/{id:int:min(1)}")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<CategoriasDTOResponse>> PatchAsync(int id , JsonPatchDocument<CategoriasDTORequest> patchDoc)
     {
@@ -163,6 +178,8 @@ public class CategoriasController : ControllerBase
     /// <returns>Categoria deletada</returns>
     // DELETE: /Categorias/DeletarCategoria/{id}
     [HttpDelete("DeletarCategoria/{id:int:min(1)}")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<CategoriasDTOResponse>> DeleteAsync(int id)
     {

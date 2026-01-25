@@ -1,4 +1,5 @@
 ﻿#region USINGS
+using Asp.Versioning;
 using AutoMapper;
 using BibliotecaAPI.DTOs.AuthDTOs.Users;
 using BibliotecaAPI.DTOs.TokensJWT;
@@ -47,6 +48,8 @@ public class UsersController : ControllerBase
     /// <returns>Usuário cadastrado</returns>
     // GET: /AuthController/Usuarios
     [HttpGet]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Route("Usuarios")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetUsersAsync()
@@ -64,6 +67,8 @@ public class UsersController : ControllerBase
     /// <returns>Usuário cadastrado</returns>
     // GET: /AuthController/Usuarios/id
     [HttpGet]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Route("Usuarios/{id}")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<UsersResponseDTO>> GetUserByIdAsync(string id)
@@ -82,6 +87,8 @@ public class UsersController : ControllerBase
     /// <returns>Lista de Autores paginadas</returns>
     // GET: Usuarios/Paginacao
     [HttpGet("Paginacao")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetPaginationAsync([FromQuery] UsuariosParameters usuariosParameters)
     {
@@ -100,6 +107,8 @@ public class UsersController : ControllerBase
     /// <returns>Usuário cadastrado</returns>
     // POST: /AuthController/Login
     [HttpPost("LoginUsuario")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
         if(!ModelState.IsValid) return BadRequest(ModelState);
@@ -151,6 +160,8 @@ public class UsersController : ControllerBase
     /// <returns>Cadastro do usuário criado</returns>
     // POST: /AuthController/Register
     [HttpPost("RegistrarUsuario")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
         if(!ModelState.IsValid) return BadRequest(ModelState);
@@ -179,6 +190,8 @@ public class UsersController : ControllerBase
     /// <returns>Refresh Token</returns>
     // POST: /AuthController/RefreshToken
     [HttpPost("RefreshToken")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> RefreshToken([FromBody] TokenModel model)
     {
@@ -219,6 +232,8 @@ public class UsersController : ControllerBase
     /// <returns></returns>
     // POST: /AuthController/Revoke
     [HttpPost("Revoke")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> Revoke(string username)
     {
@@ -243,6 +258,8 @@ public class UsersController : ControllerBase
     /// <returns></returns>
     // PUT: /AuthController/AtualizarUsuario/id
     [HttpPut("AtualizarUsuario/{id}")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<UsersResponseDTO>> PutAsync(string id, UsersRequestDTO usersDTO)
     {
@@ -270,6 +287,8 @@ public class UsersController : ControllerBase
     /// </summary>
     /// <returns>Autor atualizado</returns>
     [HttpPatch("AtualizarParcialUsuario/{id}")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<UsersResponseDTO>> PatchAsync(string id , [FromBody] JsonPatchDocument<UsersResponseDTO> patchDoc)
     {
@@ -321,6 +340,8 @@ public class UsersController : ControllerBase
     // DELETE: /AuthController/DeletarUsuario/NomeUsuario
     [HttpDelete]
     [Route("DeletarUsuario/{id}")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> DeleteUser(string id)
     {
