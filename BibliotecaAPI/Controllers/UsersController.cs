@@ -50,7 +50,6 @@ public class UsersController : ControllerBase
     [HttpGet]
     [ApiVersion("1.0")]
     [ApiVersion("2.0")]
-    [Route("Usuarios")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetUsersAsync()
     {
@@ -66,10 +65,9 @@ public class UsersController : ControllerBase
     /// </summary>
     /// <returns>Usuário cadastrado</returns>
     // GET: /AuthController/Usuarios/id
-    [HttpGet]
+    [HttpGet("{id:int:min(1)}")]
     [ApiVersion("1.0")]
     [ApiVersion("2.0")]
-    [Route("Usuarios/{id}")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<UsersResponseDTO>> GetUserByIdAsync(string id)
     {

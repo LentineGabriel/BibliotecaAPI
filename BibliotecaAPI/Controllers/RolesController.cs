@@ -48,7 +48,6 @@ public class RolesController : ControllerBase
     [HttpGet]
     [ApiVersion("1.0")]
     [ApiVersion("2.0")]
-    [Route("Perfis")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<IEnumerable<RolesResponseDTO>>> GetRolesAsync()
     {
@@ -63,10 +62,9 @@ public class RolesController : ControllerBase
     /// </summary>
     /// <returns>Usuário cadastrado</returns>
     // GET: /RolesController/Perfil/id
-    [HttpGet]
+    [HttpGet("{id:int:min(1)}")]
     [ApiVersion("1.0")]
     [ApiVersion("2.0")]
-    [Route("Perfil/{id}")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<IEnumerable<RolesResponseDTO>>> GetRoleByIdAsync(string id)
     {
@@ -83,10 +81,9 @@ public class RolesController : ControllerBase
     /// </summary>
     /// <returns>Usuário cadastrado</returns>
     // GET: /RolesController/Perfil/id
-    [HttpGet]
+    [HttpGet("UsuariosNoPerfil/{perfil}")]
     [ApiVersion("1.0")]
     [ApiVersion("2.0")]
-    [Route("UsuariosNoPerfil/{perfil}")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetUsersInRoleAsync(string perfil)
     {
