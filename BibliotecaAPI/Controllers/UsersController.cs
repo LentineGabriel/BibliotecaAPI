@@ -100,7 +100,6 @@ public class UsersController : ControllerBase
     /// <returns>Usuário cadastrado</returns>
     // POST: /AuthController/Login
     [HttpPost("LoginUsuario")]
-    [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
         if(!ModelState.IsValid) return BadRequest(ModelState);
@@ -152,7 +151,6 @@ public class UsersController : ControllerBase
     /// <returns>Cadastro do usuário criado</returns>
     // POST: /AuthController/Register
     [HttpPost("RegistrarUsuario")]
-    [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
         if(!ModelState.IsValid) return BadRequest(ModelState);
