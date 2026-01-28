@@ -12,10 +12,11 @@ using Newtonsoft.Json;
 using X.PagedList;
 #endregion
 
-namespace BibliotecaAPI.Controllers;
+namespace BibliotecaAPI.Controllers.V1;
 
 [ApiController]
-[Route("[controller]")]
+[Route("v{version:apiVersion}/[Controller]")]
+[ApiVersion("1.0")]
 public class AutorController : ControllerBase
 {
     #region PROPS/CTORS
@@ -36,8 +37,6 @@ public class AutorController : ControllerBase
     /// <returns>Lista de Autores</returns>
     // GET: Autor
     [HttpGet]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<AutorDTOResponse>>> GetAsync()
     {
@@ -53,9 +52,8 @@ public class AutorController : ControllerBase
     /// </summary>
     /// <returns>Autor encontrado</returns>
     // GET: Autor/{id}
-    [HttpGet("{id:int:min(1)}", Name = "ObterIdAutor")]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
+    [HttpGet]
+    [Route("AutoresPorId/{id:int:min(1)}")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> GetByIdAsync(int id)
     {
@@ -71,9 +69,8 @@ public class AutorController : ControllerBase
     /// </summary>
     /// <returns>Lista de Autores paginadas</returns>
     // GET: Autor/Paginacao
-    [HttpGet("Paginacao")]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
+    [HttpGet]
+    [Route("Paginacao")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Autor>>> GetPaginationAsync([FromQuery] AutoresParameters autoresParameters)
     {
@@ -86,9 +83,8 @@ public class AutorController : ControllerBase
     /// </summary>
     /// <returns>Autor encontrado pelo seu nome</returns>
     // GET: Autor/PesquisaPorNome
-    [HttpGet("PesquisaPorNome")]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
+    [HttpGet]
+    [Route("PesquisaPoNome")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Autor>>> GetFilterNamePaginationAsync([FromQuery] AutoresFiltroNome autoresFiltroNome)
     {
@@ -101,9 +97,8 @@ public class AutorController : ControllerBase
     /// </summary>
     /// <returns>Autor encontrado por sua nacionalidade</returns>
     // GET: Autor/PesquisaPorNacionalidade
-    [HttpGet("PesquisaPorNacionalidade")]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
+    [HttpGet]
+    [Route("PesquisaPorNacionalidade")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Autor>>> GetFilterNationalityPaginationAsync([FromQuery] AutoresFiltroNacionalidade autoresFiltroNacionalidade)
     {
@@ -117,9 +112,8 @@ public class AutorController : ControllerBase
     /// Adiciona um novo autor ao sistema.
     /// </summary>
     /// <returns>Autor criado</returns>
-    [HttpPost("AdicionarAutores")]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
+    [HttpPost]
+    [Route("AdicionarAutores")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> PostAsync(AutorDTORequest autorDTO)
     {
@@ -140,8 +134,6 @@ public class AutorController : ControllerBase
     /// </summary>
     /// <returns>Autor atualizado</returns>
     [HttpPut("AtualizarAutor/{id:int:min(1)}")]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> PutAsync(int id , AutorDTORequest autorDTO)
     {
@@ -162,8 +154,6 @@ public class AutorController : ControllerBase
     /// </summary>
     /// <returns>Autor atualizado</returns>
     [HttpPatch("AtualizarParcialAutor/{id:int:min(1)}")]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> PatchAsync(int id , JsonPatchDocument<AutorDTORequest> patchDoc)
     {
@@ -191,8 +181,6 @@ public class AutorController : ControllerBase
     /// </summary>
     /// <returns>Autor deletado</returns>
     [HttpDelete("DeletarAutor/{id:int:min(1)}")]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> DeleteAsync(int id)
     {

@@ -1,4 +1,4 @@
-﻿using BibliotecaAPI.Services.Interfaces;
+﻿using BibliotecaAPI.Services.Interfaces.TokenJWT;
 using BibliotecaAPI.Settings;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

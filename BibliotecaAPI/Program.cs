@@ -8,7 +8,7 @@ using BibliotecaAPI.Models;
 using BibliotecaAPI.Repositories;
 using BibliotecaAPI.Repositories.Interfaces;
 using BibliotecaAPI.Services;
-using BibliotecaAPI.Services.Interfaces;
+using BibliotecaAPI.Services.Interfaces.TokenJWT;
 using BibliotecaAPI.Settings;
 using BibliotecaAPI.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

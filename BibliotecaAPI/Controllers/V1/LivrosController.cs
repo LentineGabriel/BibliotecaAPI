@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 using X.PagedList;
 #endregion
 
-namespace BibliotecaAPI.Controllers;
+namespace BibliotecaAPI.Controllers.V1;
 
 [ApiController]
 [Route("[controller]")]
@@ -179,6 +179,8 @@ public class LivrosController : ControllerBase
         var livroDTO = _mapper.Map<LivrosDTOResponse>(livroCompleto);
         return new CreatedAtRouteResult("ObterIdLivro" , new { id = livroCriado.IdLivro } , livroDTO);
     }
+
+    // Livros lidos por um usuário - VERSÃO 2.0
     #endregion
 
     #region PUT

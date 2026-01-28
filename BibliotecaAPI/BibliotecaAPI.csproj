@@ -29,4 +29,18 @@
 		<PackageReference Include="X.PagedList.Mvc.Core" Version="9.1.2" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Controllers\V2\" />
+	  <Folder Include="Services\Interfaces\Auth\" />
+	  <Folder Include="Services\Interfaces\Autores\" />
+	  <Folder Include="Services\Interfaces\Categorias\" />
+	  <Folder Include="Services\Interfaces\Editoras\" />
+	  <Folder Include="Services\Interfaces\Livros\" />
+	  <Folder Include="Services\UseCases\Autores\" />
+	  <Folder Include="Services\UseCases\Editoras\" />
+	  <Folder Include="Services\UseCases\Categorias\" />
+	  <Folder Include="Services\UseCases\Livros\" />
+	  <Folder Include="Services\UseCases\Auth\" />
+	</ItemGroup>
+
 </Project>

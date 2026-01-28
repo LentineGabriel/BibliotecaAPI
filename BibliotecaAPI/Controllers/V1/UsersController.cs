@@ -5,7 +5,7 @@ using BibliotecaAPI.DTOs.AuthDTOs.Users;
 using BibliotecaAPI.DTOs.TokensJWT;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Pagination.UsuariosFiltro;
-using BibliotecaAPI.Services.Interfaces;
+using BibliotecaAPI.Services.Interfaces.TokenJWT;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.JsonPatch;
@@ -17,7 +17,7 @@ using System.Security.Claims;
 using X.PagedList;
 #endregion
 
-namespace BibliotecaAPI.Controllers;
+namespace BibliotecaAPI.Controllers.V1;
 
 [ApiController]
 [Route("[controller]")]
