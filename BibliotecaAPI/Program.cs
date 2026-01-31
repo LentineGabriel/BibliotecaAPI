@@ -8,7 +8,9 @@ using BibliotecaAPI.Models;
 using BibliotecaAPI.Repositories;
 using BibliotecaAPI.Repositories.Interfaces;
 using BibliotecaAPI.Services;
+using BibliotecaAPI.Services.Interfaces.Autores;
 using BibliotecaAPI.Services.Interfaces.TokenJWT;
+using BibliotecaAPI.Services.UseCases.Autores;
 using BibliotecaAPI.Settings;
 using BibliotecaAPI.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -116,6 +118,12 @@ builder.Services.AddScoped<ICategoriaLivrosRepositorio , CategoriaLivrosReposito
 builder.Services.AddAutoMapper(cfg => { } , typeof(MappingProfile));
 builder.Services.AddIdentity<ApplicationUser , IdentityRole>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 builder.Services.AddScoped<ITokenService , TokenService>();
+
+// Autores Use Cases
+builder.Services.AddScoped<ICreateAutoresUseCase , CreateAutoresUseCase>();
+builder.Services.AddScoped<IPutAutoresUseCase , PutAutoresUseCase>();
+builder.Services.AddScoped<IPatchAutoresUseCase , PatchAutoresUseCase>();
+builder.Services.AddScoped<IDeleteAutoresUseCase , DeleteAutoresUseCase>();
 #endregion
 
 #region JWT TOKEN

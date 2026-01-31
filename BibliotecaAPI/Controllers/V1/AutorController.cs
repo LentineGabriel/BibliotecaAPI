@@ -5,6 +5,7 @@ using BibliotecaAPI.DTOs.AutorDTOs;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Pagination.AutoresFiltro;
 using BibliotecaAPI.Repositories.Interfaces;
+using BibliotecaAPI.Services.Interfaces.Autores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -22,11 +23,19 @@ public class AutorController : ControllerBase
     #region PROPS/CTORS
     private readonly IUnityOfWork _uof;
     private readonly IMapper _mapper;
-    
-    public AutorController(IUnityOfWork uof, IMapper mapper)
+    private readonly ICreateAutoresUseCase _createAutoresUseCase;
+    private readonly IPutAutoresUseCase _putAutoresUseCase;
+    private readonly IPatchAutoresUseCase _patchAutoresUseCase;
+    private readonly IDeleteAutoresUseCase _deleteAutoresUseCase;
+
+    public AutorController(IUnityOfWork uof, IMapper mapper, ICreateAutoresUseCase createAutoresUseCase, IPutAutoresUseCase putAutoresUseCase, IPatchAutoresUseCase patchAutoresUseCase, IDeleteAutoresUseCase deleteAutoresUseCase)
     {
         _uof = uof;
         _mapper = mapper;
+        _createAutoresUseCase = createAutoresUseCase;
+        _putAutoresUseCase = putAutoresUseCase;
+        _patchAutoresUseCase = patchAutoresUseCase;
+        _deleteAutoresUseCase = deleteAutoresUseCase;
     }
     #endregion
 
@@ -114,17 +123,13 @@ public class AutorController : ControllerBase
     /// <returns>Autor criado</returns>
     [HttpPost]
     [Route("AdicionarAutores")]
-    [Authorize(Policy = "AdminsOnly")]
-    public async Task<ActionResult<AutorDTOResponse>> PostAsync(AutorDTORequest autorDTO)
+    // [Authorize(Policy = "AdminsOnly")]
+    public async Task<ActionResult<AutorDTOResponse>> PostAsync([FromBody] AutorDTORequest autorDTO)
     {
         if(autorDTO == null) return BadRequest("Não foi possível adicionar um novo autor. Tente novamente mais tarde!");
+        var autorCriado = await _createAutoresUseCase.CreateAsync(autorDTO);
 
-        var autorNovo = _mapper.Map<Autor>(autorDTO);
-        var autorCriado = _uof.AutorRepositorio.Create(autorNovo);
-        await _uof.CommitAsync();
-
-        var autorRetornoDTO = _mapper.Map<AutorDTOResponse>(autorCriado);
-        return new CreatedAtRouteResult("ObterIdAutor" , new { id = autorCriado.IdAutor } , autorRetornoDTO);
+        return Ok(autorCriado);
     }
     #endregion
 
@@ -138,13 +143,9 @@ public class AutorController : ControllerBase
     public async Task<ActionResult<AutorDTOResponse>> PutAsync(int id , AutorDTORequest autorDTO)
     {
         if(id != autorDTO.IdAutor) return BadRequest($"Não foi possível encontrar o autor com ID {id}. Por favor, verifique o ID e tente novamente!");
+        var autorExistente = await _putAutoresUseCase.PutAsync(autorDTO);
 
-        var autor = _mapper.Map<Autor>(autorDTO);
-        var autorExistente = _uof.AutorRepositorio.Update(autor);
-        await _uof.CommitAsync();
-
-        var autorRetornoDTO = _mapper.Map<AutorDTOResponse>(autorExistente);
-        return Ok(autorRetornoDTO);
+        return Ok(autorExistente);
     }
     #endregion
 
@@ -158,19 +159,8 @@ public class AutorController : ControllerBase
     public async Task<ActionResult<AutorDTOResponse>> PatchAsync(int id , JsonPatchDocument<AutorDTORequest> patchDoc)
     {
         if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
+        var autorRetornoDTO = await _patchAutoresUseCase.PatchAsync(id , patchDoc);
 
-        var autor = await _uof.AutorRepositorio.GetIdAsync(a => a.IdAutor == id);
-        if(autor == null) return NotFound($"Autor com ID {id} não encontrado. Por favor, verifique o ID e tente novamente!");
-
-        var autorDTO = _mapper.Map<AutorDTORequest>(autor);
-        patchDoc.ApplyTo(autorDTO , ModelState);
-        if(!ModelState.IsValid) return BadRequest(ModelState);
-
-        _mapper.Map(autorDTO , autor);
-        _uof.AutorRepositorio.Update(autor);
-        await _uof.CommitAsync();
-
-        var autorRetornoDTO = _mapper.Map<AutorDTOResponse>(autor);
         return Ok(autorRetornoDTO);
     }
     #endregion
@@ -184,13 +174,7 @@ public class AutorController : ControllerBase
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> DeleteAsync(int id)
     {
-        var deletarAutor = await _uof.AutorRepositorio.GetIdAsync(a => a.IdAutor == id);
-        if(deletarAutor == null) return NotFound("Autor não localizado! Verifique o ID digitado");
-
-        var autorExcluido = _uof.AutorRepositorio.Delete(deletarAutor);
-        await _uof.CommitAsync();
-
-        var autorExcluidoDTO = _mapper.Map<AutorDTOResponse>(autorExcluido);
+        var autorExcluidoDTO =  await _deleteAutoresUseCase.DeleteAsync(id);
         return Ok(autorExcluidoDTO);
     }
     #endregion
