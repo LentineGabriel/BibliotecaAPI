@@ -23,15 +23,17 @@ public class AutorController : ControllerBase
     #region PROPS/CTORS
     private readonly IUnityOfWork _uof;
     private readonly IMapper _mapper;
+    private readonly IGetAutoresUseCase _getAutoresUseCase;
     private readonly ICreateAutoresUseCase _createAutoresUseCase;
     private readonly IPutAutoresUseCase _putAutoresUseCase;
     private readonly IPatchAutoresUseCase _patchAutoresUseCase;
     private readonly IDeleteAutoresUseCase _deleteAutoresUseCase;
 
-    public AutorController(IUnityOfWork uof, IMapper mapper, ICreateAutoresUseCase createAutoresUseCase, IPutAutoresUseCase putAutoresUseCase, IPatchAutoresUseCase patchAutoresUseCase, IDeleteAutoresUseCase deleteAutoresUseCase)
+    public AutorController(IUnityOfWork uof, IMapper mapper, IGetAutoresUseCase getAutoresUseCase, ICreateAutoresUseCase createAutoresUseCase, IPutAutoresUseCase putAutoresUseCase, IPatchAutoresUseCase patchAutoresUseCase, IDeleteAutoresUseCase deleteAutoresUseCase)
     {
         _uof = uof;
         _mapper = mapper;
+        _getAutoresUseCase = getAutoresUseCase;
         _createAutoresUseCase = createAutoresUseCase;
         _putAutoresUseCase = putAutoresUseCase;
         _patchAutoresUseCase = patchAutoresUseCase;
@@ -49,11 +51,8 @@ public class AutorController : ControllerBase
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<AutorDTOResponse>>> GetAsync()
     {
-        var autores = await _uof.AutorRepositorio.GetAllAsync();
-        if(autores == null || !autores.Any()) return NotFound("Autores não encontrados. Por favor, tente novamente!");
-
-        var autoresDTO = _mapper.Map<IEnumerable<AutorDTOResponse>>(autores);
-        return Ok(autoresDTO);
+        var autores = await _getAutoresUseCase.GetAllAsync();
+        return Ok(autores);
     }
 
     /// <summary>
@@ -63,14 +62,11 @@ public class AutorController : ControllerBase
     // GET: Autor/{id}
     [HttpGet]
     [Route("AutoresPorId/{id:int:min(1)}")]
-    [Authorize(Policy = "AdminsOnly")]
+    //[Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> GetByIdAsync(int id)
     {
-        var autor = await _uof.AutorRepositorio.GetIdAsync(a => a.IdAutor == id);
-        if(autor == null) return NotFound($"Autor por ID = {id} não encontrado. Por favor, tente novamente!");
-        
-        var autorDTO = _mapper.Map<AutorDTOResponse>(autor);
-        return Ok(autorDTO);
+        var autorId = await _getAutoresUseCase.GetByIdAsync(id);
+        return Ok(autorId);
     }
 
     /// <summary>
@@ -83,7 +79,7 @@ public class AutorController : ControllerBase
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Autor>>> GetPaginationAsync([FromQuery] AutoresParameters autoresParameters)
     {
-        var autores = await _uof.AutorRepositorio.GetAutoresAsync(autoresParameters);
+        var autores = await _getAutoresUseCase.GetPaginationAsync(autoresParameters);
         return ObterAutores(autores);
     }
 
@@ -97,7 +93,7 @@ public class AutorController : ControllerBase
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Autor>>> GetFilterNamePaginationAsync([FromQuery] AutoresFiltroNome autoresFiltroNome)
     {
-        var autores = await _uof.AutorRepositorio.GetAutoresFiltrandoPeloNome(autoresFiltroNome);
+        var autores = await _getAutoresUseCase.GetFilterNamePaginationAsync(autoresFiltroNome);
         return ObterAutores(autores);
     }
 
@@ -111,7 +107,7 @@ public class AutorController : ControllerBase
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Autor>>> GetFilterNationalityPaginationAsync([FromQuery] AutoresFiltroNacionalidade autoresFiltroNacionalidade)
     {
-        var autores = await _uof.AutorRepositorio.GetAutoresFiltrandoPelaNacionalidade(autoresFiltroNacionalidade);
+        var autores = await _getAutoresUseCase.GetFilterNationalityPaginationAsync(autoresFiltroNacionalidade);
         return ObterAutores(autores);
     }
     #endregion
@@ -123,7 +119,7 @@ public class AutorController : ControllerBase
     /// <returns>Autor criado</returns>
     [HttpPost]
     [Route("AdicionarAutores")]
-    // [Authorize(Policy = "AdminsOnly")]
+    [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> PostAsync([FromBody] AutorDTORequest autorDTO)
     {
         if(autorDTO == null) return BadRequest("Não foi possível adicionar um novo autor. Tente novamente mais tarde!");

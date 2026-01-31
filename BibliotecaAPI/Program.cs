@@ -119,11 +119,14 @@ builder.Services.AddAutoMapper(cfg => { } , typeof(MappingProfile));
 builder.Services.AddIdentity<ApplicationUser , IdentityRole>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 builder.Services.AddScoped<ITokenService , TokenService>();
 
+#region Autores Use Cases
 // Autores Use Cases
+builder.Services.AddScoped<IGetAutoresUseCase , GetAutoresUseCase>();
 builder.Services.AddScoped<ICreateAutoresUseCase , CreateAutoresUseCase>();
 builder.Services.AddScoped<IPutAutoresUseCase , PutAutoresUseCase>();
 builder.Services.AddScoped<IPatchAutoresUseCase , PatchAutoresUseCase>();
 builder.Services.AddScoped<IDeleteAutoresUseCase , DeleteAutoresUseCase>();
+#endregion
 #endregion
 
 #region JWT TOKEN
