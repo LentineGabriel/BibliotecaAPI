@@ -9,8 +9,10 @@ using BibliotecaAPI.Repositories;
 using BibliotecaAPI.Repositories.Interfaces;
 using BibliotecaAPI.Services;
 using BibliotecaAPI.Services.Interfaces.Autores;
+using BibliotecaAPI.Services.Interfaces.Categorias;
 using BibliotecaAPI.Services.Interfaces.TokenJWT;
 using BibliotecaAPI.Services.UseCases.Autores;
+using BibliotecaAPI.Services.UseCases.CategoriasLivros;
 using BibliotecaAPI.Settings;
 using BibliotecaAPI.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -126,6 +128,15 @@ builder.Services.AddScoped<ICreateAutoresUseCase , CreateAutoresUseCase>();
 builder.Services.AddScoped<IPutAutoresUseCase , PutAutoresUseCase>();
 builder.Services.AddScoped<IPatchAutoresUseCase , PatchAutoresUseCase>();
 builder.Services.AddScoped<IDeleteAutoresUseCase , DeleteAutoresUseCase>();
+#endregion
+
+#region Categorias Use Cases
+// Categorias Use Cases
+builder.Services.AddScoped<IGetCategoriasUseCase , GetCategoriasUseCase>();
+builder.Services.AddScoped<ICreateCategoriasUseCase , CreateCategoriasUseCase>();
+builder.Services.AddScoped<IPutCategoriasUseCase , PutCategoriasUseCase>();
+builder.Services.AddScoped<IPatchCategoriasUseCase , PatchCategoriasUseCase>();
+builder.Services.AddScoped<IDeleteCategoriasUseCase , DeleteCategoriasUseCase>();
 #endregion
 #endregion
 

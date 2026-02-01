@@ -21,7 +21,6 @@ namespace BibliotecaAPI.Controllers.V1;
 public class AutorController : ControllerBase
 {
     #region PROPS/CTORS
-    private readonly IUnityOfWork _uof;
     private readonly IMapper _mapper;
     private readonly IGetAutoresUseCase _getAutoresUseCase;
     private readonly ICreateAutoresUseCase _createAutoresUseCase;
@@ -29,9 +28,8 @@ public class AutorController : ControllerBase
     private readonly IPatchAutoresUseCase _patchAutoresUseCase;
     private readonly IDeleteAutoresUseCase _deleteAutoresUseCase;
 
-    public AutorController(IUnityOfWork uof, IMapper mapper, IGetAutoresUseCase getAutoresUseCase, ICreateAutoresUseCase createAutoresUseCase, IPutAutoresUseCase putAutoresUseCase, IPatchAutoresUseCase patchAutoresUseCase, IDeleteAutoresUseCase deleteAutoresUseCase)
+    public AutorController(IMapper mapper, IGetAutoresUseCase getAutoresUseCase, ICreateAutoresUseCase createAutoresUseCase, IPutAutoresUseCase putAutoresUseCase, IPatchAutoresUseCase patchAutoresUseCase, IDeleteAutoresUseCase deleteAutoresUseCase)
     {
-        _uof = uof;
         _mapper = mapper;
         _getAutoresUseCase = getAutoresUseCase;
         _createAutoresUseCase = createAutoresUseCase;
@@ -60,8 +58,7 @@ public class AutorController : ControllerBase
     /// </summary>
     /// <returns>Autor encontrado</returns>
     // GET: Autor/{id}
-    [HttpGet]
-    [Route("AutoresPorId/{id:int:min(1)}")]
+    [HttpGet("AutoresPorId/{id:int:min(1)}")]
     //[Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<AutorDTOResponse>> GetByIdAsync(int id)
     {
