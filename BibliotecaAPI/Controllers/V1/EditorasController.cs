@@ -5,6 +5,7 @@ using BibliotecaAPI.DTOs.EditoraDTOs;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Pagination.EditorasFiltro;
 using BibliotecaAPI.Repositories.Interfaces;
+using BibliotecaAPI.Services.Interfaces.EditorasLivros;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -15,17 +16,18 @@ using X.PagedList;
 namespace BibliotecaAPI.Controllers.V1;
 
 [ApiController]
-[Route("[controller]")]
+[Route("v{version:apiVersion}/[Controller]")]
+[ApiVersion("1.0")]
 public class EditorasController : ControllerBase
 {
     #region PROPS/CTOR
-    private readonly IUnityOfWork _uof;
     private readonly IMapper _mapper;
+    private readonly IGetEditorasUseCase _getEditorasUseCase;
 
-    public EditorasController(IUnityOfWork uof, IMapper mapper)
+    public EditorasController(IMapper mapper, IGetEditorasUseCase getEditorasUseCase)
     {
-        _uof = uof;
         _mapper = mapper;
+        _getEditorasUseCase = getEditorasUseCase;
     }
     #endregion
 
@@ -36,16 +38,11 @@ public class EditorasController : ControllerBase
     /// <returns>Lista de editoras</returns>
     // GET: /Editoras
     [HttpGet]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<EditorasDTOResponse>>> GetAsync()
     {
-        var editoras = await _uof.EditorasRepositorio.GetAllAsync();
-        if(editoras == null || !editoras.Any()) return BadRequest("Editoras não encontradas. Por favor, tente novamente!");
-
-        var editorasDTO = _mapper.Map<IEnumerable<EditorasDTOResponse>>(editoras);
-        return Ok(editorasDTO);
+        var editoras = await _getEditorasUseCase.GetAsync();
+        return Ok(editoras);
     }
 
     /// <summary>
@@ -54,16 +51,11 @@ public class EditorasController : ControllerBase
     /// <returns>Editora via ID</returns>
     // GET: /Editoras/{id}
     [HttpGet("{id:int:min(1)}", Name = "ObterIdEditora")]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> GetByIdAsync(int id)
     {
-        var editora = await _uof.EditorasRepositorio.GetIdAsync(e => e.IdEditora == id);
-        if(editora == null) return NotFound($"Editora por ID = {id} não encontrada. Por favor, tente novamente!");
-        
-        var editoraDTO = _mapper.Map<EditorasDTOResponse>(editora);
-        return Ok(editoraDTO);
+        var editoraId = await _getEditorasUseCase.GetByIdAsync(id);
+        return Ok(editoraId);
     }
 
     /// <summary>
@@ -72,13 +64,11 @@ public class EditorasController : ControllerBase
     /// <returns>Lista de Editoras paginadas</returns>
     // GET: /Editoras/Paginacao
     [HttpGet("Paginacao")]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Editoras>>> GetPaginationAsync([FromQuery] EditorasParameters editorasParameters)
     {
-        var editoras = await _uof.EditorasRepositorio.GetEditorasAsync(editorasParameters);
-        return ObterEditoras(editoras);
+        var editorasPaginadas = await _getEditorasUseCase.GetPaginationAsync(editorasParameters);
+        return ObterEditoras(editorasPaginadas);
     }
 
     /// <summary>
@@ -87,12 +77,10 @@ public class EditorasController : ControllerBase
     /// <returns>Editoras por nome</returns>
     // GET: /Editoras/PesquisaPorNome
     [HttpGet("PesquisaPorNome")]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Editoras>>> GetFilterNamePaginationAsync([FromQuery] EditorasFiltroNome editorasFiltroNome)
     {
-        var editoras = await _uof.EditorasRepositorio.GetEditorasFiltrandoPeloNome(editorasFiltroNome);
+        var editoras = await _getEditorasUseCase.GetFilterNamePaginationAsync(editorasFiltroNome);
         return ObterEditoras(editoras);
     }
 
@@ -102,12 +90,10 @@ public class EditorasController : ControllerBase
     /// <returns>Editoras por nacionalidade</returns>
     // GET: /Editoras/PesquisaPorPaisDeOrigem
     [HttpGet("PesquisaPorNacionalidade")]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Editoras>>> GetFilterNationalityPaginationAsync([FromQuery] EditorasFiltroPaisOrigem editorasFiltroPaisOrigem)
     {
-        var editoras = await _uof.EditorasRepositorio.GetEditorasFiltrandoPorPaisDeOrigem(editorasFiltroPaisOrigem);
+        var editoras = await _getEditorasUseCase.GetFilterNationalityPaginationAsync(editorasFiltroPaisOrigem);
         return ObterEditoras(editoras);
     }
     #endregion

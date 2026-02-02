@@ -10,9 +10,11 @@ using BibliotecaAPI.Repositories.Interfaces;
 using BibliotecaAPI.Services;
 using BibliotecaAPI.Services.Interfaces.Autores;
 using BibliotecaAPI.Services.Interfaces.Categorias;
+using BibliotecaAPI.Services.Interfaces.EditorasLivros;
 using BibliotecaAPI.Services.Interfaces.TokenJWT;
 using BibliotecaAPI.Services.UseCases.Autores;
 using BibliotecaAPI.Services.UseCases.CategoriasLivros;
+using BibliotecaAPI.Services.UseCases.EditorasLivros;
 using BibliotecaAPI.Settings;
 using BibliotecaAPI.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -105,7 +107,7 @@ builder.Services.AddAuthorization(op =>
     op.AddPolicy("UsersOnly" , policy => policy.RequireRole("Users"));
 });
 
-#region DATABASE & DI
+#region DATABASE, DI & USE CASES
 // DATABASE
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(op => op.UseMySql(connectionString , ServerVersion.AutoDetect(connectionString)));
@@ -137,6 +139,15 @@ builder.Services.AddScoped<ICreateCategoriasUseCase , CreateCategoriasUseCase>()
 builder.Services.AddScoped<IPutCategoriasUseCase , PutCategoriasUseCase>();
 builder.Services.AddScoped<IPatchCategoriasUseCase , PatchCategoriasUseCase>();
 builder.Services.AddScoped<IDeleteCategoriasUseCase , DeleteCategoriasUseCase>();
+#endregion
+
+#region Editoras Use Cases
+// Editoras Use Cases
+builder.Services.AddScoped<IGetEditorasUseCase , GetEditorasUseCase>();
+builder.Services.AddScoped<ICreateEditorasUseCase , CreateEditorasUseCase>();
+builder.Services.AddScoped<IPutEditorasUseCase , PutEditorasUseCase>();
+builder.Services.AddScoped<IPatchEditorasUseCase , PatchEditorasUseCase>();
+builder.Services.AddScoped<IDeleteEditorasUseCase , DeleteEditorasUseCase>();
 #endregion
 #endregion
 

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using BibliotecaAPI.DTOs.CategoriaDTOs;
-using BibliotecaAPI.Pagination.AutoresFiltro;
 using BibliotecaAPI.Pagination.CategoriasFiltro;
 using BibliotecaAPI.Repositories.Interfaces;
 using BibliotecaAPI.Services.Interfaces.Categorias;

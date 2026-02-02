@@ -103,7 +103,6 @@ public class CategoriasController : ControllerBase
     /// </summary>
     /// <returns>Categoria criada</returns>
     [HttpPost("AdicionarCategorias")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<CategoriasDTOResponse>> PostAsync([FromBody] CategoriasDTORequest categoriasDTO)
     {
@@ -120,7 +119,6 @@ public class CategoriasController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPut("AtualizarCategoria/{id:int:min(1)}")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<CategoriasDTOResponse>> PutAsync(int id , CategoriasDTORequest categoriasDTO)
     {
@@ -138,7 +136,6 @@ public class CategoriasController : ControllerBase
     /// <returns>Categoria atualizada</returns>
     // PATCH: /Categorias/AtualizarParcialCategoria/{id}
     [HttpPatch("AtualizarParcialCategoria/{id:int:min(1)}")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<CategoriasDTOResponse>> PatchAsync(int id , JsonPatchDocument<CategoriasDTORequest> patchDoc)
     {
@@ -156,7 +153,6 @@ public class CategoriasController : ControllerBase
     /// <returns>Categoria deletada</returns>
     // DELETE: /Categorias/DeletarCategoria/{id}
     [HttpDelete("DeletarCategoria/{id:int:min(1)}")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<CategoriasDTOResponse>> DeleteAsync(int id)
     {

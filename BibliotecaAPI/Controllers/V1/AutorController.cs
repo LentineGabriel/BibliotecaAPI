@@ -4,7 +4,6 @@ using AutoMapper;
 using BibliotecaAPI.DTOs.AutorDTOs;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Pagination.AutoresFiltro;
-using BibliotecaAPI.Repositories.Interfaces;
 using BibliotecaAPI.Services.Interfaces.Autores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
