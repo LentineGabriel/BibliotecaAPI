@@ -23,11 +23,13 @@ public class EditorasController : ControllerBase
     #region PROPS/CTOR
     private readonly IMapper _mapper;
     private readonly IGetEditorasUseCase _getEditorasUseCase;
+    private readonly ICreateEditorasUseCase _createEditorasUseCase;
 
-    public EditorasController(IMapper mapper, IGetEditorasUseCase getEditorasUseCase)
+    public EditorasController(IMapper mapper, IGetEditorasUseCase getEditorasUseCase, ICreateEditorasUseCase createEditorasUseCase)
     {
         _mapper = mapper;
         _getEditorasUseCase = getEditorasUseCase;
+        _createEditorasUseCase = createEditorasUseCase;
     }
     #endregion
 
@@ -105,18 +107,11 @@ public class EditorasController : ControllerBase
     /// <returns>Categoria criada</returns>
     [HttpPost("AdicionarEditoras")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> PostAsync(EditorasDTORequest editorasDTO)
     {
-        if(editorasDTO == null) return BadRequest("Não foi possível adicionar uma nova editora. Tente novamente mais tarde!");
-
-        var editoraNova = _mapper.Map<Editoras>(editorasDTO);
-        var editoraCriada = _uof.EditorasRepositorio.Create(editoraNova);
-        await _uof.CommitAsync();
-        
-        var editoraRetornoDTO = _mapper.Map<EditorasDTOResponse>(editoraCriada);
-        return new CreatedAtRouteResult("ObterIdEditora" , new { id = editoraCriada.IdEditora } , editoraRetornoDTO);
+        var editoraCriada = _createEditorasUseCase.PostAsync(editorasDTO);
+        return 
     }
     #endregion
 

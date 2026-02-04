@@ -10,6 +10,7 @@ using BibliotecaAPI.Repositories.Interfaces;
 using BibliotecaAPI.Services;
 using BibliotecaAPI.Services.Interfaces.Autores;
 using BibliotecaAPI.Services.Interfaces.Categorias;
+using BibliotecaAPI.Services.Interfaces.Editoras;
 using BibliotecaAPI.Services.Interfaces.EditorasLivros;
 using BibliotecaAPI.Services.Interfaces.TokenJWT;
 using BibliotecaAPI.Services.UseCases.Autores;

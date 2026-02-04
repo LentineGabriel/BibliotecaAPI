@@ -1,6 +1,6 @@
 ﻿using BibliotecaAPI.DTOs.EditoraDTOs;
-using BibliotecaAPI.Models;
 using BibliotecaAPI.Pagination.EditorasFiltro;
+using BibliotecaAPI.Models;
 using X.PagedList;
 
 namespace BibliotecaAPI.Services.Interfaces.EditorasLivros;
