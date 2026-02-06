@@ -24,12 +24,14 @@ public class EditorasController : ControllerBase
     private readonly IMapper _mapper;
     private readonly IGetEditorasUseCase _getEditorasUseCase;
     private readonly ICreateEditorasUseCase _createEditorasUseCase;
+    private readonly IPutEditorasUseCase _putEditorasUseCase;
 
-    public EditorasController(IMapper mapper, IGetEditorasUseCase getEditorasUseCase, ICreateEditorasUseCase createEditorasUseCase)
+    public EditorasController(IMapper mapper, IGetEditorasUseCase getEditorasUseCase, ICreateEditorasUseCase createEditorasUseCase, IPutEditorasUseCase putEditorasUseCase)
     {
         _mapper = mapper;
         _getEditorasUseCase = getEditorasUseCase;
         _createEditorasUseCase = createEditorasUseCase;
+        _putEditorasUseCase = putEditorasUseCase;
     }
     #endregion
 
@@ -111,7 +113,7 @@ public class EditorasController : ControllerBase
     public async Task<ActionResult<EditorasDTOResponse>> PostAsync(EditorasDTORequest editorasDTO)
     {
         var editoraCriada = _createEditorasUseCase.PostAsync(editorasDTO);
-        return 
+        return Ok(editoraCriada);
     }
     #endregion
 
@@ -122,18 +124,13 @@ public class EditorasController : ControllerBase
     /// <returns></returns>
     [HttpPut("AtualizarEditora/{id:int:min(1)}")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> PutAsync(int id , EditorasDTORequest editorasDTO)
     {
         if(id != editorasDTO.IdEditora) return BadRequest($"Não foi possível encontrar a editora com ID {id}. Por favor, verifique o ID e tente novamente!");
-        
-        var editora = _mapper.Map<Editoras>(editorasDTO);
-        var editoraExistente = _uof.EditorasRepositorio.Update(editora);
-        await _uof.CommitAsync();
 
-        var editoraRetornoDTO = _mapper.Map<EditorasDTOResponse>(editoraExistente);
-        return Ok(editoraRetornoDTO);
+        var editoraAtualizada = await _putEditorasUseCase.PutAsync(editorasDTO);
+        return Ok(editoraAtualizada);
     }
     #endregion
 
