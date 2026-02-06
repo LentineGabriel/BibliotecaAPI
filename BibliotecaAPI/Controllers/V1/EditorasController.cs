@@ -25,13 +25,15 @@ public class EditorasController : ControllerBase
     private readonly IGetEditorasUseCase _getEditorasUseCase;
     private readonly ICreateEditorasUseCase _createEditorasUseCase;
     private readonly IPutEditorasUseCase _putEditorasUseCase;
+    private readonly IPatchEditorasUseCase _patchEditorasUseCase;
 
-    public EditorasController(IMapper mapper, IGetEditorasUseCase getEditorasUseCase, ICreateEditorasUseCase createEditorasUseCase, IPutEditorasUseCase putEditorasUseCase)
+    public EditorasController(IMapper mapper, IGetEditorasUseCase getEditorasUseCase, ICreateEditorasUseCase createEditorasUseCase, IPutEditorasUseCase putEditorasUseCase, IPatchEditorasUseCase patchEditorasUseCase)
     {
         _mapper = mapper;
         _getEditorasUseCase = getEditorasUseCase;
         _createEditorasUseCase = createEditorasUseCase;
         _putEditorasUseCase = putEditorasUseCase;
+        _patchEditorasUseCase = patchEditorasUseCase;
     }
     #endregion
 
@@ -141,24 +143,10 @@ public class EditorasController : ControllerBase
     /// <returns>Editora atualizada</returns>
     [HttpPatch("AtualizarParcialEditora/{id:int:min(1)}")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> PatchAsync(int id , JsonPatchDocument<EditorasDTORequest> patchDoc)
     {
-        if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
-
-        var editora = await _uof.EditorasRepositorio.GetIdAsync(e => e.IdEditora == id);
-        if(editora == null) return NotFound($"Editora por ID = {id} não encontrada. Por favor, tente novamente!");
-
-        var editoraDTO = _mapper.Map<EditorasDTORequest>(editora);
-        patchDoc.ApplyTo(editoraDTO , ModelState);
-        if(!ModelState.IsValid) return BadRequest(ModelState);
-
-        _mapper.Map(editoraDTO , editora);
-        _uof.EditorasRepositorio.Update(editora);
-        await _uof.CommitAsync();
-
-        var autorRetornoDTO = _mapper.Map<EditorasDTOResponse>(editora);
+        var editoraDTO = await _patchEditorasUseCase.PatchAsync(id , patchDoc);
         return Ok(editoraDTO);
     }
     #endregion
