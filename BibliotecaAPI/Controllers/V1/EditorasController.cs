@@ -116,7 +116,7 @@ public class EditorasController : ControllerBase
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> PostAsync(EditorasDTORequest editorasDTO)
     {
-        var editoraCriada = _createEditorasUseCase.PostAsync(editorasDTO);
+        var editoraCriada = await _createEditorasUseCase.PostAsync(editorasDTO);
         return Ok(editoraCriada);
     }
     #endregion
