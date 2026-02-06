@@ -3,7 +3,6 @@ using BibliotecaAPI.DTOs.EditoraDTOs;
 using BibliotecaAPI.Repositories.Interfaces;
 using BibliotecaAPI.Services.Interfaces.EditorasLivros;
 using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.AspNetCore.JsonPatch.Exceptions;
 using Newtonsoft.Json;
 
 namespace BibliotecaAPI.Services.UseCases.EditorasLivros;

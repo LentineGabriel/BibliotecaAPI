@@ -26,14 +26,16 @@ public class EditorasController : ControllerBase
     private readonly ICreateEditorasUseCase _createEditorasUseCase;
     private readonly IPutEditorasUseCase _putEditorasUseCase;
     private readonly IPatchEditorasUseCase _patchEditorasUseCase;
+    private readonly IDeleteEditorasUseCase _deleteEditorasUseCase;
 
-    public EditorasController(IMapper mapper, IGetEditorasUseCase getEditorasUseCase, ICreateEditorasUseCase createEditorasUseCase, IPutEditorasUseCase putEditorasUseCase, IPatchEditorasUseCase patchEditorasUseCase)
+    public EditorasController(IMapper mapper, IGetEditorasUseCase getEditorasUseCase, ICreateEditorasUseCase createEditorasUseCase, IPutEditorasUseCase putEditorasUseCase, IPatchEditorasUseCase patchEditorasUseCase, IDeleteEditorasUseCase deleteEditorasUseCase)
     {
         _mapper = mapper;
         _getEditorasUseCase = getEditorasUseCase;
         _createEditorasUseCase = createEditorasUseCase;
         _putEditorasUseCase = putEditorasUseCase;
         _patchEditorasUseCase = patchEditorasUseCase;
+        _deleteEditorasUseCase = deleteEditorasUseCase;
     }
     #endregion
 
@@ -158,18 +160,11 @@ public class EditorasController : ControllerBase
     /// <returns>Editora deletada</returns>
     [HttpDelete("DeletarEditora/{id:int:min(1)}")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> DeleteAsync(int id)
     {
-        var deletarEditora = await _uof.EditorasRepositorio.GetIdAsync(e => e.IdEditora == id);
-        if(deletarEditora == null) return NotFound($"Editora não localizada! Verifique o ID digitado");
-        
-        var editoraExcluida = _uof.EditorasRepositorio.Delete(deletarEditora);
-        await _uof.CommitAsync();
-        
-        var editoraExcluidaDTO = _mapper.Map<EditorasDTOResponse>(editoraExcluida);
-        return Ok(editoraExcluidaDTO);
+        var editoraExcluida = await _deleteEditorasUseCase.DeleteAsync(id);
+        return Ok(editoraExcluida);
     }
     #endregion
 

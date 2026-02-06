@@ -4,5 +4,5 @@ using Microsoft.AspNetCore.JsonPatch;
 namespace BibliotecaAPI.Services.Interfaces.EditorasLivros;
 public interface IPatchEditorasUseCase
 {
-    Task<EditorasDTOResponse> PatchAsync(JsonPatchDocument<EditorasDTORequest> patchDoc);
+    Task<EditorasDTOResponse> PatchAsync(int id , JsonPatchDocument<EditorasDTORequest> patchDoc);
 }
