@@ -5,6 +5,7 @@ using BibliotecaAPI.DTOs.LivrosDTOs;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Pagination.LivrosFiltro;
 using BibliotecaAPI.Repositories.Interfaces;
+using BibliotecaAPI.Services.Interfaces.Livros;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -21,11 +22,13 @@ public class LivrosController : ControllerBase
     #region PROPS/CTORS
     private readonly IUnityOfWork _uof;
     private readonly IMapper _mapper;
+    private readonly IGetLivrosUseCase _getLivrosUseCase;
 
-    public LivrosController(IUnityOfWork uof, IMapper mapper)
+    public LivrosController(IUnityOfWork uof, IMapper mapper, IGetLivrosUseCase getLivrosUseCase)
     {
         _uof = uof;
         _mapper = mapper;
+        _getLivrosUseCase = getLivrosUseCase;
     }
     #endregion
 
@@ -37,15 +40,13 @@ public class LivrosController : ControllerBase
     // GET: /Livros
     [HttpGet]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<LivrosDTOResponse>>> GetAsync()
     {
-        var livros = await _uof.LivrosRepositorio.GetLivroCompletoAsync();
+        var livros = await _getLivrosUseCase.GetAsync();
         if(livros == null || !livros.Any()) return NotFound("Livros não encontrados. Por favor, tente novamente!");
 
-        var livrosDTO = _mapper.Map<IEnumerable<LivrosDTOResponse>>(livros);
-        return Ok(livrosDTO);
+        return Ok(livros);
     }
 
     /// <summary>
@@ -55,15 +56,13 @@ public class LivrosController : ControllerBase
     // GET: /Livros/{id}
     [HttpGet("{id:int:min(1)}", Name = "ObterIdLivro")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<LivrosDTOResponse>> GetByIdAsync(int id)
     {
-        var livro = await _uof.LivrosRepositorio.GetLivroCompletoAsync(id);
-        if(livro == null) return NotFound($"Livro por ID = {id} não encontrado. Por favor, tente novamente!");
+        var livroId = await _getLivrosUseCase.GetByIdAsync(id);
+        if(livroId == null) return NotFound($"Livro por ID = {id} não encontrado. Por favor, tente novamente!");
         
-        var livroDTO = _mapper.Map<LivrosDTOResponse>(livro);
-        return Ok(livroDTO);
+        return Ok(livroId);
     }
 
     /// <summary>
@@ -73,12 +72,11 @@ public class LivrosController : ControllerBase
     // GET: /Livros/Paginacao
     [HttpGet("Paginacao")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetPaginationAsync([FromQuery] LivrosParameters livrosParameters)
     {
-        var livros = await _uof.LivrosRepositorio.GetLivrosAsync(livrosParameters);
-        return ObterLivros(livros);
+        var livrosPaginados = await _getLivrosUseCase.GetPaginationAsync(livrosParameters);
+        return ObterLivros(livrosPaginados);
     }
 
     /// <summary>
@@ -88,11 +86,10 @@ public class LivrosController : ControllerBase
     // GET: /Livros/PesquisaPorNome
     [HttpGet("PesquisaPorNome")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByNameAsync([FromQuery] LivrosFiltroNome livrosFiltroNome)
     {
-        var livros = await _uof.LivrosRepositorio.GetLivrosFiltrandoPeloNome(livrosFiltroNome);
+        var livros = await _getLivrosUseCase.GetFilterByNameAsync(livrosFiltroNome);
         return ObterLivros(livros);
     }
 
@@ -103,11 +100,10 @@ public class LivrosController : ControllerBase
     // GET: /Livros/PesquisaPorAutor
     [HttpGet("PesquisaPorAutor")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByAutorAsync([FromQuery] LivrosFiltroAutor livrosFiltroAutor)
     {
-        var livros = await _uof.LivrosRepositorio.GetLivrosFiltrandoPeloAutor(livrosFiltroAutor);
+        var livros = await _getLivrosUseCase.GetFilterByAutorAsync(livrosFiltroAutor);
         return ObterLivros(livros);
     }
 
@@ -118,11 +114,10 @@ public class LivrosController : ControllerBase
     // GET: /Livros/PesquisaPorEditora
     [HttpGet("PesquisaPorEditora")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByEditoraAsync([FromQuery] LivrosFiltroEditora livrosFiltroEditora)
     {
-        var livros = await _uof.LivrosRepositorio.GetLivrosFiltrandoPelaEditora(livrosFiltroEditora);
+        var livros = await _getLivrosUseCase.GetFilterByEditoraAsync(livrosFiltroEditora);
         return ObterLivros(livros);
     }
 
@@ -133,11 +128,10 @@ public class LivrosController : ControllerBase
     // GET: /Livros/PesquisaPorAnoPublicacao
     [HttpGet("PesquisaPorAnoPublicacao")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByAnoPublicacaoAsync([FromQuery] LivrosFiltroAnoPublicacao livrosFiltroAnoPublicacao)
     {
-        var livros = await _uof.LivrosRepositorio.GetLivrosFiltrandoPorAnoPublicacao(livrosFiltroAnoPublicacao);
+        var livros = await _getLivrosUseCase.GetFilterByAnoPublicacaoAsync(livrosFiltroAnoPublicacao);
         return ObterLivros(livros);
     }
 
@@ -148,11 +142,10 @@ public class LivrosController : ControllerBase
     // GET: /Livros/PesquisaPorCategoria
     [HttpGet("PesquisaPorCategoria")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByCategoriaAsync([FromQuery] LivrosFiltroCategoria livrosFiltroCategoria)
     {
-        var livros = await _uof.LivrosRepositorio.GetLivrosFiltrandoPorCategoria(livrosFiltroCategoria);
+        var livros = await _getLivrosUseCase.GetFilterByCategoriaAsync(livrosFiltroCategoria);
         return ObterLivros(livros);
     }
     #endregion

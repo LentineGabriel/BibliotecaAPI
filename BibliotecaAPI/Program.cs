@@ -11,10 +11,12 @@ using BibliotecaAPI.Services;
 using BibliotecaAPI.Services.Interfaces.Autores;
 using BibliotecaAPI.Services.Interfaces.Categorias;
 using BibliotecaAPI.Services.Interfaces.EditorasLivros;
+using BibliotecaAPI.Services.Interfaces.Livros;
 using BibliotecaAPI.Services.Interfaces.TokenJWT;
 using BibliotecaAPI.Services.UseCases.Autores;
 using BibliotecaAPI.Services.UseCases.CategoriasLivros;
 using BibliotecaAPI.Services.UseCases.EditorasLivros;
+using BibliotecaAPI.Services.UseCases.Livros;
 using BibliotecaAPI.Settings;
 using BibliotecaAPI.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -148,6 +150,11 @@ builder.Services.AddScoped<ICreateEditorasUseCase , CreateEditorasUseCase>();
 builder.Services.AddScoped<IPutEditorasUseCase , PutEditorasUseCase>();
 builder.Services.AddScoped<IPatchEditorasUseCase , PatchEditorasUseCase>();
 builder.Services.AddScoped<IDeleteEditorasUseCase , DeleteEditorasUseCase>();
+#endregion
+
+#region Livros Use Cases
+// Livros Use Cases
+builder.Services.AddScoped<IGetLivrosUseCase, GetLivrosUseCase>();
 #endregion
 #endregion
 

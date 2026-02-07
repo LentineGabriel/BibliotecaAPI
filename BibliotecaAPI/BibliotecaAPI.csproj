@@ -32,9 +32,7 @@
 	<ItemGroup>
 	  <Folder Include="Controllers\V2\" />
 	  <Folder Include="Services\Interfaces\Auth\" />
-	  <Folder Include="Services\Interfaces\Livros\" />
 	  <Folder Include="Services\UseCases\Auth\" />
-	  <Folder Include="Services\UseCases\Livros\" />
 	</ItemGroup>
 
 </Project>
