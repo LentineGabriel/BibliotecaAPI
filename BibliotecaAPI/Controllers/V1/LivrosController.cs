@@ -25,14 +25,16 @@ public class LivrosController : ControllerBase
     private readonly ICreateLivrosUseCase _createLivrosUseCase;
     private readonly IPutLivrosUseCase _putLivrosUseCase;
     private readonly IPatchLivrosUseCase _patchLivrosUseCase;
+    private readonly IDeleteLivrosUseCase _deleteLivrosUseCase;
 
-    public LivrosController(IMapper mapper, IGetLivrosUseCase getLivrosUseCase, ICreateLivrosUseCase createLivrosUseCase, IPutLivrosUseCase putLivrosUseCase, IPatchLivrosUseCase patchLivrosUseCase)
+    public LivrosController(IMapper mapper, IGetLivrosUseCase getLivrosUseCase, ICreateLivrosUseCase createLivrosUseCase, IPutLivrosUseCase putLivrosUseCase, IPatchLivrosUseCase patchLivrosUseCase, IDeleteLivrosUseCase deleteLivrosUseCase)
     {
         _mapper = mapper;
         _getLivrosUseCase = getLivrosUseCase;
         _createLivrosUseCase = createLivrosUseCase;
         _putLivrosUseCase = putLivrosUseCase;
         _patchLivrosUseCase = patchLivrosUseCase;
+        _deleteLivrosUseCase = deleteLivrosUseCase;
     }
     #endregion
 
@@ -210,7 +212,6 @@ public class LivrosController : ControllerBase
     /// <returns>Categoria(s) do Livro atualizada</returns>
     [HttpPatch("AtualizarCategorias/{id:int:min(1)}")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> PatchCategoriasAsync(int id, [FromBody] LivrosCategoriasPatchDTO dto)
     {
@@ -248,14 +249,8 @@ public class LivrosController : ControllerBase
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<LivrosDTOResponse>> DeleteAsync(int id)
     {
-        var deletarLivro = await _uof.LivrosRepositorio.GetIdAsync(l => l.IdLivro == id);
-        if(deletarLivro == null) return NotFound("Livro não localizado! Verifique o ID digitado");
-
-        var livroExcluido = _uof.LivrosRepositorio.Delete(deletarLivro);
-        await _uof.CommitAsync();
-
-        var livroExcluidoDTO = _mapper.Map<LivrosDTOResponse>(livroExcluido);
-        return Ok(livroExcluidoDTO);
+        var livroExcluido = await _deleteLivrosUseCase.DeleteAsync(id);
+        return Ok(livroExcluido);
     }
     #endregion
 
