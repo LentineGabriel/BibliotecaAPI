@@ -167,7 +167,7 @@ public class LivrosController : ControllerBase
     public async Task<ActionResult<LivrosDTOResponse>> PostAsync(LivrosDTORequest livrosDTO)
     {
         if(livrosDTO == null) return BadRequest("Não foi possível adicionar um novo livro. Tente novamente mais tarde!");
-        var livroCriado = _createLivrosUseCase.PostAsync(livrosDTO);
+        var livroCriado = await _createLivrosUseCase.PostAsync(livrosDTO);
 
         return Ok(livroCriado);
     }
@@ -216,26 +216,9 @@ public class LivrosController : ControllerBase
     public async Task<IActionResult> PatchCategoriasAsync(int id, [FromBody] LivrosCategoriasPatchDTO dto)
     {
         if(!ModelState.IsValid) return BadRequest(ModelState);
+        var resultado = await _patchLivrosUseCase.PatchCategoriasAsync(id, dto);
 
-        var livro = await _uof.LivrosRepositorio.GetLivroCompletoAsync(id);
-        if(livro == null) return NotFound($"Livro por ID = {id} não encontrado. Por favor, tente novamente!");
-
-        // limpando todas as categorias presentes
-        if(!dto.IdsCategorias.Any()) livro.LivrosCategorias!.Clear();
-
-        foreach(var categoriaId in dto.IdsCategorias)
-        {
-            livro.LivrosCategorias!.Add(new LivroCategoria
-            {
-                LivroId = livro.IdLivro ,
-                CategoriaId = categoriaId
-            });
-        }
-
-        _uof.LivrosRepositorio.Update(livro);
-        await _uof.CommitAsync();
-
-        return Ok(new { Message = "Categorias atualizadas com sucesso!" });
+        return Ok(resultado);
     }
     #endregion
 

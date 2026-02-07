@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using BibliotecaAPI.DTOs.LivrosDTOs;
+using BibliotecaAPI.Models;
 using BibliotecaAPI.Repositories.Interfaces;
 using BibliotecaAPI.Services.Interfaces.Livros;
 using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BibliotecaAPI.Services.UseCases.Livros;
 
@@ -35,5 +37,29 @@ public class PatchLivrosUseCase : IPatchLivrosUseCase
 
         var livroCompleto = await _uof.LivrosRepositorio.GetLivroCompletoAsync(id);
         return _mapper.Map<LivrosDTOResponse>(livroCompleto);
+    }
+
+    public async Task<IActionResult> PatchCategoriasAsync(int id , LivrosCategoriasPatchDTO dto)
+    {
+        var livro = await _uof.LivrosRepositorio.GetLivroCompletoAsync(id);
+        if(livro == null) throw new NullReferenceException($"Livro por ID = {id} não encontrado. Por favor, tente novamente!");
+
+        // limpando todas as categorias presentes
+        if(!dto.IdsCategorias.Any()) livro.LivrosCategorias!.Clear();
+
+        foreach(var categoriaId in dto.IdsCategorias)
+        {
+            livro.LivrosCategorias!.Add(new LivroCategoria
+            {
+                LivroId = livro.IdLivro ,
+                CategoriaId = categoriaId
+            });
+        }
+
+        _uof.LivrosRepositorio.Update(livro);
+        await _uof.CommitAsync();
+
+        var livroCompleto = await _uof.LivrosRepositorio.GetLivroCompletoAsync(id);
+        return new JsonResult(_mapper.Map<LivrosDTOResponse>(livroCompleto));
     }
 }
