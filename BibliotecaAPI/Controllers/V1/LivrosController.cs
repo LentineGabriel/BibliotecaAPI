@@ -20,17 +20,17 @@ namespace BibliotecaAPI.Controllers.V1;
 public class LivrosController : ControllerBase
 {
     #region PROPS/CTORS
-    private readonly IUnityOfWork _uof;
     private readonly IMapper _mapper;
     private readonly IGetLivrosUseCase _getLivrosUseCase;
     private readonly ICreateLivrosUseCase _createLivrosUseCase;
+    private readonly IPutLivrosUseCase _putLivrosUseCase;
 
-    public LivrosController(IUnityOfWork uof, IMapper mapper, IGetLivrosUseCase getLivrosUseCase, ICreateLivrosUseCase createLivrosUseCase)
+    public LivrosController(IMapper mapper, IGetLivrosUseCase getLivrosUseCase, ICreateLivrosUseCase createLivrosUseCase, IPutLivrosUseCase putLivrosUseCase)
     {
-        _uof = uof;
         _mapper = mapper;
         _getLivrosUseCase = getLivrosUseCase;
         _createLivrosUseCase = createLivrosUseCase;
+        _putLivrosUseCase = putLivrosUseCase;
     }
     #endregion
 
@@ -178,23 +178,13 @@ public class LivrosController : ControllerBase
     /// <returns></returns>
     [HttpPut("AtualizarLivro/{id:int:min(1)}")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<LivrosDTOResponse>> PutAsync(int id, LivrosDTORequest livrosDTO)
     {
         if(id != livrosDTO.IdLivro) return BadRequest($"Não foi possível encontrar o livro com ID {id}. Por favor, verifique o ID digitado e tente novamente!");
+        var livroAtualizado = await _putLivrosUseCase.PutAsync(id, livrosDTO);
 
-        // carrega livro + autor + editora + categoria
-        var livroBanco = await _uof.LivrosRepositorio.GetLivroCompletoAsync(id);
-        if(livroBanco == null) return NotFound($"Livro por ID = {id} não encontrado. Por favor, tente novamente!");
-        _mapper.Map(livrosDTO , livroBanco);
-
-        _mapper.Map(livrosDTO , livroBanco);
-        _uof.LivrosRepositorio.Update(livroBanco);
-        await _uof.CommitAsync();
-
-        var livroDTO = _mapper.Map<LivrosDTOResponse>(livroBanco);
-        return Ok(livroDTO);
+        return Ok(livroAtualizado);
     }
     #endregion
 
