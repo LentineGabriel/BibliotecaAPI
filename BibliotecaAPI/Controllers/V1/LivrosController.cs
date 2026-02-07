@@ -24,13 +24,15 @@ public class LivrosController : ControllerBase
     private readonly IGetLivrosUseCase _getLivrosUseCase;
     private readonly ICreateLivrosUseCase _createLivrosUseCase;
     private readonly IPutLivrosUseCase _putLivrosUseCase;
+    private readonly IPatchLivrosUseCase _patchLivrosUseCase;
 
-    public LivrosController(IMapper mapper, IGetLivrosUseCase getLivrosUseCase, ICreateLivrosUseCase createLivrosUseCase, IPutLivrosUseCase putLivrosUseCase)
+    public LivrosController(IMapper mapper, IGetLivrosUseCase getLivrosUseCase, ICreateLivrosUseCase createLivrosUseCase, IPutLivrosUseCase putLivrosUseCase, IPatchLivrosUseCase patchLivrosUseCase)
     {
         _mapper = mapper;
         _getLivrosUseCase = getLivrosUseCase;
         _createLivrosUseCase = createLivrosUseCase;
         _putLivrosUseCase = putLivrosUseCase;
+        _patchLivrosUseCase = patchLivrosUseCase;
     }
     #endregion
 
@@ -195,27 +197,11 @@ public class LivrosController : ControllerBase
     /// <returns>Livro atualizada</returns>
     [HttpPatch("AtualizarParcialLivro/{id:int:min(1)}")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<LivrosDTOResponse>> PatchAsync(int id , JsonPatchDocument<LivrosDTORequest> patchDoc) 
     {
-        if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
-
-        var livro = await _uof.LivrosRepositorio.GetIdAsync(l => l.IdLivro == id);
-        if(livro == null) return NotFound($"Livro por ID = {id} não encontrado. Por favor, tente novamente!");
-
-        var livroDTO = _mapper.Map<LivrosDTORequest>(livro);
-        patchDoc.ApplyTo(livroDTO , ModelState);
-        if(!ModelState.IsValid) return BadRequest(ModelState);
-
-        _mapper.Map(livroDTO , livro);
-        _uof.LivrosRepositorio.Update(livro);
-        await _uof.CommitAsync();
-
-        var livroCompleto = await _uof.LivrosRepositorio.GetLivroCompletoAsync(id);
-        var livroCompletoDTO = _mapper.Map<LivrosDTOResponse>(livroCompleto);
-
-        return Ok(livroCompletoDTO);
+        var livroAtualizado = await _patchLivrosUseCase.PatchAsync(id, patchDoc);
+        return Ok(livroAtualizado);
     }
 
     /// <summary>
@@ -259,7 +245,6 @@ public class LivrosController : ControllerBase
     /// <returns>Livro deletado</returns>
     [HttpDelete("DeletarLivros/{id:int:min(1)}")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<LivrosDTOResponse>> DeleteAsync(int id)
     {

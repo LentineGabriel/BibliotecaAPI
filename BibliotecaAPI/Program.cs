@@ -157,6 +157,8 @@ builder.Services.AddScoped<IDeleteEditorasUseCase , DeleteEditorasUseCase>();
 builder.Services.AddScoped<IGetLivrosUseCase, GetLivrosUseCase>();
 builder.Services.AddScoped<ICreateLivrosUseCase, CreateLivrosUseCase>();
 builder.Services.AddScoped<IPutLivrosUseCase, PutLivrosUseCase>();
+builder.Services.AddScoped<IPatchLivrosUseCase, PatchLivrosUseCase>();
+builder.Services.AddScoped<IDeleteLivrosUseCase, DeleteLivrosUseCase>();
 #endregion
 #endregion
 
