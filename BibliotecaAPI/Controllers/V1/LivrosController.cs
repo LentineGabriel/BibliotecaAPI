@@ -23,12 +23,14 @@ public class LivrosController : ControllerBase
     private readonly IUnityOfWork _uof;
     private readonly IMapper _mapper;
     private readonly IGetLivrosUseCase _getLivrosUseCase;
+    private readonly ICreateLivrosUseCase _createLivrosUseCase;
 
-    public LivrosController(IUnityOfWork uof, IMapper mapper, IGetLivrosUseCase getLivrosUseCase)
+    public LivrosController(IUnityOfWork uof, IMapper mapper, IGetLivrosUseCase getLivrosUseCase, ICreateLivrosUseCase createLivrosUseCase)
     {
         _uof = uof;
         _mapper = mapper;
         _getLivrosUseCase = getLivrosUseCase;
+        _createLivrosUseCase = createLivrosUseCase;
     }
     #endregion
 
@@ -157,20 +159,13 @@ public class LivrosController : ControllerBase
     /// <returns></returns>
     [HttpPost("AdicionarLivro")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<LivrosDTOResponse>> PostAsync(LivrosDTORequest livrosDTO)
     {
         if(livrosDTO == null) return BadRequest("Não foi possível adicionar um novo livro. Tente novamente mais tarde!");
+        var livroCriado = _createLivrosUseCase.PostAsync(livrosDTO);
 
-        var livroNovo = _mapper.Map<Livros>(livrosDTO);
-        var livroCriado = _uof.LivrosRepositorio.Create(livroNovo);
-        await _uof.CommitAsync();
-
-        var livroCompleto = await _uof.LivrosRepositorio.GetLivroCompletoAsync(livroCriado.IdLivro);
-
-        var livroDTO = _mapper.Map<LivrosDTOResponse>(livroCompleto);
-        return new CreatedAtRouteResult("ObterIdLivro" , new { id = livroCriado.IdLivro } , livroDTO);
+        return Ok(livroCriado);
     }
 
     // Livros lidos por um usuário - VERSÃO 2.0

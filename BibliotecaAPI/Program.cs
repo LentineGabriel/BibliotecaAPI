@@ -155,6 +155,8 @@ builder.Services.AddScoped<IDeleteEditorasUseCase , DeleteEditorasUseCase>();
 #region Livros Use Cases
 // Livros Use Cases
 builder.Services.AddScoped<IGetLivrosUseCase, GetLivrosUseCase>();
+builder.Services.AddScoped<ICreateLivrosUseCase, CreateLivrosUseCase>();
+
 #endregion
 #endregion
 
