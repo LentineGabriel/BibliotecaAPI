@@ -4,7 +4,6 @@ using AutoMapper;
 using BibliotecaAPI.DTOs.LivrosDTOs;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Pagination.LivrosFiltro;
-using BibliotecaAPI.Repositories.Interfaces;
 using BibliotecaAPI.Services.Interfaces.Livros;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
@@ -46,7 +45,6 @@ public class LivrosController : ControllerBase
     /// <returns>Lista de editoras</returns>
     // GET: /Livros
     [HttpGet]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<LivrosDTOResponse>>> GetAsync()
     {
@@ -62,7 +60,6 @@ public class LivrosController : ControllerBase
     /// <returns>Livro via ID</returns>
     // GET: /Livros/{id}
     [HttpGet("{id:int:min(1)}", Name = "ObterIdLivro")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<LivrosDTOResponse>> GetByIdAsync(int id)
     {
@@ -78,7 +75,6 @@ public class LivrosController : ControllerBase
     /// <returns>Lista de Livros paginadas</returns>
     // GET: /Livros/Paginacao
     [HttpGet("Paginacao")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetPaginationAsync([FromQuery] LivrosParameters livrosParameters)
     {
@@ -92,7 +88,6 @@ public class LivrosController : ControllerBase
     /// <returns>Livros por nome</returns>
     // GET: /Livros/PesquisaPorNome
     [HttpGet("PesquisaPorNome")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByNameAsync([FromQuery] LivrosFiltroNome livrosFiltroNome)
     {
@@ -106,7 +101,6 @@ public class LivrosController : ControllerBase
     /// <returns>Livros por nome do autor</returns>
     // GET: /Livros/PesquisaPorAutor
     [HttpGet("PesquisaPorAutor")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByAutorAsync([FromQuery] LivrosFiltroAutor livrosFiltroAutor)
     {
@@ -120,7 +114,6 @@ public class LivrosController : ControllerBase
     /// <returns>Livros por nome da editora</returns>
     // GET: /Livros/PesquisaPorEditora
     [HttpGet("PesquisaPorEditora")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByEditoraAsync([FromQuery] LivrosFiltroEditora livrosFiltroEditora)
     {
@@ -134,7 +127,6 @@ public class LivrosController : ControllerBase
     /// <returns>Livros pelo ano de publicação</returns>
     // GET: /Livros/PesquisaPorAnoPublicacao
     [HttpGet("PesquisaPorAnoPublicacao")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByAnoPublicacaoAsync([FromQuery] LivrosFiltroAnoPublicacao livrosFiltroAnoPublicacao)
     {
@@ -148,7 +140,6 @@ public class LivrosController : ControllerBase
     /// <returns>Livros pelo seu gênero</returns>
     // GET: /Livros/PesquisaPorCategoria
     [HttpGet("PesquisaPorCategoria")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<Livros>>> GetFilterByCategoriaAsync([FromQuery] LivrosFiltroCategoria livrosFiltroCategoria)
     {
@@ -163,7 +154,6 @@ public class LivrosController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPost("AdicionarLivro")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<LivrosDTOResponse>> PostAsync(LivrosDTORequest livrosDTO)
     {
@@ -172,8 +162,6 @@ public class LivrosController : ControllerBase
 
         return Ok(livroCriado);
     }
-
-    // Livros lidos por um usuário - VERSÃO 2.0
     #endregion
 
     #region PUT
@@ -182,7 +170,6 @@ public class LivrosController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPut("AtualizarLivro/{id:int:min(1)}")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<LivrosDTOResponse>> PutAsync(int id, LivrosDTORequest livrosDTO)
     {
@@ -199,7 +186,6 @@ public class LivrosController : ControllerBase
     /// </summary>
     /// <returns>Livro atualizada</returns>
     [HttpPatch("AtualizarParcialLivro/{id:int:min(1)}")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<LivrosDTOResponse>> PatchAsync(int id , JsonPatchDocument<LivrosDTORequest> patchDoc) 
     {
@@ -214,7 +200,6 @@ public class LivrosController : ControllerBase
     /// </summary>
     /// <returns>Categoria(s) do Livro atualizada</returns>
     [HttpPatch("AtualizarCategorias/{id:int:min(1)}")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> PatchCategoriasAsync(int id, [FromBody] LivrosCategoriasPatchDTO dto)
     {
@@ -231,7 +216,6 @@ public class LivrosController : ControllerBase
     /// </summary>
     /// <returns>Livro deletado</returns>
     [HttpDelete("DeletarLivros/{id:int:min(1)}")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<LivrosDTOResponse>> DeleteAsync(int id)
     {
