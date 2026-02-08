@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BibliotecaAPI.Services.UseCases.Livros;
 
-public class PatchLivrosUseCase : IPatchLivrosUseCase
+public sealed class PatchLivrosUseCase : IPatchLivrosUseCase
 {
     #region PROPS/CTOR
     private readonly IUnityOfWork _uof;
@@ -23,10 +23,8 @@ public class PatchLivrosUseCase : IPatchLivrosUseCase
 
     public async Task<LivrosDTOResponse> PatchAsync(int id , JsonPatchDocument<LivrosDTORequest> patchDoc)
     {
-        if(patchDoc == null) throw new NullReferenceException("Nenhuma opção foi enviada para atualizar parcialmente.");
-
         var livro = await _uof.LivrosRepositorio.GetIdAsync(l => l.IdLivro == id);
-        if(livro == null) throw new NullReferenceException($"Livro por ID = {id} não encontrado. Por favor, tente novamente!");
+        if(livro == null) throw new KeyNotFoundException($"Livro por ID = {id} não encontrado. Por favor, tente novamente!");
 
         var livroDTO = _mapper.Map<LivrosDTORequest>(livro);
         patchDoc.ApplyTo(livroDTO);

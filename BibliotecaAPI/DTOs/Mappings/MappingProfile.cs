@@ -24,7 +24,7 @@ namespace BibliotecaAPI.DTOs.Mappings
             // Request -> Livros
             CreateMap<LivrosDTORequest , Livros>().ForMember(dest => dest.Autor , opt => opt.Ignore())
                                                   .ForMember(dest => dest.Editora , opt => opt.Ignore())
-                                                  .ForMember(dest => dest.LivrosCategorias , opt => opt.Ignore());
+                                                  .ForMember(dest => dest.LivrosCategorias , opt => opt.Ignore()).ReverseMap();
             #endregion
 
             #region AUTOR
