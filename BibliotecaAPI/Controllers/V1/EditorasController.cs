@@ -112,7 +112,6 @@ public class EditorasController : ControllerBase
     /// </summary>
     /// <returns>Categoria criada</returns>
     [HttpPost("AdicionarEditoras")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> PostAsync(EditorasDTORequest editorasDTO)
     {
@@ -127,7 +126,6 @@ public class EditorasController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPut("AtualizarEditora/{id:int:min(1)}")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> PutAsync(int id , EditorasDTORequest editorasDTO)
     {
@@ -144,7 +142,6 @@ public class EditorasController : ControllerBase
     /// </summary>
     /// <returns>Editora atualizada</returns>
     [HttpPatch("AtualizarParcialEditora/{id:int:min(1)}")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> PatchAsync(int id , JsonPatchDocument<EditorasDTORequest> patchDoc)
     {
@@ -159,7 +156,6 @@ public class EditorasController : ControllerBase
     /// </summary>
     /// <returns>Editora deletada</returns>
     [HttpDelete("DeletarEditora/{id:int:min(1)}")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<EditorasDTOResponse>> DeleteAsync(int id)
     {
