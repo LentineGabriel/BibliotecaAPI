@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using BibliotecaAPI.DTOs.AutorDTOs;
-using BibliotecaAPI.Models;
 using BibliotecaAPI.Repositories.Interfaces;
 using BibliotecaAPI.Services.Interfaces.Autores;
 using Microsoft.AspNetCore.JsonPatch;

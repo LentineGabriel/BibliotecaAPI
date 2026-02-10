@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using BibliotecaAPI.DTOs.AutorDTOs;
 using BibliotecaAPI.DTOs.CategoriaDTOs;
 using BibliotecaAPI.Repositories.Interfaces;
 using BibliotecaAPI.Services.Interfaces.Categorias;

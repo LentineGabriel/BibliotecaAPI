@@ -1,6 +1,5 @@
 ﻿using BibliotecaAPI.DTOs.LivrosDTOs;
 using BibliotecaAPI.Pagination.LivrosFiltro;
-using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
 
 namespace BibliotecaAPI.Services.Interfaces.Livros;

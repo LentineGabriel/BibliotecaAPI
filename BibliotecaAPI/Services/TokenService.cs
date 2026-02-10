@@ -1,4 +1,5 @@
-﻿using BibliotecaAPI.Services.Interfaces.TokenJWT;
+﻿#region USINGS
+using BibliotecaAPI.Services.Interfaces.TokenJWT;
 using BibliotecaAPI.Settings;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -6,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+#endregion
 
 namespace BibliotecaAPI.Services;
 

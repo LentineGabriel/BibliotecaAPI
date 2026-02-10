@@ -15,6 +15,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<LivroCategoria> LivrosCategorias { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+    #endregion
+
     override protected void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -24,5 +26,4 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
         modelBuilder.Entity<LivroCategoria>().HasOne(lc => lc.Livros).WithMany(l => l.LivrosCategorias).HasForeignKey(lc => lc.LivroId);
         modelBuilder.Entity<LivroCategoria>().HasOne(lc => lc.Categorias).WithMany(c => c.LivrosCategorias).HasForeignKey(lc => lc.CategoriaId);
     }
-    #endregion
 }
