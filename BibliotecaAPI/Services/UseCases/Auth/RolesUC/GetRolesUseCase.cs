@@ -47,5 +47,17 @@ public class GetRolesUseCase : IGetRolesUseCase
         return _mapper.Map<IEnumerable<UsersResponseDTO>>(usuariosNoPerfil);
     }
 
-    public async Task<IPagedList<RolesResponseDTO>> GetPaginationAsync(PerfilParameters perfilParameters) => (IPagedList<RolesResponseDTO>)await _roleManager.Roles.ToListAsync();
+    public async Task<IPagedList<RolesResponseDTO>> GetPaginationAsync(PerfilParameters perfilParameters)
+    {
+        if(perfilParameters == null) throw new ArgumentNullException(nameof(perfilParameters));
+
+        // Normaliza valores de paginação
+        var pageNumber = perfilParameters.PageNumber <= 0 ? 1 : perfilParameters.PageNumber;
+        var pageSize = perfilParameters.PageSize <= 0 ? 10 : perfilParameters.PageSize;
+
+        // Projeta IdentityRole para RolesResponseDTO e aplica paginação
+        var query = _roleManager.Roles.AsNoTracking().Select(r => new RolesResponseDTO { Name = r.Name });
+
+        return await query.ToPagedListAsync(pageNumber , pageSize);
+    }
 }

@@ -56,7 +56,7 @@ public class RolesController : ControllerBase
     /// </summary>
     /// <returns>Usuário cadastrado</returns>
     // GET: /RolesController/Perfil/id
-    [HttpGet("{id:int:min(1)}")]
+    [HttpGet("{id}")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<IEnumerable<RolesResponseDTO>>> GetRoleByIdAsync(string id)
     {
@@ -87,7 +87,7 @@ public class RolesController : ControllerBase
     public async Task<ActionResult<IEnumerable<RolesResponseDTO>>> GetPaginationAsync([FromQuery] PerfilParameters perfilParameters)
     {
         var perfisPaginados = await _getRolesUseCase.GetPaginationAsync(perfilParameters);
-        return ObterPerfis((IPagedList<IdentityRole>)perfisPaginados);
+        return ObterPerfisRolesResponseDTO(perfisPaginados);
     }
     #endregion
 
@@ -127,24 +127,24 @@ public class RolesController : ControllerBase
     /// </summary>
     /// <returns></returns>
     // PUT: /RolesController/AtualizarPerfil/id
-    //[HttpPut("AtualizarPerfil/{id}")]
-    //[Authorize(Policy = "AdminsOnly")]
-    //public async Task<ActionResult<RolesResponseDTO>> PutRoleAsync(string id , RolesRequestDTO rolesDTO)
-    //{
-    //    if(id != rolesDTO.Id) return BadRequest($"Não foi possível encontrar o perfil com o nome '{id}'. Por favor, verifique o nome e tente novamente!");
+    [HttpPut("AtualizarPerfil/{id}")]
+    [Authorize(Policy = "AdminsOnly")]
+    public async Task<ActionResult<RolesResponseDTO>> PutRoleAsync(string id , RolesRequestDTO rolesDTO)
+    {
+        if(id != rolesDTO.Id) return BadRequest($"Não foi possível encontrar o perfil com o nome '{id}'. Por favor, verifique o nome e tente novamente!");
 
-    //    var role = await _roleManager.FindByIdAsync(id);
-    //    if(role == null) return BadRequest($"Não foi possível encontrar o perfil com o nome '{id}'. Por favor, verifique o nome digitado e tente novamente!");
+        var role = await _roleManager.FindByIdAsync(id);
+        if(role == null) return BadRequest($"Não foi possível encontrar o perfil com o nome '{id}'. Por favor, verifique o nome digitado e tente novamente!");
 
-    //    role.Name = rolesDTO.Name;
+        role.Name = rolesDTO.Name;
 
-    //    var result = await _roleManager.UpdateAsync(role);
-    //    if(!result.Succeeded) return BadRequest(result.Errors);
+        var result = await _roleManager.UpdateAsync(role);
+        if(!result.Succeeded) return BadRequest(result.Errors);
 
-    //    var response = _mapper.Map<RolesResponseDTO>(role);
+        var response = _mapper.Map<RolesResponseDTO>(role);
 
-    //    return Ok(response);
-    //}
+        return Ok(response);
+    }
     #endregion
 
     #region DELETE
@@ -153,25 +153,25 @@ public class RolesController : ControllerBase
     /// </summary>
     /// <returns>Perfil de usuário deletado</returns>
     // DELETE: /RolesController/DeletarPerfil/RoleName
-    //[HttpDelete]
-    //[Route("DeletarPerfil/{id}")]
-    //[Authorize(Policy = "AdminsOnly")]
-    //public async Task<IActionResult> DeleteRole(string id)
-    //{
-    //    var role = await _roleManager.FindByIdAsync(id);
-    //    if(role != null)
-    //    {
-    //        var result = await _roleManager.DeleteAsync(role);
-    //        if(result.Succeeded) return StatusCode(StatusCodes.Status200OK , new Response { Status = "Sucesso" , Message = $"Perfil '{role.Name}' deletado com sucesso." });
-    //        else return StatusCode(StatusCodes.Status400BadRequest , new Response { Status = "Erro" , Message = $"Erro ao deletar o perfil '{role.Name}'." });
-    //    }
-    //    return BadRequest(new { Error = "Não foi possível encontrar o perfil. Por favor, tente novamente!" });
-    //}
+    [HttpDelete]
+    [Route("DeletarPerfil/{id}")]
+    [Authorize(Policy = "AdminsOnly")]
+    public async Task<IActionResult> DeleteRole(string id)
+    {
+        var role = await _roleManager.FindByIdAsync(id);
+        if(role != null)
+        {
+            var result = await _roleManager.DeleteAsync(role);
+            if(result.Succeeded) return StatusCode(StatusCodes.Status200OK , new Response { Status = "Sucesso" , Message = $"Perfil '{role.Name}' deletado com sucesso." });
+            else return StatusCode(StatusCodes.Status400BadRequest , new Response { Status = "Erro" , Message = $"Erro ao deletar o perfil '{role.Name}'." });
+        }
+        return BadRequest(new { Error = "Não foi possível encontrar o perfil. Por favor, tente novamente!" });
+    }
     #endregion
     #endregion
 
     #region METHODS
-    private ActionResult<IEnumerable<RolesResponseDTO>> ObterPerfis(IPagedList<IdentityRole> perfil)
+    private ActionResult<IEnumerable<RolesResponseDTO>> ObterPerfisIdentityRole(IPagedList<IdentityRole> perfil)
     {
         var metadados = new
         {
@@ -186,6 +186,21 @@ public class RolesController : ControllerBase
 
         var perfilDTO = _mapper.Map<IEnumerable<RolesResponseDTO>>(perfil);
         return Ok(perfilDTO);
+    }
+
+    private ActionResult<IEnumerable<RolesResponseDTO>> ObterPerfisRolesResponseDTO(IPagedList<RolesResponseDTO> perfil)
+    {
+        var metadados = new
+        {
+            perfil.Count ,
+            perfil.PageSize ,
+            perfil.PageCount ,
+            perfil.TotalItemCount ,
+            perfil.HasNextPage ,
+            perfil.HasPreviousPage
+        };
+        Response.Headers.Append("X-Pagination" , JsonConvert.SerializeObject(metadados));
+        return Ok(perfil);
     }
     #endregion
 }

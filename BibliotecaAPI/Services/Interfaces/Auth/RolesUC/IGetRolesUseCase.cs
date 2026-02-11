@@ -1,6 +1,7 @@
 ﻿using BibliotecaAPI.DTOs.AuthDTOs.Roles;
 using BibliotecaAPI.DTOs.AuthDTOs.Users;
 using BibliotecaAPI.Pagination.PerfilFiltro;
+using Microsoft.AspNetCore.Identity;
 using X.PagedList;
 
 namespace BibliotecaAPI.Services.Interfaces.Auth.RolesUC;
