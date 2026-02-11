@@ -18,7 +18,8 @@ using X.PagedList;
 namespace BibliotecaAPI.Controllers.V1;
 
 [ApiController]
-[Route("[controller]")]
+[Route("v{version:apiVersion}/[Controller]")]
+[ApiVersion("1.0")]
 public class RolesController : ControllerBase
 {
     #region PROPS/CTOR
@@ -46,8 +47,6 @@ public class RolesController : ControllerBase
     /// <returns>Todos os perfis de usuário</returns>
     // GET: /RolesController/Perfis
     [HttpGet]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<IEnumerable<RolesResponseDTO>>> GetRolesAsync()
     {
@@ -63,8 +62,6 @@ public class RolesController : ControllerBase
     /// <returns>Usuário cadastrado</returns>
     // GET: /RolesController/Perfil/id
     [HttpGet("{id:int:min(1)}")]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<IEnumerable<RolesResponseDTO>>> GetRoleByIdAsync(string id)
     {
@@ -82,8 +79,6 @@ public class RolesController : ControllerBase
     /// <returns>Usuário cadastrado</returns>
     // GET: /RolesController/Perfil/id
     [HttpGet("UsuariosNoPerfil/{perfil}")]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetUsersInRoleAsync(string perfil)
     {
@@ -100,8 +95,6 @@ public class RolesController : ControllerBase
     /// <returns>Lista de Autores paginadas</returns>
     // GET: Perfil/Paginacao
     [HttpGet("Paginacao")]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     // [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<RolesResponseDTO>>> GetPaginationAsync([FromQuery] PerfilParameters perfilParameters)
     {
@@ -120,8 +113,6 @@ public class RolesController : ControllerBase
     /// <returns>Novo perfil de usuário</returns>
     // POST: /RolesController/CriarPerfil
     [HttpPost]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Route("CriarPerfil")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> CreateRole(string roleName)
@@ -142,8 +133,6 @@ public class RolesController : ControllerBase
     /// <returns>Usuário a um perfil</returns>
     // POST: /RolesController/AdicionarUsuarioAoPerfil
     [HttpPost]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Route("AdicionarUsuarioAoPerfil")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> AddUserToRole(string email , string roleName)
@@ -166,8 +155,6 @@ public class RolesController : ControllerBase
     /// <returns></returns>
     // PUT: /RolesController/AtualizarPerfil/id
     [HttpPut("AtualizarPerfil/{id}")]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<RolesResponseDTO>> PutRoleAsync(string id , RolesRequestDTO rolesDTO)
     {
@@ -194,8 +181,6 @@ public class RolesController : ControllerBase
     /// <returns>Perfil de usuário deletado</returns>
     // DELETE: /RolesController/DeletarPerfil/RoleName
     [HttpDelete]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Route("DeletarPerfil/{id}")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> DeleteRole(string id)
