@@ -6,6 +6,7 @@ using BibliotecaAPI.DTOs.AuthDTOs.Users;
 using BibliotecaAPI.DTOs.TokensJWT;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Pagination.PerfilFiltro;
+using BibliotecaAPI.Services.Interfaces.Auth.RolesUC;
 using BibliotecaAPI.Services.Interfaces.TokenJWT;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -23,19 +24,15 @@ namespace BibliotecaAPI.Controllers.V1;
 public class RolesController : ControllerBase
 {
     #region PROPS/CTOR
-    private readonly ITokenService _tokenService;
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly IConfiguration _cfg;
+    private readonly IGetRolesUseCase _getRolesUseCase;
+    private readonly ICreateRolesUseCase _createRolesUseCase;
     private readonly IMapper _mapper;
 
-    public RolesController(ITokenService tokenService , UserManager<ApplicationUser> userManager , RoleManager<IdentityRole> roleManager , IConfiguration cfg , IMapper mapper)
+    public RolesController(IGetRolesUseCase getRolesUseCase , IMapper mapper , ICreateRolesUseCase createRolesUseCase)
     {
-        _tokenService = tokenService;
-        _userManager = userManager;
-        _roleManager = roleManager;
-        _cfg = cfg;
+        _getRolesUseCase = getRolesUseCase;
         _mapper = mapper;
+        _createRolesUseCase = createRolesUseCase;
     }
     #endregion
 
@@ -50,9 +47,7 @@ public class RolesController : ControllerBase
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<IEnumerable<RolesResponseDTO>>> GetRolesAsync()
     {
-        var roles = await _roleManager.Roles.ToListAsync();
-        var result = _mapper.Map<IEnumerable<RolesResponseDTO>>(roles);
-
+        var result = await _getRolesUseCase.GetRolesAsync();
         return Ok(result);
     }
 
@@ -65,12 +60,8 @@ public class RolesController : ControllerBase
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<IEnumerable<RolesResponseDTO>>> GetRoleByIdAsync(string id)
     {
-        var role = await _roleManager.FindByIdAsync(id);
-        if(role == null) return NotFound($"Não foi possível encontrar o perfil com o ID {id}. Por favor, tente novamente!");
-
-        var roleDTO = _mapper.Map<RolesResponseDTO>(role);
-
-        return Ok(roleDTO);
+        var roleId = await _getRolesUseCase.GetRoleByIdAsync(id);
+        return Ok(roleId);
     }
 
     /// <summary>
@@ -82,11 +73,8 @@ public class RolesController : ControllerBase
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetUsersInRoleAsync(string perfil)
     {
-        var usuariosNoPerfil = await _userManager.GetUsersInRoleAsync(perfil);
-        if(usuariosNoPerfil == null || !usuariosNoPerfil.Any()) return NotFound($"Nenhum usuário encontrado no perfil '{perfil}'. Por favor, tente novamente!");
-
-        var usuariosNoPerfilDTO = _mapper.Map<IEnumerable<UsersResponseDTO>>(usuariosNoPerfil);
-        return Ok(usuariosNoPerfilDTO);
+        var usuariosNoPerfil = await _getRolesUseCase.GetUsersInRoleAsync(perfil);
+        return Ok(usuariosNoPerfil);
     }
 
     /// <summary>
@@ -95,14 +83,11 @@ public class RolesController : ControllerBase
     /// <returns>Lista de Autores paginadas</returns>
     // GET: Perfil/Paginacao
     [HttpGet("Paginacao")]
-    // [Authorize(Policy = "AdminsAndUsers")]
+    [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<RolesResponseDTO>>> GetPaginationAsync([FromQuery] PerfilParameters perfilParameters)
     {
-        var perfis = await _roleManager.Roles.ToListAsync();
-        if(perfis == null || !perfis.Any()) return NotFound("Perfis não encontrados. Por favor, tente novamente!");
-
-        var perfisPaginados = await perfis.ToPagedListAsync(perfilParameters.PageNumber , perfilParameters.PageSize);
-        return ObterPerfis(perfisPaginados);
+        var perfisPaginados = await _getRolesUseCase.GetPaginationAsync(perfilParameters);
+        return ObterPerfis((IPagedList<IdentityRole>)perfisPaginados);
     }
     #endregion
 
@@ -117,14 +102,8 @@ public class RolesController : ControllerBase
     [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> CreateRole(string roleName)
     {
-        var roleExists = await _roleManager.RoleExistsAsync(roleName);
-        if(!roleExists)
-        {
-            var roleResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
-            if(roleResult != null) return StatusCode(StatusCodes.Status200OK , new Response { Status = "Sucesso" , Message = $"Role '{roleName}' adicionada com sucesso!" });
-            else return StatusCode(StatusCodes.Status400BadRequest , new Response { Status = "Erro" , Message = $"Erro ao adicionar a role '{roleName}'." });
-        }
-        return StatusCode(StatusCodes.Status400BadRequest , new Response { Status = "Erro" , Message = $"Role {roleName} já existe." });
+        var perfilCriado = await _createRolesUseCase.CreateRole(roleName);
+        return Ok(perfilCriado);
     }
 
     /// <summary>
@@ -137,14 +116,8 @@ public class RolesController : ControllerBase
     [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> AddUserToRole(string email , string roleName)
     {
-        var user = await _userManager.FindByEmailAsync(email);
-        if(user != null)
-        {
-            var result = await _userManager.AddToRoleAsync(user , roleName);
-            if(result.Succeeded) return StatusCode(StatusCodes.Status200OK , new Response { Status = "Sucesso" , Message = $"Usuário '{user.Email}' adicionado ao perfil '{roleName}'." });
-            else return StatusCode(StatusCodes.Status400BadRequest , new Response { Status = "Erro" , Message = $"Erro ao adicionar o usuário '{user.Email}' ao perfil '{roleName}'." });
-        }
-        return BadRequest(new { Error = "Não foi possível encontrar o usuário. Por favor, tente novamente!" });
+        var usuarioNoPerfil = await _createRolesUseCase.AddUserToRole(email , roleName);
+        return Ok(usuarioNoPerfil);
     }
     #endregion
 
@@ -154,24 +127,24 @@ public class RolesController : ControllerBase
     /// </summary>
     /// <returns></returns>
     // PUT: /RolesController/AtualizarPerfil/id
-    [HttpPut("AtualizarPerfil/{id}")]
-    [Authorize(Policy = "AdminsOnly")]
-    public async Task<ActionResult<RolesResponseDTO>> PutRoleAsync(string id , RolesRequestDTO rolesDTO)
-    {
-        if(id != rolesDTO.Id) return BadRequest($"Não foi possível encontrar o perfil com o nome '{id}'. Por favor, verifique o nome e tente novamente!");
+    //[HttpPut("AtualizarPerfil/{id}")]
+    //[Authorize(Policy = "AdminsOnly")]
+    //public async Task<ActionResult<RolesResponseDTO>> PutRoleAsync(string id , RolesRequestDTO rolesDTO)
+    //{
+    //    if(id != rolesDTO.Id) return BadRequest($"Não foi possível encontrar o perfil com o nome '{id}'. Por favor, verifique o nome e tente novamente!");
 
-        var role = await _roleManager.FindByIdAsync(id);
-        if(role == null) return BadRequest($"Não foi possível encontrar o perfil com o nome '{id}'. Por favor, verifique o nome digitado e tente novamente!");
+    //    var role = await _roleManager.FindByIdAsync(id);
+    //    if(role == null) return BadRequest($"Não foi possível encontrar o perfil com o nome '{id}'. Por favor, verifique o nome digitado e tente novamente!");
 
-        role.Name = rolesDTO.Name;
+    //    role.Name = rolesDTO.Name;
 
-        var result = await _roleManager.UpdateAsync(role);
-        if(!result.Succeeded) return BadRequest(result.Errors);
+    //    var result = await _roleManager.UpdateAsync(role);
+    //    if(!result.Succeeded) return BadRequest(result.Errors);
 
-        var response = _mapper.Map<RolesResponseDTO>(role);
+    //    var response = _mapper.Map<RolesResponseDTO>(role);
 
-        return Ok(response);
-    }
+    //    return Ok(response);
+    //}
     #endregion
 
     #region DELETE
@@ -180,20 +153,20 @@ public class RolesController : ControllerBase
     /// </summary>
     /// <returns>Perfil de usuário deletado</returns>
     // DELETE: /RolesController/DeletarPerfil/RoleName
-    [HttpDelete]
-    [Route("DeletarPerfil/{id}")]
-    [Authorize(Policy = "AdminsOnly")]
-    public async Task<IActionResult> DeleteRole(string id)
-    {
-        var role = await _roleManager.FindByIdAsync(id);
-        if(role != null)
-        {
-            var result = await _roleManager.DeleteAsync(role);
-            if(result.Succeeded) return StatusCode(StatusCodes.Status200OK , new Response { Status = "Sucesso" , Message = $"Perfil '{role.Name}' deletado com sucesso." });
-            else return StatusCode(StatusCodes.Status400BadRequest , new Response { Status = "Erro" , Message = $"Erro ao deletar o perfil '{role.Name}'." });
-        }
-        return BadRequest(new { Error = "Não foi possível encontrar o perfil. Por favor, tente novamente!" });
-    }
+    //[HttpDelete]
+    //[Route("DeletarPerfil/{id}")]
+    //[Authorize(Policy = "AdminsOnly")]
+    //public async Task<IActionResult> DeleteRole(string id)
+    //{
+    //    var role = await _roleManager.FindByIdAsync(id);
+    //    if(role != null)
+    //    {
+    //        var result = await _roleManager.DeleteAsync(role);
+    //        if(result.Succeeded) return StatusCode(StatusCodes.Status200OK , new Response { Status = "Sucesso" , Message = $"Perfil '{role.Name}' deletado com sucesso." });
+    //        else return StatusCode(StatusCodes.Status400BadRequest , new Response { Status = "Erro" , Message = $"Erro ao deletar o perfil '{role.Name}'." });
+    //    }
+    //    return BadRequest(new { Error = "Não foi possível encontrar o perfil. Por favor, tente novamente!" });
+    //}
     #endregion
     #endregion
 

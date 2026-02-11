@@ -8,11 +8,13 @@ using BibliotecaAPI.Models;
 using BibliotecaAPI.Repositories;
 using BibliotecaAPI.Repositories.Interfaces;
 using BibliotecaAPI.Services;
+using BibliotecaAPI.Services.Interfaces.Auth.RolesUC;
 using BibliotecaAPI.Services.Interfaces.Autores;
 using BibliotecaAPI.Services.Interfaces.Categorias;
 using BibliotecaAPI.Services.Interfaces.EditorasLivros;
 using BibliotecaAPI.Services.Interfaces.Livros;
 using BibliotecaAPI.Services.Interfaces.TokenJWT;
+using BibliotecaAPI.Services.UseCases.Auth.RolesUC;
 using BibliotecaAPI.Services.UseCases.Autores;
 using BibliotecaAPI.Services.UseCases.CategoriasLivros;
 using BibliotecaAPI.Services.UseCases.EditorasLivros;
@@ -121,9 +123,9 @@ builder.Services.AddScoped<ILivrosRepositorio , LivrosRepositorio>();
 builder.Services.AddScoped<IAutorRepositorio , AutorRepositorio>();
 builder.Services.AddScoped<IEditorasRepositorio , EditorasRepositorio>();
 builder.Services.AddScoped<ICategoriaLivrosRepositorio , CategoriaLivrosRepositorio>();
+builder.Services.AddScoped<ITokenService , TokenService>();
 builder.Services.AddAutoMapper(cfg => { } , typeof(MappingProfile));
 builder.Services.AddIdentity<ApplicationUser , IdentityRole>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
-builder.Services.AddScoped<ITokenService , TokenService>();
 
 #region Autores Use Cases
 // Autores Use Cases
@@ -160,6 +162,11 @@ builder.Services.AddScoped<IPutLivrosUseCase, PutLivrosUseCase>();
 builder.Services.AddScoped<IPatchLivrosUseCase, PatchLivrosUseCase>();
 builder.Services.AddScoped<IDeleteLivrosUseCase, DeleteLivrosUseCase>();
 #endregion
+
+#region Auth Use Cases
+// Roles Use Cases
+builder.Services.AddScoped<IGetRolesUseCase , GetRolesUseCase>();
+builder.Services.AddScoped<ICreateRolesUseCase , CreateRolesUseCase>();
 #endregion
 
 #region JWT TOKEN
@@ -200,6 +207,7 @@ builder.Services.AddAuthentication(op =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
     };
 });
+#endregion
 #endregion
 #endregion
 
