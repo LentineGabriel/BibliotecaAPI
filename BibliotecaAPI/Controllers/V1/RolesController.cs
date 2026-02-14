@@ -27,14 +27,16 @@ public class RolesController : ControllerBase
     private readonly IGetRolesUseCase _getRolesUseCase;
     private readonly ICreateRolesUseCase _createRolesUseCase;
     private readonly IPutRolesUseCase _putRolesUseCase;
+    private readonly IDeleteRolesUseCase _deleteRolesUseCase;
     private readonly IMapper _mapper;
 
-    public RolesController(IGetRolesUseCase getRolesUseCase , IMapper mapper , ICreateRolesUseCase createRolesUseCase , IPutRolesUseCase putRolesUseCase)
+    public RolesController(IGetRolesUseCase getRolesUseCase , IMapper mapper , ICreateRolesUseCase createRolesUseCase , IPutRolesUseCase putRolesUseCase , IDeleteRolesUseCase deleteRolesUseCase)
     {
         _getRolesUseCase = getRolesUseCase;
         _mapper = mapper;
         _createRolesUseCase = createRolesUseCase;
         _putRolesUseCase = putRolesUseCase;
+        _deleteRolesUseCase = deleteRolesUseCase;
     }
     #endregion
 
@@ -151,14 +153,7 @@ public class RolesController : ControllerBase
     [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> DeleteRole(string id)
     {
-        var role = await _roleManager.FindByIdAsync(id);
-        if(role != null)
-        {
-            var result = await _roleManager.DeleteAsync(role);
-            if(result.Succeeded) return StatusCode(StatusCodes.Status200OK , new Response { Status = "Sucesso" , Message = $"Perfil '{role.Name}' deletado com sucesso." });
-            else return StatusCode(StatusCodes.Status400BadRequest , new Response { Status = "Erro" , Message = $"Erro ao deletar o perfil '{role.Name}'." });
-        }
-        return BadRequest(new { Error = "Não foi possível encontrar o perfil. Por favor, tente novamente!" });
+        return await _deleteRolesUseCase.DeleteRole(id);
     }
     #endregion
     #endregion
