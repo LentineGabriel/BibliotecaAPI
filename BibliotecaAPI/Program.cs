@@ -167,6 +167,7 @@ builder.Services.AddScoped<IDeleteLivrosUseCase, DeleteLivrosUseCase>();
 // Roles Use Cases
 builder.Services.AddScoped<IGetRolesUseCase , GetRolesUseCase>();
 builder.Services.AddScoped<ICreateRolesUseCase , CreateRolesUseCase>();
+builder.Services.AddScoped<IPutRolesUseCase , PutRolesUseCase>();
 #endregion
 
 #region JWT TOKEN

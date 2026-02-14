@@ -26,13 +26,15 @@ public class RolesController : ControllerBase
     #region PROPS/CTOR
     private readonly IGetRolesUseCase _getRolesUseCase;
     private readonly ICreateRolesUseCase _createRolesUseCase;
+    private readonly IPutRolesUseCase _putRolesUseCase;
     private readonly IMapper _mapper;
 
-    public RolesController(IGetRolesUseCase getRolesUseCase , IMapper mapper , ICreateRolesUseCase createRolesUseCase)
+    public RolesController(IGetRolesUseCase getRolesUseCase , IMapper mapper , ICreateRolesUseCase createRolesUseCase , IPutRolesUseCase putRolesUseCase)
     {
         _getRolesUseCase = getRolesUseCase;
         _mapper = mapper;
         _createRolesUseCase = createRolesUseCase;
+        _putRolesUseCase = putRolesUseCase;
     }
     #endregion
 
@@ -133,16 +135,7 @@ public class RolesController : ControllerBase
     {
         if(id != rolesDTO.Id) return BadRequest($"Não foi possível encontrar o perfil com o nome '{id}'. Por favor, verifique o nome e tente novamente!");
 
-        var role = await _roleManager.FindByIdAsync(id);
-        if(role == null) return BadRequest($"Não foi possível encontrar o perfil com o nome '{id}'. Por favor, verifique o nome digitado e tente novamente!");
-
-        role.Name = rolesDTO.Name;
-
-        var result = await _roleManager.UpdateAsync(role);
-        if(!result.Succeeded) return BadRequest(result.Errors);
-
-        var response = _mapper.Map<RolesResponseDTO>(role);
-
+        var response = await _putRolesUseCase.PutRoleAsync(id , rolesDTO);
         return Ok(response);
     }
     #endregion
