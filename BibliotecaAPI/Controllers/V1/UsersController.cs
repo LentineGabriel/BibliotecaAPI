@@ -20,7 +20,8 @@ using X.PagedList;
 namespace BibliotecaAPI.Controllers.V1;
 
 [ApiController]
-[Route("[controller]")]
+[Route("v{version:apiVersion}/[Controller]")]
+[ApiVersion("1.0")]
 public class UsersController : ControllerBase
 {
     #region PROPS/CTOR

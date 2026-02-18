@@ -3,15 +3,11 @@ using Asp.Versioning;
 using AutoMapper;
 using BibliotecaAPI.DTOs.AuthDTOs.Roles;
 using BibliotecaAPI.DTOs.AuthDTOs.Users;
-using BibliotecaAPI.DTOs.TokensJWT;
-using BibliotecaAPI.Models;
 using BibliotecaAPI.Pagination.PerfilFiltro;
 using BibliotecaAPI.Services.Interfaces.Auth.RolesUC;
-using BibliotecaAPI.Services.Interfaces.TokenJWT;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using X.PagedList;
 #endregion

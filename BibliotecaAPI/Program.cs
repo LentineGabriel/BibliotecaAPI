@@ -9,6 +9,7 @@ using BibliotecaAPI.Repositories;
 using BibliotecaAPI.Repositories.Interfaces;
 using BibliotecaAPI.Services;
 using BibliotecaAPI.Services.Interfaces.Auth.RolesUC;
+using BibliotecaAPI.Services.Interfaces.Auth.UsersUC;
 using BibliotecaAPI.Services.Interfaces.Autores;
 using BibliotecaAPI.Services.Interfaces.Categorias;
 using BibliotecaAPI.Services.Interfaces.EditorasLivros;
@@ -169,6 +170,13 @@ builder.Services.AddScoped<IGetRolesUseCase , GetRolesUseCase>();
 builder.Services.AddScoped<ICreateRolesUseCase , CreateRolesUseCase>();
 builder.Services.AddScoped<IPutRolesUseCase , PutRolesUseCase>();
 builder.Services.AddScoped<IDeleteRolesUseCase , DeleteRolesUseCase>();
+
+// Users Use Cases
+builder.Services.AddScoped<IGetUsersUseCase , GetUsersUseCase>();
+builder.Services.AddScoped<ICreateUsersUseCase , CreateUsersUseCase>();
+builder.Services.AddScoped<IPutUsersUseCase , PutUsersUseCase>();
+builder.Services.AddScoped<IPatchUsersUseCase , PatchUsersUseCase>();
+builder.Services.AddScoped<IDeleteUsersUseCase , DeleteUsersUseCase>();
 #endregion
 
 #region JWT TOKEN
