@@ -5,6 +5,7 @@ using BibliotecaAPI.DTOs.AuthDTOs.Users;
 using BibliotecaAPI.DTOs.TokensJWT;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Pagination.UsuariosFiltro;
+using BibliotecaAPI.Services.Interfaces.Auth.UsersUC;
 using BibliotecaAPI.Services.Interfaces.TokenJWT;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -25,18 +26,14 @@ namespace BibliotecaAPI.Controllers.V1;
 public class UsersController : ControllerBase
 {
     #region PROPS/CTOR
-    private readonly ITokenService _tokenService;
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly IConfiguration _cfg;
+    private readonly IGetUsersUseCase _getUsersUseCase;
+    private readonly ICreateUsersUseCase _createUsersUseCase;
     private readonly IMapper _mapper;
 
-    public UsersController(ITokenService tokenService , UserManager<ApplicationUser> userManager , RoleManager<IdentityRole> roleManager , IConfiguration cfg, IMapper mapper)
+    public UsersController(IGetUsersUseCase getUsersUseCase , ICreateUsersUseCase createUsersUseCase , IMapper mapper)
     {
-        _tokenService = tokenService;
-        _userManager = userManager;
-        _roleManager = roleManager;
-        _cfg = cfg;
+        _getUsersUseCase = getUsersUseCase;
+        _createUsersUseCase = createUsersUseCase;
         _mapper = mapper;
     }
     #endregion
@@ -50,15 +47,11 @@ public class UsersController : ControllerBase
     // GET: /AuthController/Usuarios
     [HttpGet]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetUsersAsync()
     {
-        var usuarios = await _userManager.Users.ToListAsync();
-        if(usuarios == null || !usuarios.Any()) return NotFound("Usuários não encontrados. Por favor, tente novamente!");
-
-        var usuariosDTO = _mapper.Map<IEnumerable<UsersResponseDTO>>(usuarios);
-        return Ok(usuariosDTO);
+        var usuario = await _getUsersUseCase.GetUsersAsync();
+        return Ok(usuario);
     }
 
     /// <summary>
@@ -68,16 +61,11 @@ public class UsersController : ControllerBase
     // GET: /AuthController/Usuarios/id
     [HttpGet("{id:int:min(1)}")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<UsersResponseDTO>> GetUserByIdAsync(string id)
     {
-        var usuario = await _userManager.FindByIdAsync(id);
-        if(usuario == null) return NotFound($"Não foi possível encontrar o usuário com o ID {id}. Por favor, tente novamente!");
-
-        var usuarioDTO = _mapper.Map<UsersResponseDTO>(usuario);
-
-        return Ok(usuarioDTO);
+        var usuarioId = await _getUsersUseCase.GetUserByIdAsync(id);
+        return Ok(usuarioId);
     }
 
     /// <summary>
@@ -87,15 +75,11 @@ public class UsersController : ControllerBase
     // GET: Usuarios/Paginacao
     [HttpGet("Paginacao")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetPaginationAsync([FromQuery] UsuariosParameters usuariosParameters)
     {
-        var usuarios = await _userManager.Users.ToListAsync();
-        if(usuarios == null || !usuarios.Any()) return NotFound("Usuários não encontrados. Por favor, tente novamente!");
-
-        var usuariosPaged = await usuarios.ToPagedListAsync(usuariosParameters.PageNumber , usuariosParameters.PageSize);
-        return ObterUsuarios(usuariosPaged);
+        var usuariosPaginados = await _getUsersUseCase.GetPaginationAsync(usuariosParameters);
+        return ObterUsuarios(usuariosPaginados);
     }
     #endregion
 
@@ -107,48 +91,12 @@ public class UsersController : ControllerBase
     // POST: /AuthController/Login
     [HttpPost("LoginUsuario")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
         if(!ModelState.IsValid) return BadRequest(ModelState);
 
-        var user = await _userManager.FindByNameAsync(model.NomeUsuario!);
-        if(user is not null && await _userManager.CheckPasswordAsync(user, model.Password!))
-        {
-            var userRoles = await _userManager.GetRolesAsync(user);
-            var authClaims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // guid id
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id), // id usuário
-                new Claim(ClaimTypes.Name, user.UserName!), // nome usuário
-                new Claim(ClaimTypes.Email, user.Email!), // email usuário
-            };
-
-            foreach(var userRole in userRoles)
-            {
-                authClaims.Add(new Claim(ClaimTypes.Role , userRole));
-            }
-
-            var token = _tokenService.GenerateAccessToken(authClaims);
-            var refreshToken = _tokenService.GenerateRefreshToken();
-
-            // Salvar refresh token no banco de dados
-            if(!int.TryParse(_cfg["JWT:RefreshTokenValidityInMinutes"], out int refreshTokenValidityInMinutes) || refreshTokenValidityInMinutes <= 0)
-                throw new InvalidOperationException("Configuração inválida para validade do refresh token.");
-
-            user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(refreshTokenValidityInMinutes);
-
-            await _userManager.UpdateAsync(user);
-
-            return Ok(new
-            {
-                Token = new JwtSecurityTokenHandler().WriteToken(token),
-                RefreshToken = refreshToken,
-                Expiration = token.ValidTo
-            });
-        }
-        return Unauthorized("Credenciais inválidas");
+        var usuarioLogado = await _createUsersUseCase.Login(model);
+        return Ok(usuarioLogado);
     }
     #endregion
 
@@ -160,23 +108,10 @@ public class UsersController : ControllerBase
     // POST: /AuthController/Register
     [HttpPost("RegistrarUsuario")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
         if(!ModelState.IsValid) return BadRequest(ModelState);
-
-        if(await _userManager.FindByNameAsync(model.NomeUsuario!) != null) return Conflict(new Response { Status = "Error" , Message = "Usuário já existe!" });
-        if(await _userManager.FindByEmailAsync(model.EmailUsuario!) != null) return Conflict(new Response { Status = "Error" , Message = "Email já está em uso!" });
-
-        var user = new ApplicationUser
-        {
-            UserName = model.NomeUsuario!.Trim() ,
-            Email = model.EmailUsuario!.Trim().ToLowerInvariant() ,
-            SecurityStamp = Guid.NewGuid().ToString()
-        };
-
-        var result = await _userManager.CreateAsync(user , model.Password!);
-        if(!result.Succeeded) return BadRequest(result.Errors);
+        await _createUsersUseCase.Register(model);
 
         return Created(string.Empty , new Response { Status = "Successo" , Message = "Usuário criado com sucesso!" });
     }
@@ -190,37 +125,13 @@ public class UsersController : ControllerBase
     // POST: /AuthController/RefreshToken
     [HttpPost("RefreshToken")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> RefreshToken([FromBody] TokenModel model)
     {
         if(!ModelState.IsValid) return BadRequest(ModelState);
-        
-        var accessToken = model.AccessToken;
-        var refreshToken = model.RefreshToken;
-        if(string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken)) return BadRequest("Token inválido.");
+        await _createUsersUseCase.RefreshToken(model);
 
-        var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
-        if(principal == null) return Unauthorized("Token inválido.");
-
-        var userId = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-        if(string.IsNullOrWhiteSpace(userId)) return Unauthorized("Token inválido.");
-
-        var user = await _userManager.FindByIdAsync(userId);
-        if(user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow) return Unauthorized("Token inválido ou expirado.");
-
-        var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims.ToList());
-        var newRefreshToken = _tokenService.GenerateRefreshToken();
-
-        user.RefreshToken = newRefreshToken;
-        user.RefreshTokenExpiryTime = _tokenService.GetRefreshTokenExpiry();
-        await _userManager.UpdateAsync(user);
-
-        return Ok(new
-        {
-            AccessToken = new JwtSecurityTokenHandler().WriteToken(newAccessToken) ,
-            RefreshToken = newRefreshToken
-        });
+        return Ok(new Response { Status = "Sucesso", Message = "Refresh token processado." });
     }
     #endregion
 
@@ -232,20 +143,10 @@ public class UsersController : ControllerBase
     // POST: /AuthController/Revoke
     [HttpPost("Revoke")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> Revoke(string username)
     {
-        var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-        if(string.IsNullOrWhiteSpace(userId)) return Unauthorized();
-
-        var user = await _userManager.FindByIdAsync(userId);
-        if(user == null) return NotFound("Usuário não encontrado");
-
-        user.RefreshToken = null;
-        user.RefreshTokenExpiryTime = null;
-        await _userManager.UpdateAsync(user);
-
+        await _createUsersUseCase.Revoke(username);
         return NoContent();
     }
     #endregion
@@ -258,7 +159,6 @@ public class UsersController : ControllerBase
     // PUT: /AuthController/AtualizarUsuario/id
     [HttpPut("AtualizarUsuario/{id}")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<UsersResponseDTO>> PutAsync(string id, UsersRequestDTO usersDTO)
     {
@@ -287,7 +187,6 @@ public class UsersController : ControllerBase
     /// <returns>Autor atualizado</returns>
     [HttpPatch("AtualizarParcialUsuario/{id}")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<UsersResponseDTO>> PatchAsync(string id , [FromBody] JsonPatchDocument<UsersResponseDTO> patchDoc)
     {
@@ -340,7 +239,6 @@ public class UsersController : ControllerBase
     [HttpDelete]
     [Route("DeletarUsuario/{id}")]
     [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> DeleteUser(string id)
     {
@@ -358,6 +256,23 @@ public class UsersController : ControllerBase
 
     #region METHODS
     private ActionResult<IEnumerable<UsersResponseDTO>> ObterUsuarios(IPagedList<ApplicationUser> usuarios)
+    {
+        var metadados = new
+        {
+            usuarios.Count ,
+            usuarios.PageSize ,
+            usuarios.PageCount ,
+            usuarios.TotalItemCount ,
+            usuarios.HasNextPage ,
+            usuarios.HasPreviousPage
+        };
+        Response.Headers.Append("X-Pagination" , JsonConvert.SerializeObject(metadados));
+
+        var usuariosDTO = _mapper.Map<IEnumerable<UsersResponseDTO>>(usuarios);
+        return Ok(usuariosDTO);
+    }
+
+    private ActionResult<IEnumerable<UsersResponseDTO>> ObterUsuarios(IPagedList<UsersResponseDTO> usuarios)
     {
         var metadados = new
         {

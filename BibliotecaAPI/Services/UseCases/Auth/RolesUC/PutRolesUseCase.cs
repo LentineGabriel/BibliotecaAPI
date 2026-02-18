@@ -9,13 +9,11 @@ namespace BibliotecaAPI.Services.UseCases.Auth.RolesUC;
 public class PutRolesUseCase : IPutRolesUseCase
 {
     #region PROPS/CTOR
-    private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IMapper _mapper;
 
-    public PutRolesUseCase(UserManager<ApplicationUser> userManager , RoleManager<IdentityRole> roleManager , IMapper mapper)
+    public PutRolesUseCase(RoleManager<IdentityRole> roleManager , IMapper mapper)
     {
-        _userManager = userManager;
         _roleManager = roleManager;
         _mapper = mapper;
     }
