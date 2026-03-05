@@ -3,6 +3,7 @@ using BibliotecaAPI.DTOs.TokensJWT;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Services.Interfaces.Auth.UsersUC;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BibliotecaAPI.Services.UseCases.Auth.UsersUC;
 
@@ -19,34 +20,32 @@ public class DeleteUsersUseCase : IDeleteUsersUseCase
     }
     #endregion
 
-    public async Task<Response> DeleteUser(string id)
+    public async Task<IActionResult> DeleteUser(string id)
     {
         var user = await _userManager.FindByIdAsync(id);
-        if (user == null)
+        if(user != null)
         {
-            return new Response
+            var result = await _userManager.DeleteAsync(user);
+            if(result.Succeeded)
             {
-                Status = "Erro",
-                Message = $"Usuário com id '{id}' não encontrado."
-            };
+                var response = new Response
+                {
+                    Status = "Sucesso" ,
+                    Message = $"Usuário '{user.UserName}' deletado com sucesso."
+                };
+                return new ObjectResult(response) { StatusCode = StatusCodes.Status200OK };
+            }
+            else
+            {
+                var response = new Response
+                {
+                    Status = "Erro" ,
+                    Message = $"Erro ao deletar o Usuário '{user.UserName}'."
+                };
+                return new BadRequestObjectResult(response);
+            }
         }
 
-        var result = await _userManager.DeleteAsync(user);
-        if (result.Succeeded)
-        {
-            return new Response
-            {
-                Status = "Sucesso",
-                Message = $"Usuário '{user.UserName}' deletado com sucesso."
-            };
-        }
-
-        var errors = result.Errors != null && result.Errors.Any() ? string.Join("; ", result.Errors.Select(e => e.Description ?? e.Code ?? e.ToString())) : "Erro desconhecido ao deletar o usuário.";
-
-        return new Response
-        {
-            Status = "Erro",
-            Message = $"Erro ao deletar o usuário '{user.UserName}': {errors}"
-        };
+        return new BadRequestObjectResult(new { Error = "Não foi possível encontrar o Usuário. Por favor, tente novamente!" });
     }
 }

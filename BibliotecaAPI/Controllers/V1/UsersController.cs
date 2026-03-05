@@ -194,9 +194,7 @@ public class UsersController : ControllerBase
     [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> DeleteUser(string id)
     {
-        await _deleteUsersUseCase.DeleteUser(id);
-
-        return BadRequest(new { Error = "Não foi possível encontrar o usuário. Por favor, tente novamente!" });
+        return await _deleteUsersUseCase.DeleteUser(id);
     }
     #endregion
     #endregion

@@ -2,6 +2,7 @@
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Services.Interfaces.Auth.UsersUC;
 using BibliotecaAPI.Services.Interfaces.TokenJWT;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -26,7 +27,7 @@ public class CreateUsersUseCase : ICreateUsersUseCase
     public async Task<LoginResponseDTO> Login(LoginModel model)
     {
         var user = await _userManager.FindByNameAsync(model.NomeUsuario!);
-        if(user is not null && await _userManager.CheckPasswordAsync(user , model.Password!))
+        if (user is not null && await _userManager.CheckPasswordAsync(user , model.Password!))
         {
             var userRoles = await _userManager.GetRolesAsync(user);
             var authClaims = new List<Claim>
@@ -77,7 +78,7 @@ public class CreateUsersUseCase : ICreateUsersUseCase
 
         var result = await _userManager.CreateAsync(user , model.Password!);
 
-        if(!result.Succeeded) throw new ApplicationException(string.Join(" | " , result.Errors.Select(e => e.Description)));
+        if(!result.Succeeded) throw new ApplicationException(string.Join(" | " , result.Errors.Select(e => e.Description))));
 
         // Gerar claims
         var authClaims = new List<Claim>
