@@ -1,5 +1,7 @@
-﻿namespace BibliotecaAPI.Services.Interfaces.Auth.UsersUC;
+﻿using BibliotecaAPI.DTOs.TokensJWT;
+
+namespace BibliotecaAPI.Services.Interfaces.Auth.UsersUC;
 public interface IDeleteUsersUseCase
 {
-    Task DeleteUser(string id);
+    Task<Response> DeleteUser(string id);
 }

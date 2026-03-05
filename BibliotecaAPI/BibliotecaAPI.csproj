@@ -31,8 +31,6 @@
 
 	<ItemGroup>
 	  <Folder Include="Controllers\V2\" />
-	  <Folder Include="Services\Interfaces\Auth\UsersUC\" />
-	  <Folder Include="Services\UseCases\Auth\UsersUC\" />
 	</ItemGroup>
 
 </Project>

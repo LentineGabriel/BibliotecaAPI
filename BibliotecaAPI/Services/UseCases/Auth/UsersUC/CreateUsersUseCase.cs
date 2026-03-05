@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using BibliotecaAPI.DTOs.TokensJWT;
+﻿using BibliotecaAPI.DTOs.TokensJWT;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Services.Interfaces.Auth.UsersUC;
 using BibliotecaAPI.Services.Interfaces.TokenJWT;
@@ -13,20 +12,18 @@ public class CreateUsersUseCase : ICreateUsersUseCase
 {
     #region PROS/CTOR
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IMapper _mapper;
     private readonly ITokenService _tokenService;
     private readonly IConfiguration _cfg;
 
-    public CreateUsersUseCase(UserManager<ApplicationUser> userManager , IMapper mapper , ITokenService tokenService , IConfiguration cfg)
+    public CreateUsersUseCase(UserManager<ApplicationUser> userManager , ITokenService tokenService , IConfiguration cfg)
     {
         _userManager = userManager;
-        _mapper = mapper;
         _tokenService = tokenService;
         _cfg = cfg;
     }
     #endregion
 
-    public async Task<IdentityResult> Login(LoginModel model)
+    public async Task<LoginResponseDTO> Login(LoginModel model)
     {
         var user = await _userManager.FindByNameAsync(model.NomeUsuario!);
         if(user is not null && await _userManager.CheckPasswordAsync(user , model.Password!))
@@ -45,7 +42,10 @@ public class CreateUsersUseCase : ICreateUsersUseCase
                 authClaims.Add(new Claim(ClaimTypes.Role , userRole));
             }
 
-            var token = _tokenService.GenerateAccessToken(authClaims);
+            // Generate JWT (may return JwtSecurityToken) and convert to string
+            var jwtToken = _tokenService.GenerateAccessToken(authClaims);
+            var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+
             var refreshToken = _tokenService.GenerateRefreshToken();
 
             // Salvar refresh token no banco de dados
@@ -53,29 +53,58 @@ public class CreateUsersUseCase : ICreateUsersUseCase
                 throw new InvalidOperationException("Configuração inválida para validade do refresh token.");
 
             user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(refreshTokenValidityInMinutes);
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(refreshTokenValidityInMinutes);
 
-            var usuarioLogado = await _userManager.UpdateAsync(user);
-            return usuarioLogado;
+            await _userManager.UpdateAsync(user);
+            return new LoginResponseDTO
+            {
+                AccessToken = token ,
+                RefreshToken = refreshToken ,
+                Expiration = DateTime.UtcNow.AddMinutes(refreshTokenValidityInMinutes)
+            };
         }
 
         throw new UnauthorizedAccessException("Credenciais inválidas");
     }
 
-    public async Task<IdentityResult> Register(RegisterModel model)
+    public async Task<RegisterResponseDTO> Register(RegisterModel model)
     {
-        if(await _userManager.FindByNameAsync(model.NomeUsuario!) != null) return IdentityResult.Failed(new IdentityError { Code = "UserExists" , Description = "Usuário já existe!" });
-        if(await _userManager.FindByEmailAsync(model.EmailUsuario!) != null) return IdentityResult.Failed(new IdentityError { Code = "EmailInUse" , Description = "Email já está em uso!" });
-
         var user = new ApplicationUser
         {
-            UserName = model.NomeUsuario!.Trim() ,
-            Email = model.EmailUsuario!.Trim().ToLowerInvariant() ,
-            SecurityStamp = Guid.NewGuid().ToString()
+            UserName = model.NomeUsuario ,
+            Email = model.EmailUsuario
         };
 
         var result = await _userManager.CreateAsync(user , model.Password!);
-        return result;
+
+        if(!result.Succeeded) throw new ApplicationException(string.Join(" | " , result.Errors.Select(e => e.Description)));
+
+        // Gerar claims
+        var authClaims = new List<Claim>
+        {
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            new Claim(ClaimTypes.Name, user.UserName!),
+            new Claim(ClaimTypes.Email, user.Email!)
+        };
+
+        // Generate JWT token (JwtSecurityToken) and convert to string before assigning to DTO
+        var jwtToken = _tokenService.GenerateAccessToken(authClaims);
+        var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+
+        var refreshToken = _tokenService.GenerateRefreshToken();
+
+        user.RefreshToken = refreshToken;
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(int.Parse(_cfg["JWT:RefreshTokenValidityInMinutes"]!));
+
+        await _userManager.UpdateAsync(user);
+
+        return new RegisterResponseDTO
+        {
+            AccessToken = token ,
+            RefreshToken = refreshToken ,
+            Expiration = user.RefreshTokenExpiryTime!.Value
+        };
     }
 
     public async Task RefreshToken(TokenModel model)
@@ -93,7 +122,10 @@ public class CreateUsersUseCase : ICreateUsersUseCase
         var user = await _userManager.FindByIdAsync(userId);
         if(user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow) throw new UnauthorizedAccessException("Token inválido ou expirado.");
 
-        var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims.ToList());
+        // Convert newly generated token to string to match expected usage
+        var newJwtToken = _tokenService.GenerateAccessToken(principal.Claims.ToList());
+        var newAccessToken = new JwtSecurityTokenHandler().WriteToken(newJwtToken);
+
         var newRefreshToken = _tokenService.GenerateRefreshToken();
 
         user.RefreshToken = newRefreshToken;

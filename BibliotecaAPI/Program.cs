@@ -16,6 +16,7 @@ using BibliotecaAPI.Services.Interfaces.EditorasLivros;
 using BibliotecaAPI.Services.Interfaces.Livros;
 using BibliotecaAPI.Services.Interfaces.TokenJWT;
 using BibliotecaAPI.Services.UseCases.Auth.RolesUC;
+using BibliotecaAPI.Services.UseCases.Auth.UsersUC;
 using BibliotecaAPI.Services.UseCases.Autores;
 using BibliotecaAPI.Services.UseCases.CategoriasLivros;
 using BibliotecaAPI.Services.UseCases.EditorasLivros;

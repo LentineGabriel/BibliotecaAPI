@@ -28,12 +28,18 @@ public class UsersController : ControllerBase
     #region PROPS/CTOR
     private readonly IGetUsersUseCase _getUsersUseCase;
     private readonly ICreateUsersUseCase _createUsersUseCase;
+    private readonly IPutUsersUseCase _putUsersUseCase;
+    private readonly IPatchUsersUseCase _patchUsersUseCase;
+    private readonly IDeleteUsersUseCase _deleteUsersUseCase;
     private readonly IMapper _mapper;
 
-    public UsersController(IGetUsersUseCase getUsersUseCase , ICreateUsersUseCase createUsersUseCase , IMapper mapper)
+    public UsersController(IGetUsersUseCase getUsersUseCase , ICreateUsersUseCase createUsersUseCase , IPutUsersUseCase putUsersUseCase , IPatchUsersUseCase patchUsersUseCase , IDeleteUsersUseCase deleteUsersUseCase , IMapper mapper)
     {
         _getUsersUseCase = getUsersUseCase;
         _createUsersUseCase = createUsersUseCase;
+        _putUsersUseCase = putUsersUseCase;
+        _patchUsersUseCase = patchUsersUseCase;
+        _deleteUsersUseCase = deleteUsersUseCase;
         _mapper = mapper;
     }
     #endregion
@@ -46,7 +52,6 @@ public class UsersController : ControllerBase
     /// <returns>Usuário cadastrado</returns>
     // GET: /AuthController/Usuarios
     [HttpGet]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetUsersAsync()
     {
@@ -59,8 +64,7 @@ public class UsersController : ControllerBase
     /// </summary>
     /// <returns>Usuário cadastrado</returns>
     // GET: /AuthController/Usuarios/id
-    [HttpGet("{id:int:min(1)}")]
-    [ApiVersion("1.0")]
+    [HttpGet("{id}")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<UsersResponseDTO>> GetUserByIdAsync(string id)
     {
@@ -74,7 +78,6 @@ public class UsersController : ControllerBase
     /// <returns>Lista de Autores paginadas</returns>
     // GET: Usuarios/Paginacao
     [HttpGet("Paginacao")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetPaginationAsync([FromQuery] UsuariosParameters usuariosParameters)
     {
@@ -90,7 +93,6 @@ public class UsersController : ControllerBase
     /// <returns>Usuário cadastrado</returns>
     // POST: /AuthController/Login
     [HttpPost("LoginUsuario")]
-    [ApiVersion("1.0")]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
         if(!ModelState.IsValid) return BadRequest(ModelState);
@@ -107,7 +109,6 @@ public class UsersController : ControllerBase
     /// <returns>Cadastro do usuário criado</returns>
     // POST: /AuthController/Register
     [HttpPost("RegistrarUsuario")]
-    [ApiVersion("1.0")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
         if(!ModelState.IsValid) return BadRequest(ModelState);
@@ -124,7 +125,6 @@ public class UsersController : ControllerBase
     /// <returns>Refresh Token</returns>
     // POST: /AuthController/RefreshToken
     [HttpPost("RefreshToken")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> RefreshToken([FromBody] TokenModel model)
     {
@@ -142,7 +142,6 @@ public class UsersController : ControllerBase
     /// <returns></returns>
     // POST: /AuthController/Revoke
     [HttpPost("Revoke")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> Revoke(string username)
     {
@@ -158,25 +157,13 @@ public class UsersController : ControllerBase
     /// <returns></returns>
     // PUT: /AuthController/AtualizarUsuario/id
     [HttpPut("AtualizarUsuario/{id}")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<UsersResponseDTO>> PutAsync(string id, UsersRequestDTO usersDTO)
     {
         if(id != usersDTO.Id) return BadRequest($"Não foi possível encontrar o usuário com o ID {id}. Por favor, verifique o ID e tente novamente!");
+        var usuarioAlterado = await _putUsersUseCase.PutAsync(id , usersDTO);
 
-        var user = await _userManager.FindByIdAsync(id);
-        if(user == null) return BadRequest($"Não foi possível encontrar o usuário com ID {id}. Por favor, verifique o id digitado e tente novamente!");
-
-        user.UserName = usersDTO.Username;
-        user.Email = usersDTO.Email;
-        user.EmailConfirmed = usersDTO.EmailConfirmed;
-
-        var result = await _userManager.UpdateAsync(user);
-        if(!result.Succeeded) return BadRequest(result.Errors);
-
-        var response = _mapper.Map<UsersResponseDTO>(user);
-
-        return Ok(response);
+        return Ok(usuarioAlterado);
     }
     #endregion
 
@@ -186,47 +173,13 @@ public class UsersController : ControllerBase
     /// </summary>
     /// <returns>Autor atualizado</returns>
     [HttpPatch("AtualizarParcialUsuario/{id}")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<ActionResult<UsersResponseDTO>> PatchAsync(string id , [FromBody] JsonPatchDocument<UsersResponseDTO> patchDoc)
     {
         if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
-        
-        var user = await _userManager.FindByIdAsync(id);
-        if(user == null) return BadRequest($"Não foi possível encontrar o usuário com ID {id}. Por favor, verifique o id digitado e tente novamente!");
+        var usuarioAlterado = await _patchUsersUseCase.PatchAsync(id , patchDoc);
 
-        var userToPatch = _mapper.Map<UsersResponseDTO>(user);
-
-        // Não deixando o EmailConfirmed ser alterado via patch
-        if(patchDoc.Operations.Any(op => op.path.Equals("/emailConfirmed", StringComparison.OrdinalIgnoreCase))) return BadRequest("A propriedade 'EmailConfirmed' não pode ser alterada via patch.");
-
-        patchDoc.ApplyTo(userToPatch , ModelState);
-        if(!ModelState.IsValid) return BadRequest(ModelState);
-        if(!TryValidateModel(userToPatch)) return BadRequest(ModelState);
-
-        // Caso o email tenha sido alterado
-        if(!string.Equals(userToPatch.Email, user.Email, StringComparison.OrdinalIgnoreCase)) 
-        {
-            var setEmail = await _userManager.SetEmailAsync(user, userToPatch.Email!);
-            if(!setEmail.Succeeded) return BadRequest(setEmail.Errors);
-        }
-
-        // Caso o username tenha sido alterado
-        if(!string.Equals(userToPatch.Username, user.UserName, StringComparison.OrdinalIgnoreCase)) 
-        {
-            var setUserName = await _userManager.SetUserNameAsync(user, userToPatch.Username!);
-            if(!setUserName.Succeeded) return BadRequest(setUserName.Errors);
-        }
-
-        // P/ outros campos "não sensíveis"
-        _mapper.Map(userToPatch , user);
-
-        var result = await _userManager.UpdateAsync(user);
-        if(!result.Succeeded) return BadRequest(result.Errors);
-
-        var response = _mapper.Map<UsersResponseDTO>(user);
-
-        return Ok(response);
+        return Ok(usuarioAlterado);
     }
     #endregion
 
@@ -238,17 +191,11 @@ public class UsersController : ControllerBase
     // DELETE: /AuthController/DeletarUsuario/NomeUsuario
     [HttpDelete]
     [Route("DeletarUsuario/{id}")]
-    [ApiVersion("1.0")]
     [Authorize(Policy = "AdminsOnly")]
     public async Task<IActionResult> DeleteUser(string id)
     {
-        var user = await _userManager.FindByIdAsync(id);
-        if(user != null)
-        {
-            var result = await _userManager.DeleteAsync(user);
-            if(result.Succeeded) return StatusCode(StatusCodes.Status200OK , new Response { Status = "Sucesso", Message = $"Usuário '{user.UserName}' deletado com sucesso." });
-            else return StatusCode(StatusCodes.Status400BadRequest , new Response { Status = "Erro", Message = $"Erro ao deletar o usuário '{user.UserName}'." });
-        }
+        await _deleteUsersUseCase.DeleteUser(id);
+
         return BadRequest(new { Error = "Não foi possível encontrar o usuário. Por favor, tente novamente!" });
     }
     #endregion
