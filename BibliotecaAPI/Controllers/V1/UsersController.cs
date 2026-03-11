@@ -201,23 +201,6 @@ public class UsersController : ControllerBase
     #endregion
 
     #region METHODS
-    private ActionResult<IEnumerable<UsersResponseDTO>> ObterUsuarios(IPagedList<ApplicationUser> usuarios)
-    {
-        var metadados = new
-        {
-            usuarios.Count ,
-            usuarios.PageSize ,
-            usuarios.PageCount ,
-            usuarios.TotalItemCount ,
-            usuarios.HasNextPage ,
-            usuarios.HasPreviousPage
-        };
-        Response.Headers.Append("X-Pagination" , JsonConvert.SerializeObject(metadados));
-
-        var usuariosDTO = _mapper.Map<IEnumerable<UsersResponseDTO>>(usuarios);
-        return Ok(usuariosDTO);
-    }
-
     private ActionResult<IEnumerable<UsersResponseDTO>> ObterUsuarios(IPagedList<UsersResponseDTO> usuarios)
     {
         var metadados = new

@@ -8,4 +8,5 @@ public interface IGetUsersUseCase
     Task<IEnumerable<UsersResponseDTO>> GetUsersAsync();
     Task<UsersResponseDTO> GetUserByIdAsync(string id);
     Task<IPagedList<UsersResponseDTO>> GetPaginationAsync(UsuariosParameters usuariosParameters);
+    Task<IPagedList<UsersResponseDTO>> GetUserEstanteAsync(string id);
 }
