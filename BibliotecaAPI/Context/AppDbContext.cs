@@ -13,6 +13,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Editoras> Editoras { get; set; }
     public DbSet<Categorias> Categorias { get; set; }
     public DbSet<LivroCategoria> LivrosCategorias { get; set; }
+    public DbSet<Estante> Estantes { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
     #endregion
@@ -25,5 +26,9 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
         modelBuilder.Entity<LivroCategoria>().HasKey(lc => new { lc.LivroId, lc.CategoriaId });
         modelBuilder.Entity<LivroCategoria>().HasOne(lc => lc.Livros).WithMany(l => l.LivrosCategorias).HasForeignKey(lc => lc.LivroId);
         modelBuilder.Entity<LivroCategoria>().HasOne(lc => lc.Categorias).WithMany(c => c.LivrosCategorias).HasForeignKey(lc => lc.CategoriaId);
+
+        // Criando a restrição de unicidade para a combinação de UserId e LivroId na tabela Estante e fazendo a relação
+        modelBuilder.Entity<Estante>().HasIndex(e => new { e.UserId , e.LivroId }).IsUnique();
+        modelBuilder.Entity<Estante>().HasOne(e => e.Livro).WithMany().HasForeignKey(e => e.LivroId);
     }
 }

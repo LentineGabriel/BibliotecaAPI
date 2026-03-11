@@ -47,4 +47,9 @@ public class GetUsersUseCase : IGetUsersUseCase
         var usuariosDto = _mapper.Map<IEnumerable<UsersResponseDTO>>(usuarios);
         return await usuariosDto.ToPagedListAsync(usuariosParameters.PageNumber , usuariosParameters.PageSize);
     }
+
+    public Task<IPagedList<UsersResponseDTO>> GetUserEstanteAsync(string id)
+    {
+        throw new NotImplementedException();
+    }
 }

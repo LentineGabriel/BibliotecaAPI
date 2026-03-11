@@ -78,7 +78,7 @@ public class CreateUsersUseCase : ICreateUsersUseCase
 
         var result = await _userManager.CreateAsync(user , model.Password!);
 
-        if(!result.Succeeded) throw new ApplicationException(string.Join(" | " , result.Errors.Select(e => e.Description))));
+        if(!result.Succeeded) throw new ApplicationException(string.Join(" | " , result.Errors.Select(e => e.Description)));
 
         // Gerar claims
         var authClaims = new List<Claim>

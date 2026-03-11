@@ -22,7 +22,7 @@ public class UsersController : ControllerBase
     }
     #endregion
 
-    #region ESTANTE
+    #region GET
     /// <summary>
     /// Retorna a estante do usuário logado no sistema.
     /// </summary>
@@ -32,7 +32,16 @@ public class UsersController : ControllerBase
     public async Task<ActionResult<UsersResponseDTO>> GetUserEstanteAsync(string id)
     {
         // var usuarioId = await _getUsersUseCase.GetUserEstanteAsync(id);
-        return Ok(usuarioId);
+        return Ok();
+    }
+    #endregion
+
+    #region POST
+    [HttpPost("BuscarLivros")]
+    public async Task<ActionResult<UsersResponseDTO>> BooksSearchAsync(string id)
+    {
+        // var usuarioId = await _getUsersUseCase.BuscarLivrosAsync(id);
+        return Ok();
     }
     #endregion
 }
