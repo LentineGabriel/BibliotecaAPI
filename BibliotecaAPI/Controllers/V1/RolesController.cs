@@ -17,6 +17,7 @@ namespace BibliotecaAPI.Controllers.V1;
 [ApiController]
 [Route("v{version:apiVersion}/[Controller]")]
 [ApiVersion("1.0")]
+[ApiVersion("2.0")]
 public class RolesController : ControllerBase
 {
     #region PROPS/CTOR
