@@ -34,5 +34,5 @@ public class EstanteRepositorio : IEstanteRepositorio
             .ToListAsync();
 
     public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
-    public async Task Remove(Estante estante) => await _context.SaveChangesAsync();
+    public void Remove(Estante estante) => _context.Remove(estante);
 }

@@ -6,5 +6,5 @@ public interface IEstanteRepositorio
     Task<Estante?> GetByUserAndLivroAsync(string userId , int livroId); // evitar duplicidade
     Task<IEnumerable<Estante>> GetEstanteUsuarioAsync(string userId , int page , int pageSize); // paginação 
     Task SaveChangesAsync();
-    Task Remove(Estante estante);
+    void Remove(Estante estante);
 }

@@ -13,6 +13,7 @@ using BibliotecaAPI.Services.Interfaces.Auth.UsersUC;
 using BibliotecaAPI.Services.Interfaces.Autores;
 using BibliotecaAPI.Services.Interfaces.Categorias;
 using BibliotecaAPI.Services.Interfaces.EditorasLivros;
+using BibliotecaAPI.Services.Interfaces.EstanteUC;
 using BibliotecaAPI.Services.Interfaces.Livros;
 using BibliotecaAPI.Services.Interfaces.TokenJWT;
 using BibliotecaAPI.Services.UseCases.Auth.RolesUC;
@@ -20,11 +21,13 @@ using BibliotecaAPI.Services.UseCases.Auth.UsersUC;
 using BibliotecaAPI.Services.UseCases.Autores;
 using BibliotecaAPI.Services.UseCases.CategoriasLivros;
 using BibliotecaAPI.Services.UseCases.EditorasLivros;
+using BibliotecaAPI.Services.UseCases.EstanteUC;
 using BibliotecaAPI.Services.UseCases.Livros;
 using BibliotecaAPI.Settings;
 using BibliotecaAPI.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -125,6 +128,7 @@ builder.Services.AddScoped<ILivrosRepositorio , LivrosRepositorio>();
 builder.Services.AddScoped<IAutorRepositorio , AutorRepositorio>();
 builder.Services.AddScoped<IEditorasRepositorio , EditorasRepositorio>();
 builder.Services.AddScoped<ICategoriaLivrosRepositorio , CategoriaLivrosRepositorio>();
+builder.Services.AddScoped<IEstanteRepositorio, EstanteRepositorio>();
 builder.Services.AddScoped<ITokenService , TokenService>();
 builder.Services.AddAutoMapper(cfg => { } , typeof(MappingProfile));
 builder.Services.AddIdentity<ApplicationUser , IdentityRole>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
@@ -178,6 +182,11 @@ builder.Services.AddScoped<ICreateUsersUseCase , CreateUsersUseCase>();
 builder.Services.AddScoped<IPutUsersUseCase , PutUsersUseCase>();
 builder.Services.AddScoped<IPatchUsersUseCase , PatchUsersUseCase>();
 builder.Services.AddScoped<IDeleteUsersUseCase , DeleteUsersUseCase>();
+#endregion
+
+#region Estante Use Cases
+builder.Services.AddScoped<IGetLivroEstante , GetLivroEstante>();
+builder.Services.AddScoped<ICreateLivroEstante , CreateLivroEstante>();
 #endregion
 
 #region JWT TOKEN
