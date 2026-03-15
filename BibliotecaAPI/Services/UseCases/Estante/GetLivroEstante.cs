@@ -6,14 +6,14 @@ namespace BibliotecaAPI.Services.UseCases.EstanteUC;
 public class GetLivroEstante : IGetLivroEstante
 {
     #region PROPS/CTOR
-    private readonly IUnityOfWork _uof;
+    private readonly IEstanteRepositorio _estanteRepositorio;
 
-    public GetLivroEstante(IUnityOfWork uof)
+    public GetLivroEstante(IEstanteRepositorio estanteRepositorio)
     {
-        _uof = uof;
+        _estanteRepositorio = estanteRepositorio;
     }
     #endregion
 
-    public async Task<IEnumerable<Estante>> GetAsync(string userId , int page , int pageSize) => await _uof.EstanteRepositorio.GetEstanteUsuarioAsync(userId , page , pageSize);
-    public async Task<IEnumerable<Estante>> SearchBooksAsync(string userId , string termo) => await _uof.EstanteRepositorio.SearchBooksAsync(termo);
+    public async Task<IEnumerable<Estante>> GetAsync(string userId , int page , int pageSize) => await _estanteRepositorio.GetEstanteUsuarioAsync(userId , page , pageSize);
+    public async Task<IEnumerable<Estante>> SearchBooksAsync(string userId , int page , int pageSize , string termo) => await _estanteRepositorio.SearchBooksAsync(userId, page, pageSize, termo);
 }

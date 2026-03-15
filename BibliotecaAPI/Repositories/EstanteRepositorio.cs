@@ -1,5 +1,6 @@
 ﻿using BibliotecaAPI.Context;
 using BibliotecaAPI.Repositories.Interfaces;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace BibliotecaAPI.Repositories;
@@ -32,7 +33,35 @@ public class EstanteRepositorio : IEstanteRepositorio
                                         .ThenInclude(lc => lc.Categorias)
                                 .Skip((page - 1) * pageSize).Take(pageSize).AsNoTracking().ToListAsync();
 
-    public async Task<IEnumerable<Estante>> SearchBooksAsync(string termo) => await _context.Estantes.Include(e => e.Livro!).Where(e => e.Livro!.NomeLivro!.Contains(termo)).ToListAsync();
+    public async Task<IEnumerable<Estante>> SearchBooksAsync(string userId , int page , int pageSize , string termo)
+    {
+        var query = _context.Estantes
+            .Where(e => e.UserId == userId)
+            .Include(e => e.Livro)
+                .ThenInclude(l => l.Autor)
+            .Include(e => e.Livro)
+                .ThenInclude(l => l.Editora)
+            .Include(e => e.Livro)
+                .ThenInclude(l => l.LivrosCategorias)
+                    .ThenInclude(lc => lc.Categorias)
+            .AsNoTracking();
+
+        if(!string.IsNullOrWhiteSpace(termo))
+        {
+            termo = termo.ToLower();
+
+            query = query.Where(e =>
+                e.Livro!.NomeLivro!.ToLower().Contains(termo) ||
+                e.Livro.Autor!.PrimeiroNome!.ToLower().Contains(termo) ||
+                e.Livro.Autor.Sobrenome!.ToLower().Contains(termo) ||
+                e.Livro.Editora!.NomeEditora!.ToLower().Contains(termo));
+        }
+
+        return await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
     public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
     public void Remove(Estante estante) => _context.Remove(estante);
 }

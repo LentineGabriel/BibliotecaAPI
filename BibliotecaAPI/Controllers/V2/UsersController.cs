@@ -42,7 +42,7 @@ public class UsersController : ControllerBase
     /// Retorna a estante do usuário logado no sistema.
     /// </summary>
     /// <returns>Usuário cadastrado</returns>
-    // GET: /AuthController/Usuarios/Id/Estante
+    // GET: /AuthController/Usuarios/Estante
     [HttpGet("Estante")]
     public async Task<ActionResult<IEnumerable<EstanteDTOResponse>>> GetUserEstanteAsync(int page = 1, int pageSize = 10)
     {
@@ -57,6 +57,11 @@ public class UsersController : ControllerBase
         return ObterEstante(estantePaged);
     }
 
+    /// <summary>
+    /// Retorna um livro da estante do usuário logado no sistema.
+    /// </summary>
+    /// <returns>Usuário cadastrado</returns>
+    // GET: /AuthController/Usuarios/Estante/BuscarLivros
     [HttpGet("Estante/BuscarLivros")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<IEnumerable<EstanteDTOResponse>>> BooksSearchAsync(string termo, int page = 1 , int pageSize = 10)
@@ -64,7 +69,7 @@ public class UsersController : ControllerBase
         var usuarioId = User.GetUserId();
         if(usuarioId == null) return Unauthorized("É necessário estar logado para mexer na estante.");
 
-        var buscaEnumerable = await _getLivroEstante.SearchBooksAsync(usuarioId, termo);
+        var buscaEnumerable = await _getLivroEstante.SearchBooksAsync(usuarioId, page, pageSize, termo);
 
         // Verifica se o resultado já é um IPagedList, caso contrário, converte para PagedList
         var buscaPaged = buscaEnumerable as IPagedList<Estante> ?? buscaEnumerable.ToPagedList(page , pageSize);
@@ -74,6 +79,11 @@ public class UsersController : ControllerBase
     #endregion
 
     #region POST
+    /// <summary>
+    /// Adiciona um livro a estante do usuário logado no sistema.
+    /// </summary>
+    /// <returns>Usuário cadastrado</returns>
+    // GET: /AuthController/Usuarios/Estante/AdicionarLivro
     [HttpPost("Estante/AdicionarLivro")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<EstanteDTOResponse>> CreateUserEstanteAsync(int livroId)

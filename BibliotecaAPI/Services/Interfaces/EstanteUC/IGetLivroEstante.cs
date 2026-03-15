@@ -2,5 +2,5 @@
 public interface IGetLivroEstante
 {
     Task<IEnumerable<Estante>> GetAsync(string userId, int page, int pageSize);
-    Task<IEnumerable<Estante>> SearchBooksAsync(string userId, string termo);
+    Task<IEnumerable<Estante>> SearchBooksAsync(string userId , int page , int pageSize , string termo);
 }
