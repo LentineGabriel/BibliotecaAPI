@@ -1,7 +1,14 @@
-﻿namespace BibliotecaAPI.Enums;
+﻿using System.Runtime.Serialization;
+
+namespace BibliotecaAPI.Enums;
 public enum StatusLivroEstante
 {
-    Lido = 1,
-    Lendo = 2,
-    QueroLer = 3
+    [EnumMember(Value = "Quero Ler")]
+    QueroLer,
+
+    [EnumMember(Value = "Lendo")]
+    Lendo,
+
+    [EnumMember(Value = "Lido")]
+    Lido
 }

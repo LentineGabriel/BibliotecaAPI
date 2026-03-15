@@ -1,11 +1,17 @@
 ﻿#region USINGS
 using Asp.Versioning;
+using AutoMapper;
 using BibliotecaAPI.DTOs.AuthDTOs.Users;
+using BibliotecaAPI.DTOs.AutorDTOs;
+using BibliotecaAPI.DTOs.EstanteDTOs;
+using BibliotecaAPI.Models;
 using BibliotecaAPI.Services.Interfaces.Auth.UsersUC;
 using BibliotecaAPI.Services.Interfaces.EstanteUC;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Security.Claims;
+using X.PagedList;
 #endregion
 
 namespace BibliotecaAPI.Controllers.V2;
@@ -19,12 +25,14 @@ public class UsersController : ControllerBase
     private readonly IGetUsersUseCase _getUsersUseCase;
     private readonly IGetLivroEstante _getLivroEstante;
     private readonly ICreateLivroEstante _createLivroEstante;
+    private readonly IMapper _mapper;
 
-    public UsersController(IGetUsersUseCase getUsersUseCase , IGetLivroEstante getLivroEstante , ICreateLivroEstante createLivroEstante)
+    public UsersController(IGetUsersUseCase getUsersUseCase , IGetLivroEstante getLivroEstante , ICreateLivroEstante createLivroEstante , IMapper mapper)
     {
         _getUsersUseCase = getUsersUseCase;
         _getLivroEstante = getLivroEstante;
         _createLivroEstante = createLivroEstante;
+        _mapper = mapper;
     }
     #endregion
 
@@ -35,14 +43,17 @@ public class UsersController : ControllerBase
     /// <returns>Usuário cadastrado</returns>
     // GET: /AuthController/Usuarios/Id/Estante
     [HttpGet("Estante")]
-    public async Task<ActionResult<IEnumerable<Estante>>> GetUserEstanteAsync(int page = 1, int pageSize = 10)
+    public async Task<ActionResult<IEnumerable<EstanteDTOResponse>>> GetUserEstanteAsync(int page = 1, int pageSize = 10)
     {
         var usuarioId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if(usuarioId == null) return Unauthorized("É necessário estar logado para visualizar a estante.");
+        if (usuarioId == null) return Unauthorized("É necessário estar logado para visualizar a estante.");
 
-        var estante = await _getLivroEstante.GetAsync(usuarioId , page , pageSize); // ignorar essa possível referencia nula ou dará erro 500 para o usuário (mesmo que funcione)
+        var estanteEnumerable = await _getLivroEstante.GetAsync(usuarioId, page, pageSize);
 
-        return Ok(estante);
+        // Verifica se o resultado já é um IPagedList, caso contrário, converte para PagedList
+        var estantePaged = estanteEnumerable as IPagedList<Estante> ?? estanteEnumerable.ToPagedList(page, pageSize);
+
+        return ObterEstante(estantePaged);
     }
     #endregion
 
@@ -54,7 +65,7 @@ public class UsersController : ControllerBase
         var usuarioId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if(usuarioId == null) return Unauthorized("É necessário estar logado para mexer na estante.");
 
-        var estante = await _createLivroEstante.CreateAsync(usuarioId , livroId); // ignorar essa possível referencia nula ou dará erro 500 para o usuário (mesmo que funcione)
+        var estante = await _createLivroEstante.CreateAsync(usuarioId , livroId);
 
         return Ok(estante);
     }
@@ -65,6 +76,25 @@ public class UsersController : ControllerBase
     {
         // var usuarioId = await _getUsersUseCase.BuscarLivrosAsync(id);
         return Ok();
+    }
+    #endregion
+
+    #region METHODS
+    private ActionResult<IEnumerable<EstanteDTOResponse>> ObterEstante(IPagedList<Estante> estante)
+    {
+        var metadados = new
+        {
+            estante.Count,
+            estante.PageSize,
+            estante.PageCount,
+            estante.TotalItemCount,
+            estante.HasNextPage,
+            estante.HasPreviousPage
+        };
+        Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadados));
+
+        var estanteDTO = _mapper.Map<IEnumerable<EstanteDTOResponse>>(estante);
+        return Ok(estanteDTO);
     }
     #endregion
 }

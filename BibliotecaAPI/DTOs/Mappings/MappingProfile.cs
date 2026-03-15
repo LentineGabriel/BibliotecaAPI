@@ -5,6 +5,7 @@ using BibliotecaAPI.DTOs.AuthDTOs.Users;
 using BibliotecaAPI.DTOs.AutorDTOs;
 using BibliotecaAPI.DTOs.CategoriaDTOs;
 using BibliotecaAPI.DTOs.EditoraDTOs;
+using BibliotecaAPI.DTOs.EstanteDTOs;
 using BibliotecaAPI.DTOs.LivrosDTOs;
 using BibliotecaAPI.Models;
 using Microsoft.AspNetCore.Identity;
@@ -59,6 +60,18 @@ namespace BibliotecaAPI.DTOs.Mappings
             // Roles -> RolesDTO
             CreateMap<IdentityRole , RolesRequestDTO>();
             CreateMap<RolesResponseDTO , IdentityRole>().ReverseMap();
+            #endregion
+
+            #region ESTANTE
+            // Estante -> Response
+            CreateMap<Estante , EstanteDTOResponse>().ForMember(dest => dest.NomeLivro , opt => opt.MapFrom(src => src.Livro!.NomeLivro))
+                                                     .ForMember(dest => dest.NomeAutor , opt => opt.MapFrom(src => src.Livro != null && src.Livro.Autor != null ? src.Livro.Autor.PrimeiroNome + " " + src.Livro.Autor.Sobrenome : null))
+                                                     .ForMember(dest => dest.NomeEditora , opt => opt.MapFrom(src => src.Livro != null && src.Livro.Editora != null ? src.Livro.Editora.NomeEditora : null))
+                                                     .ForMember(dest => dest.AnoPublicacao , opt => opt.MapFrom(src => src.Livro!.AnoPublicacao))
+                                                     .ForMember(dest => dest.Categorias , opt => opt.MapFrom(src => src.Livro != null ? src.Livro.LivrosCategorias!.Select(lc => lc.Categorias.NomeCategoria) : null));
+
+            // Request -> Estante
+            CreateMap<EstanteDTORequest , Estante>().ForMember(dest => dest.Livro , opt => opt.Ignore()).ReverseMap();
             #endregion
         }
     }

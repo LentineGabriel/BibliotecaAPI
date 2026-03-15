@@ -58,6 +58,10 @@ builder.Services.AddControllers(op =>
 {
     op.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
+builder.Services.AddControllers().AddJsonOptions(op =>
+{
+    op.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 // versionamento do projeto
 builder.Services.AddApiVersioning(op =>
