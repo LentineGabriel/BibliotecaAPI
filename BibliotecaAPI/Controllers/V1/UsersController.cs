@@ -54,7 +54,7 @@ public class UsersController : ControllerBase
     // GET: /AuthController/Usuarios
     [HttpGet]
     [Authorize(Policy = "AdminsOnly")]
-    public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetUsersAsync()
+    public async Task<ActionResult<IEnumerable<UsersDTOResponse>>> GetUsersAsync()
     {
         var usuario = await _getUsersUseCase.GetUsersAsync();
         return Ok(usuario);
@@ -67,7 +67,7 @@ public class UsersController : ControllerBase
     // GET: /AuthController/Usuarios/id
     [HttpGet("{id}")]
     [Authorize(Policy = "AdminsOnly")]
-    public async Task<ActionResult<UsersResponseDTO>> GetUserByIdAsync(string id)
+    public async Task<ActionResult<UsersDTOResponse>> GetUserByIdAsync(string id)
     {
         var usuarioId = await _getUsersUseCase.GetUserByIdAsync(id);
         return Ok(usuarioId);
@@ -80,7 +80,7 @@ public class UsersController : ControllerBase
     // GET: Usuarios/Paginacao
     [HttpGet("Paginacao")]
     [Authorize(Policy = "AdminsAndUsers")]
-    public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetPaginationAsync([FromQuery] UsuariosParameters usuariosParameters)
+    public async Task<ActionResult<IEnumerable<UsersDTOResponse>>> GetPaginationAsync([FromQuery] UsuariosParameters usuariosParameters)
     {
         var usuariosPaginados = await _getUsersUseCase.GetPaginationAsync(usuariosParameters);
         return ObterUsuarios(usuariosPaginados);
@@ -159,7 +159,7 @@ public class UsersController : ControllerBase
     // PUT: /AuthController/AtualizarUsuario/id
     [HttpPut("AtualizarUsuario/{id}")]
     [Authorize(Policy = "AdminsOnly")]
-    public async Task<ActionResult<UsersResponseDTO>> PutAsync(string id, UsersRequestDTO usersDTO)
+    public async Task<ActionResult<UsersDTOResponse>> PutAsync(string id, UsersDTORequest usersDTO)
     {
         if(id != usersDTO.Id) return BadRequest($"Não foi possível encontrar o usuário com o ID {id}. Por favor, verifique o ID e tente novamente!");
         var usuarioAlterado = await _putUsersUseCase.PutAsync(id , usersDTO);
@@ -175,7 +175,7 @@ public class UsersController : ControllerBase
     /// <returns>Autor atualizado</returns>
     [HttpPatch("AtualizarParcialUsuario/{id}")]
     [Authorize(Policy = "AdminsOnly")]
-    public async Task<ActionResult<UsersResponseDTO>> PatchAsync(string id , [FromBody] JsonPatchDocument<UsersResponseDTO> patchDoc)
+    public async Task<ActionResult<UsersDTOResponse>> PatchAsync(string id , [FromBody] JsonPatchDocument<UsersDTOResponse> patchDoc)
     {
         if(patchDoc == null) return BadRequest("Nenhuma opção foi enviada para atualizar parcialmente.");
         var usuarioAlterado = await _patchUsersUseCase.PatchAsync(id , patchDoc);
@@ -201,7 +201,7 @@ public class UsersController : ControllerBase
     #endregion
 
     #region METHODS
-    private ActionResult<IEnumerable<UsersResponseDTO>> ObterUsuarios(IPagedList<UsersResponseDTO> usuarios)
+    private ActionResult<IEnumerable<UsersDTOResponse>> ObterUsuarios(IPagedList<UsersDTOResponse> usuarios)
     {
         var metadados = new
         {
@@ -214,7 +214,7 @@ public class UsersController : ControllerBase
         };
         Response.Headers.Append("X-Pagination" , JsonConvert.SerializeObject(metadados));
 
-        var usuariosDTO = _mapper.Map<IEnumerable<UsersResponseDTO>>(usuarios);
+        var usuariosDTO = _mapper.Map<IEnumerable<UsersDTOResponse>>(usuarios);
         return Ok(usuariosDTO);
     }
     #endregion

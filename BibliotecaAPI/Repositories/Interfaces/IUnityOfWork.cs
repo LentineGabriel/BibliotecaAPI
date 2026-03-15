@@ -5,6 +5,7 @@ public interface IUnityOfWork
     IAutorRepositorio AutorRepositorio { get; }
     IEditorasRepositorio EditorasRepositorio { get; }
     ICategoriaLivrosRepositorio CategoriaLivrosRepositorio { get; }
+    IEstanteRepositorio EstanteRepositorio { get; }
     Task CommitAsync();
     Task DisposeAsync();
 }

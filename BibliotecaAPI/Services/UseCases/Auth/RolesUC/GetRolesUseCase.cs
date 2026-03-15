@@ -39,12 +39,12 @@ public class GetRolesUseCase : IGetRolesUseCase
         return _mapper.Map<RolesResponseDTO>(role);
     }
 
-    public async Task<IEnumerable<UsersResponseDTO>> GetUsersInRoleAsync(string perfil)
+    public async Task<IEnumerable<UsersDTOResponse>> GetUsersInRoleAsync(string perfil)
     {
         var usuariosNoPerfil = await _userManager.GetUsersInRoleAsync(perfil);
         if(usuariosNoPerfil == null || !usuariosNoPerfil.Any()) throw new NullReferenceException($"Nenhum usuário encontrado no perfil '{perfil}'. Por favor, tente novamente!");
 
-        return _mapper.Map<IEnumerable<UsersResponseDTO>>(usuariosNoPerfil);
+        return _mapper.Map<IEnumerable<UsersDTOResponse>>(usuariosNoPerfil);
     }
 
     public async Task<IPagedList<RolesResponseDTO>> GetPaginationAsync(PerfilParameters perfilParameters)

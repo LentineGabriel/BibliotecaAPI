@@ -10,6 +10,7 @@ public class UnityOfWork : IUnityOfWork
     private IAutorRepositorio? _autorRepositorio;
     private IEditorasRepositorio? _editorasRepositorio;
     private ICategoriaLivrosRepositorio? _categoriaLivrosRepositorio;
+    private IEstanteRepositorio? _estanteRepositorio;
     public AppDbContext _context;
 
     public UnityOfWork(AppDbContext context)
@@ -23,6 +24,7 @@ public class UnityOfWork : IUnityOfWork
     public IAutorRepositorio AutorRepositorio => _autorRepositorio = _autorRepositorio ?? new AutorRepositorio(_context);
     public IEditorasRepositorio EditorasRepositorio => _editorasRepositorio = _editorasRepositorio ?? new EditorasRepositorio(_context);
     public ICategoriaLivrosRepositorio CategoriaLivrosRepositorio => _categoriaLivrosRepositorio = _categoriaLivrosRepositorio ?? new CategoriaLivrosRepositorio(_context);
+    public IEstanteRepositorio EstanteRepositorio => _estanteRepositorio = _estanteRepositorio ?? new EstanteRepositorio(_context);
     public async Task CommitAsync() => await _context.SaveChangesAsync();
     public async Task DisposeAsync() => await _context.DisposeAsync();
     #endregion

@@ -4,5 +4,5 @@ using Microsoft.AspNetCore.JsonPatch;
 namespace BibliotecaAPI.Services.Interfaces.Auth.UsersUC;
 public interface IPatchUsersUseCase
 {
-    Task<UsersResponseDTO> PatchAsync(string id , JsonPatchDocument<UsersResponseDTO> patchDoc);
+    Task<UsersDTOResponse> PatchAsync(string id , JsonPatchDocument<UsersDTOResponse> patchDoc);
 }

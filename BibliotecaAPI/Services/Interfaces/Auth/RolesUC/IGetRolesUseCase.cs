@@ -9,6 +9,6 @@ public interface IGetRolesUseCase
 {
     Task<IEnumerable<RolesResponseDTO>> GetRolesAsync();
     Task<RolesResponseDTO> GetRoleByIdAsync(string id);
-    Task<IEnumerable<UsersResponseDTO>> GetUsersInRoleAsync(string perfil);
+    Task<IEnumerable<UsersDTOResponse>> GetUsersInRoleAsync(string perfil);
     Task<IPagedList<RolesResponseDTO>> GetPaginationAsync(PerfilParameters perfilParameters);
 }

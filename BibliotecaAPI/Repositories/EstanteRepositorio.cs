@@ -15,14 +15,11 @@ public class EstanteRepositorio : IEstanteRepositorio
     }
     #endregion
 
-    public async Task AddAsync(Estante estante) => 
-        await _context.Estantes.AddAsync(estante);
+    public async Task AddAsync(Estante estante) => await _context.Estantes.AddAsync(estante);
     
-    public async Task<Estante?> GetByIdAsync(int id) =>
-        await _context.Estantes.Include(e => e.Livro!).FirstOrDefaultAsync(e => e.IdEstante == id);
+    public async Task<Estante?> GetByIdAsync(int id) => await _context.Estantes.Include(e => e.Livro!).FirstOrDefaultAsync(e => e.IdEstante == id);
     
-    public async Task<Estante?> GetByUserAndLivroAsync(string userId , int livroId) =>
-        await _context.Estantes.FirstOrDefaultAsync(e => e.UserId == userId && e.LivroId == livroId);
+    public async Task<Estante?> GetByUserAndLivroAsync(string userId , int livroId) => await _context.Estantes.FirstOrDefaultAsync(e => e.UserId == userId && e.LivroId == livroId);
 
     public async Task<IEnumerable<Estante>> GetEstanteUsuarioAsync(string userId , int page , int pageSize) =>
         await _context.Estantes.Where(e => e.UserId == userId)
@@ -35,6 +32,7 @@ public class EstanteRepositorio : IEstanteRepositorio
                                         .ThenInclude(lc => lc.Categorias)
                                 .Skip((page - 1) * pageSize).Take(pageSize).AsNoTracking().ToListAsync();
 
+    public async Task<IEnumerable<Estante>> SearchBooksAsync(string termo) => await _context.Estantes.Include(e => e.Livro!).Where(e => e.Livro!.NomeLivro!.Contains(termo)).ToListAsync();
     public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
     public void Remove(Estante estante) => _context.Remove(estante);
 }

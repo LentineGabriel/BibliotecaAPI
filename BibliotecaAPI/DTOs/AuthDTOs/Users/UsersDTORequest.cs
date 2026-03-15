@@ -1,5 +1,5 @@
 ﻿namespace BibliotecaAPI.DTOs.AuthDTOs.Users;
-public class UsersRequestDTO
+public class UsersDTORequest
 {
     public string? Id { get; set; }
     public string? Username { get; set; }

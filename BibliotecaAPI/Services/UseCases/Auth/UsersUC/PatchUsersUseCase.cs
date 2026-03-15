@@ -21,13 +21,13 @@ public class PatchUsersUseCase : IPatchUsersUseCase
     }
     #endregion
 
-    public async Task<UsersResponseDTO> PatchAsync(string id , JsonPatchDocument<UsersResponseDTO> patchDoc)
+    public async Task<UsersDTOResponse> PatchAsync(string id , JsonPatchDocument<UsersDTOResponse> patchDoc)
     {
         var user = await _userManager.FindByIdAsync(id);
         if (user == null) throw new ArgumentException($"Não foi possível encontrar o usuário com ID {id}. Por favor, verifique o id digitado e tente novamente!");
         if (patchDoc == null) throw new ArgumentNullException(nameof(patchDoc));
 
-        var userToPatch = _mapper.Map<UsersResponseDTO>(user);
+        var userToPatch = _mapper.Map<UsersDTOResponse>(user);
 
         // Não deixando o EmailConfirmed ser alterado via patch
         if (patchDoc.Operations.Any(op => op.path.Equals("/emailConfirmed", StringComparison.OrdinalIgnoreCase))) throw new InvalidOperationException("A propriedade 'EmailConfirmed' não pode ser alterada via patch.");
@@ -73,6 +73,6 @@ public class PatchUsersUseCase : IPatchUsersUseCase
             throw new InvalidOperationException(descr);
         }
 
-        return _mapper.Map<UsersResponseDTO>(user);
+        return _mapper.Map<UsersDTOResponse>(user);
     }
 }

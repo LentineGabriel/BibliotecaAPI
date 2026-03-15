@@ -3,5 +3,5 @@
 namespace BibliotecaAPI.Services.Interfaces.Auth.UsersUC;
 public interface IPutUsersUseCase
 {
-    Task<UsersResponseDTO> PutAsync(string id , UsersRequestDTO usersDTO);
+    Task<UsersDTOResponse> PutAsync(string id , UsersDTORequest usersDTO);
 }

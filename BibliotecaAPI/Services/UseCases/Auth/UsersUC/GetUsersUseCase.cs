@@ -23,32 +23,32 @@ public class GetUsersUseCase : IGetUsersUseCase
     }
     #endregion
 
-    public async Task<IEnumerable<UsersResponseDTO>> GetUsersAsync()
+    public async Task<IEnumerable<UsersDTOResponse>> GetUsersAsync()
     {
         var usuarios = await _userManager.Users.ToListAsync();
         if(usuarios == null || !usuarios.Any()) throw new NullReferenceException("Usuários não encontrados. Por favor, tente novamente!");
 
-        return _mapper.Map<IEnumerable<UsersResponseDTO>>(usuarios);
+        return _mapper.Map<IEnumerable<UsersDTOResponse>>(usuarios);
     }
 
-    public async Task<UsersResponseDTO> GetUserByIdAsync(string id)
+    public async Task<UsersDTOResponse> GetUserByIdAsync(string id)
     {
         var usuario = await _userManager.FindByIdAsync(id);
         if(usuario == null) throw new NullReferenceException($"Não foi possível encontrar o usuário com o ID {id}. Por favor, tente novamente!");
 
-        return _mapper.Map<UsersResponseDTO>(usuario);
+        return _mapper.Map<UsersDTOResponse>(usuario);
     }
 
-    public async Task<IPagedList<UsersResponseDTO>> GetPaginationAsync(UsuariosParameters usuariosParameters)
+    public async Task<IPagedList<UsersDTOResponse>> GetPaginationAsync(UsuariosParameters usuariosParameters)
     {
         var usuarios = await _userManager.Users.ToListAsync();
         if(usuarios == null || !usuarios.Any()) throw new NullReferenceException("Usuários não encontrados. Por favor, tente novamente!");
 
-        var usuariosDto = _mapper.Map<IEnumerable<UsersResponseDTO>>(usuarios);
+        var usuariosDto = _mapper.Map<IEnumerable<UsersDTOResponse>>(usuarios);
         return await usuariosDto.ToPagedListAsync(usuariosParameters.PageNumber , usuariosParameters.PageSize);
     }
 
-    public Task<IPagedList<UsersResponseDTO>> GetUserEstanteAsync(string id)
+    public Task<IPagedList<UsersDTOResponse>> GetUserEstanteAsync(string id)
     {
         throw new NotImplementedException();
     }

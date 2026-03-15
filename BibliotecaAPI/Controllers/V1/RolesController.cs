@@ -72,7 +72,7 @@ public class RolesController : ControllerBase
     // GET: /RolesController/Perfil/id
     [HttpGet("UsuariosNoPerfil/{perfil}")]
     [Authorize(Policy = "AdminsOnly")]
-    public async Task<ActionResult<IEnumerable<UsersResponseDTO>>> GetUsersInRoleAsync(string perfil)
+    public async Task<ActionResult<IEnumerable<UsersDTOResponse>>> GetUsersInRoleAsync(string perfil)
     {
         var usuariosNoPerfil = await _getRolesUseCase.GetUsersInRoleAsync(perfil);
         return Ok(usuariosNoPerfil);

@@ -20,7 +20,7 @@ public class PutUsersUseCase : IPutUsersUseCase
     }
     #endregion
 
-    public async Task<UsersResponseDTO> PutAsync(string id , UsersRequestDTO usersDTO)
+    public async Task<UsersDTOResponse> PutAsync(string id , UsersDTORequest usersDTO)
     {
         var user = await _userManager.FindByIdAsync(id);
         if(user == null) throw new ArgumentException($"Não foi possível encontrar o usuário com ID {id}. Por favor, verifique o id digitado e tente novamente!", nameof(id));
@@ -32,6 +32,6 @@ public class PutUsersUseCase : IPutUsersUseCase
         var result = await _userManager.UpdateAsync(user);
         if(!result.Succeeded) throw new InvalidOperationException(string.Join("; ", result.Errors.Select(e => e.Description)));
 
-        return _mapper.Map<UsersResponseDTO>(user);
+        return _mapper.Map<UsersDTOResponse>(user);
     }
 }

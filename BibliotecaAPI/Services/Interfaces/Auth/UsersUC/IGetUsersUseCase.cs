@@ -5,8 +5,8 @@ using X.PagedList;
 namespace BibliotecaAPI.Services.Interfaces.Auth.UsersUC;
 public interface IGetUsersUseCase
 {
-    Task<IEnumerable<UsersResponseDTO>> GetUsersAsync();
-    Task<UsersResponseDTO> GetUserByIdAsync(string id);
-    Task<IPagedList<UsersResponseDTO>> GetPaginationAsync(UsuariosParameters usuariosParameters);
-    Task<IPagedList<UsersResponseDTO>> GetUserEstanteAsync(string id);
+    Task<IEnumerable<UsersDTOResponse>> GetUsersAsync();
+    Task<UsersDTOResponse> GetUserByIdAsync(string id);
+    Task<IPagedList<UsersDTOResponse>> GetPaginationAsync(UsuariosParameters usuariosParameters);
+    Task<IPagedList<UsersDTOResponse>> GetUserEstanteAsync(string id);
 }

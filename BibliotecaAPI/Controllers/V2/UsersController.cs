@@ -56,12 +56,27 @@ public class UsersController : ControllerBase
 
         return ObterEstante(estantePaged);
     }
+
+    [HttpGet("Estante/BuscarLivros")]
+    [Authorize(Policy = "AdminsAndUsers")]
+    public async Task<ActionResult<IEnumerable<EstanteDTOResponse>>> BooksSearchAsync(string termo, int page = 1 , int pageSize = 10)
+    {
+        var usuarioId = User.GetUserId();
+        if(usuarioId == null) return Unauthorized("É necessário estar logado para mexer na estante.");
+
+        var buscaEnumerable = await _getLivroEstante.SearchBooksAsync(usuarioId, termo);
+
+        // Verifica se o resultado já é um IPagedList, caso contrário, converte para PagedList
+        var buscaPaged = buscaEnumerable as IPagedList<Estante> ?? buscaEnumerable.ToPagedList(page , pageSize);
+
+        return ObterEstante(buscaPaged);
+    }
     #endregion
 
     #region POST
     [HttpPost("Estante/AdicionarLivro")]
     [Authorize(Policy = "AdminsAndUsers")]
-    public async Task<ActionResult<Estante>> CreateUserEstanteAsync(int livroId)
+    public async Task<ActionResult<EstanteDTOResponse>> CreateUserEstanteAsync(int livroId)
     {
         var usuarioId = User.GetUserId();
         if(usuarioId == null) return Unauthorized("É necessário estar logado para mexer na estante.");
@@ -69,14 +84,6 @@ public class UsersController : ControllerBase
         var estante = await _createLivroEstante.CreateAsync(usuarioId , livroId);
 
         return Ok(estante);
-    }
-
-    [HttpPost("Estante/BuscarLivros")]
-    [Authorize(Policy = "AdminsAndUsers")]
-    public async Task<ActionResult<UsersResponseDTO>> BooksSearchAsync(string id)
-    {
-        // var usuarioId = await _getUsersUseCase.BuscarLivrosAsync(id);
-        return Ok();
     }
     #endregion
 
