@@ -4,6 +4,7 @@ using AutoMapper;
 using BibliotecaAPI.DTOs.AuthDTOs.Users;
 using BibliotecaAPI.DTOs.AutorDTOs;
 using BibliotecaAPI.DTOs.EstanteDTOs;
+using BibliotecaAPI.Extensions;
 using BibliotecaAPI.Models;
 using BibliotecaAPI.Services.Interfaces.Auth.UsersUC;
 using BibliotecaAPI.Services.Interfaces.EstanteUC;
@@ -45,7 +46,7 @@ public class UsersController : ControllerBase
     [HttpGet("Estante")]
     public async Task<ActionResult<IEnumerable<EstanteDTOResponse>>> GetUserEstanteAsync(int page = 1, int pageSize = 10)
     {
-        var usuarioId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var usuarioId = User.GetUserId();
         if (usuarioId == null) return Unauthorized("É necessário estar logado para visualizar a estante.");
 
         var estanteEnumerable = await _getLivroEstante.GetAsync(usuarioId, page, pageSize);
@@ -58,11 +59,11 @@ public class UsersController : ControllerBase
     #endregion
 
     #region POST
-    [HttpPost("Estante")]
+    [HttpPost("Estante/AdicionarLivro")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<Estante>> CreateUserEstanteAsync(int livroId)
     {
-        var usuarioId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var usuarioId = User.GetUserId();
         if(usuarioId == null) return Unauthorized("É necessário estar logado para mexer na estante.");
 
         var estante = await _createLivroEstante.CreateAsync(usuarioId , livroId);
@@ -70,7 +71,7 @@ public class UsersController : ControllerBase
         return Ok(estante);
     }
 
-    [HttpPost("BuscarLivros")]
+    [HttpPost("Estante/BuscarLivros")]
     [Authorize(Policy = "AdminsAndUsers")]
     public async Task<ActionResult<UsersResponseDTO>> BooksSearchAsync(string id)
     {

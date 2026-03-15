@@ -4,11 +4,11 @@ namespace BibliotecaAPI.Enums;
 public enum StatusLivroEstante
 {
     [EnumMember(Value = "Quero Ler")]
-    QueroLer,
+    QueroLer = 1,
 
     [EnumMember(Value = "Lendo")]
-    Lendo,
+    Lendo = 2,
 
     [EnumMember(Value = "Lido")]
-    Lido
+    Lido = 3
 }
