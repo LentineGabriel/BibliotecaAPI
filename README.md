@@ -1,147 +1,174 @@
-# 📚 Biblioteca API
-API RESTful para gerenciamento de um sistema bibliotecário, desenvolvida com foco em boas práticas de arquitetura, versionamento e segurança.
-Projeto voltado para consolidar conhecimentos em desenvolvimento backend com .NET, incluindo autenticação, persistência de dados e organização de domínio e priorizando a construção de uma boa API.
+# 📚 Biblioteca API & Dashboard Admin
+
+<p align="center">
+  <img src="https://img.shields.io/badge/.NET-512BD4?style=for-the-badge&logo=.net&logoColor=white" alt=".NET 8" />
+  <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL" />
+  <img src="https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens" alt="JWT" />
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" />
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3" />
+</p>
+
+## 📖 Sobre o Projeto
+
+A **Biblioteca API** é um ecossistema completo para o gerenciamento de sistemas bibliotecários e controle de leitura pessoal. Desenvolvida com as tecnologias mais modernas do ecossistema .NET, a solução conta com uma API robusta e um **Dashboard Administrativo SPA** (Single Page Application) elegante e performático.
+
+Este projeto foi construído como um laboratório avançado de engenharia de software, priorizando a separação de responsabilidades, segurança via JWT e uma experiência de usuário (UX) fluida.
+
+---
+
+## 🗺️ Sumário
+
+- [🚀 Visão Geral](#-visão-geral)
+- [🧠 Funcionalidades](#-funcionalidades)
+- [🎨 Dashboard Admin (Front-end)](#-dashboard-admin-front-end)
+- [🛠️ Tecnologias](#️-tecnologias)
+- [📦 Arquitetura do Sistema](#-arquitetura-do-sistema)
+- [🔐 Segurança](#-segurança)
+- [⚙️ Como Executar](#️-como-executar)
+- [📑 Documentação](#-documentação)
+- [👨‍💻 Autor](#-autor)
 
 ---
 
 ## 🚀 Visão Geral
-A Biblioteca API permite o gerenciamento completo de um ecossistema de livros, incluindo:
-- 📖 Livros  
-- ✍️ Autores  
-- 🏢 Editoras  
-- 🏷️ Categorias  
-- 👤 Usuários  
-- 🔐 Perfis e permissões  
 
-Além disso, na versão mais recente, o sistema evolui para um controle de leitura pessoal, permitindo que usuários acompanhem seus livros.
+O sistema gerencia cinco pilares principais de uma biblioteca:
+
+- **Livros**: Cadastro completo com vínculo a autores, editoras e categorias.
+- **Autores**: Gestão biográfica e nacionalidade.
+- **Editoras**: Controle de fundação e links oficiais.
+- **Categorias**: Organização taxonômica do acervo.
+- **Usuários & Perfis**: Sistema de autenticação com controle de acesso baseado em Roles (RBAC).
 
 ---
 
 ## 🧠 Funcionalidades
-### ✅ V1 — Base do Sistema
 
-- CRUD completo de:
-  - Autores
-  - Editoras
-  - Categorias
-  - Livros
-- Gerenciamento de usuários
-- Perfis de usuário (roles)
-- Relacionamentos entre entidades
-- Documentação automática com Swagger
+### ✅ V1 — Gestão Administrativa
 
----
+- **CRUD Completo**: Todas as entidades (Livros, Autores, etc) possuem operações de criação, leitura, atualização e exclusão.
+- **Paginação Avançada**: Listagens otimizadas com `X.PagedList`.
+- **Versionamento**: Suporte a múltiplas versões da API simultaneamente (V1 e V2).
+- **Filtros Dinâmicos**: Pesquisa de livros por nome, autor, editora, ano ou categoria.
 
-### 🚧 V2 — Evolução do Sistema
-- 📚 Marcação de status de leitura:
-  - Lido
-  - Lendo
-  - A Ler (padrão)
-- Associação de livros a usuários
-- Expansão do domínio para experiência personalizada
-- Novas funcionalidades em desenvolvimento
+### 🚧 V2 — Experiência do Usuário (Em progresso)
+
+- **Status de Leitura**: Controle pessoal (Lido, Lendo, A Ler).
+- **Estante Virtual**: Associação direta de livros ao perfil do usuário logado.
+- **Refresh Token**: Renovação segura de sessões.
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
-- .NET 8  
-- ASP.NET Core Web API  
-- Entity Framework Core  
-- MySQL (via Pomelo)  
-- ASP.NET Identity  
-- JWT (Json Web Token) para autenticação  
-- AutoMapper  
-- Swagger / OpenAPI  
-- API Versioning  
-- X.PagedList (paginação)  
+## 🎨 Dashboard Admin (Front-end)
+
+O sistema acompanha um **Dashboard SPA** moderno, desenvolvido em **Vanilla JS**, focado em performance máxima e design minimalista (Dark Mode com tons verdes pastéis).
+
+**Destaques do Front-end:**
+
+- **Autenticação Segura**: Fluxo de login integrado com armazenamento de JWT no `localStorage`.
+- **Interceptor de Requisições**: Injeção automática de tokens em todas as chamadas à API.
+- **CRUD Via Modals**: Operações de edição e criação realizadas em janelas modais, sem recarregar a página.
+- **Dashboard Dinâmico**: Cards informativos com contagem em tempo real de todo o acervo.
+- **UX Reativa**: Navegação instantânea entre seções e feedbacks visuais de sucesso/erro.
 
 ---
 
-## 🔐 Autenticação e Segurança
-- Autenticação baseada em JWT  
-- Controle de acesso com roles  
-- Integração com ASP.NET Identity  
+## 🛠️ Tecnologias
+
+### Back-end
+
+- **Linguagem**: C# (.NET 8)
+- **Framework API**: ASP.NET Core Web API
+- **ORM**: Entity Framework Core
+- **Banco de Dados**: MySQL (via Pomelo)
+- **Autenticação**: Identity Framework + JWT (JSON Web Token)
+- **Mapeamento**: AutoMapper
+- **Documentação**: Swagger / OpenAPI
+- **Versionamento**: API Versioning
+
+### Front-end
+
+- **Core**: HTML5 Semantic Elements
+- **Logic**: Vanilla JavaScript (ES6+)
+- **Styling**: CSS3 Modern (Variáveis, Flexbox, Grid, Glassmorphism)
+- **Icons**: Unicode/Emoji UI
 
 ---
 
-## 📦 Arquitetura e Padrões
-- Separação de responsabilidades (Controllers, Services, Data)  
-- Uso de DTOs para transporte de dados  
-- Mapeamento com AutoMapper  
-- Versionamento de API  
-- Paginação de resultados  
+## 📦 Arquitetura do Sistema
 
----
+O projeto utiliza uma arquitetura organizada em camadas, inspirada em princípios de **Clean Architecture**, garantindo testabilidade e manutenção simplificada:
 
-## 📑 Documentação da API
-Após rodar o projeto, acesse:
-
-```
-https://localhost:{porta}/swagger
-```
-
-Interface interativa para testar todos os endpoints.
-(Também compatível com o Postman, se assim for necessário)
-
----
-
-## ⚙️ Como Executar o Projeto
-### Pré-requisitos
-- .NET 8 SDK  
-- MySQL  
-
----
-
-### 🔧 Passos
-```bash
-# Clone o repositório
-git clone https://github.com/seu-usuario/BibliotecaAPI.git
-
-# Acesse a pasta
-cd BibliotecaAPI
-
-# Restaure os pacotes
-dotnet restore
-
-# Execute as migrations
-dotnet ef database update
-
-# Rode o projeto
-dotnet run
-```
-
----
-
-## 📌 Estrutura do Projeto
-```bash
+```text
 BibliotecaAPI/
- ├── 📂 Context/
- ├── 📂 Controllers/
- ├── 📂 Data/
- ├── 📂 DTOs/
- ├── 📂 Enums/
- ├── 📂 Extensions/
- ├── 📂 Filters/
- ├── 📂 Migrations/
- ├── 📂 Models/
- ├── 📂 Pagination/
- ├── 📂 Repositories/
- ├── 📂 Services/
- ├── 📂 Settings/
- └── 📂 Swagger/
+├── back-end/
+│   ├── Context/       # Contexto do Entity Framework
+│   ├── Controllers/   # Endpoints da API (V1 e V2)
+│   ├── Services/      # Use Cases e Lógica de Negócio
+│   ├── Repositories/  # Camada de Acesso a Dados
+│   ├── Models/        # Entidades do Domínio
+│   ├── DTOs/          # Objetos de Transferência de Dados
+│   └── Pagination/    # Lógica de filtros e páginas
+├── front-end/
+│   ├── css/           # Estilos modernos e Dark Mode
+│   ├── js/            # Core logic, API client e App logic
+│   └── index.html     # SPA Entry point
 ```
 
 ---
 
-## 🎯 Objetivo do Projeto
-Este projeto não é apenas um CRUD — ele foi pensado como um laboratório prático de backend, abordando:
-- Arquitetura de APIs reais  
-- Boas práticas com .NET  
-- Autenticação moderna  
-- Evolução incremental (V1 → V2)  
+## 🔐 Segurança
+
+- **JWT Authentication**: As rotas são protegidas e exigem um token válido emitido no login.
+- **RBAC (Role Based Access Control)**:
+  - `AdminsOnly`: Acesso total (CRUD, Gestão de Usuários).
+  - `AdminsAndUsers`: Acesso de leitura e funcionalidades de estante virtual.
+- **CORS Configurado**: A API está preparada para servir o front-end de forma segura em diferentes origens.
+
+---
+
+## ⚙️ Como Executar
+
+### Pré-requisitos
+
+- .NET 8 SDK
+- MySQL Server
+
+### Passo a Passo
+
+1. **Clone o repositório:**
+
+   ```bash
+   git clone https://github.com/seu-usuario/BibliotecaAPI.git
+   cd BibliotecaAPI
+   ```
+
+2. **Configure o Banco de Dados:**
+   Ajuste a `ConnectionString` no arquivo `appsettings.json` dentro da pasta `back-end`.
+
+3. **Inicie o Back-end:**
+
+   ```bash
+   cd back-end
+   dotnet ef database update
+   dotnet run
+   ```
+
+4. **Acesse o Front-end:**
+   Abra o arquivo `front-end/index.html` em qualquer navegador moderno. (Recomendado usar a extensão _Live Server_ no VS Code).
+
+---
+
+## 📑 Documentação
+
+A documentação interativa está disponível via Swagger. Com a API rodando, acesse:
+`https://localhost:{porta}/swagger`
 
 ---
 
 ## 👨‍💻 Autor
-Desenvolvido unicamente por mim, Gabriel Lentine, como parte da evolução prática em backend e APIs utilizando .NET e C#.
-<br>Nov/2025 ~ Mar/2026
+
+Desenvolvido por **Gabriel Lentine**.  
+Projeto focado em demonstrar competência técnica em desenvolvimento Full-Stack com o ecossistema Microsoft.
+
+📅 **Período**: Nov/2025 ~ Mai/2026

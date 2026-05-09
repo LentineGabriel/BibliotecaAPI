@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biblioteca API - Login</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: var(--bg-color);
+    }
+    .login-container {
+      background-color: var(--surface-color);
+      padding: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .login-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .login-header h1 {
+      color: var(--primary-color);
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    .login-header p {
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      margin-top: 16px;
+    }
+    #login-error {
+      color: var(--danger-color);
+      margin-top: 16px;
+      text-align: center;
+      font-size: 0.9rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="login-header">
+      <h1>Biblioteca API</h1>
+      <p>Acesse o painel administrativo</p>
+    </div>
+    
+    <form id="form-login">
+      <div class="form-group">
+        <label for="username">Usuário</label>
+        <input type="text" id="username" placeholder="Digite seu usuário" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input type="password" id="password" placeholder="Digite sua senha" required>
+      </div>
+      
+      <button type="submit" class="btn btn-login" id="btn-submit">Entrar</button>
+      <div id="login-error"></div>
+    </form>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    // Se já estiver logado, redireciona pro index
+    if (localStorage.getItem('biblioteca_token')) {
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('form-login').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const errorDiv = document.getElementById('login-error');
+      const btn = document.getElementById('btn-submit');
+      
+      errorDiv.style.display = 'none';
+      btn.textContent = 'Autenticando...';
+      btn.disabled = true;
+      
+      try {
+        const response = await window.api.auth.login(username, password);
+        
+        // A API de login provavelmente retorna um objeto contendo o Token.
+        // O nome exato depende do modelo LoginResponseModel do C#.
+        // Exemplo: { token: "ey...", usuario: "Admin" }
+        // Assumindo que a chave do token se chame 'token'. Se for diferente no backend, precisa ser ajustado.
+        
+        if (response && response.accessToken) {
+          localStorage.setItem('biblioteca_token', response.accessToken);
+          window.location.href = 'index.html';
+        } else {
+          throw new Error('Token não retornado pela API');
+        }
+      } catch (err) {
+        errorDiv.textContent = 'Falha no login: ' + err.message;
+        errorDiv.style.display = 'block';
+      } finally {
+        btn.textContent = 'Entrar';
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

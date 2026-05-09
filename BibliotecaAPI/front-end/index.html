@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biblioteca API - Admin</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Biblioteca API</h2>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#" data-target="dashboard" class="active">Dashboard</a></li>
+      <li><a href="#" data-target="livros">Livros</a></li>
+      <li><a href="#" data-target="autores">Autores</a></li>
+      <li><a href="#" data-target="categorias">Categorias</a></li>
+      <li><a href="#" data-target="editoras">Editoras</a></li>
+      <li><a href="#" data-target="usuarios">UsuÃ¡rios</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <!-- DASHBOARD SECTION -->
+    <section id="dashboard" class="content-section">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+      </div>
+      <div class="dashboard-grid">
+        <div class="stat-card" style="cursor:pointer;" onclick="document.querySelector('[data-target=\'livros\']').click()">
+          <h3>Total de Livros</h3>
+          <div class="value" id="total-livros">-</div>
+        </div>
+        <div class="stat-card" style="cursor:pointer;" onclick="document.querySelector('[data-target=\'autores\']').click()">
+          <h3>Total de Autores</h3>
+          <div class="value" id="total-autores">-</div>
+        </div>
+        <div class="stat-card" style="cursor:pointer;" onclick="document.querySelector('[data-target=\'categorias\']').click()">
+          <h3>Total de Categorias</h3>
+          <div class="value" id="total-categorias">-</div>
+        </div>
+        <div class="stat-card" style="cursor:pointer;" onclick="document.querySelector('[data-target=\'editoras\']').click()">
+          <h3>Total de Editoras</h3>
+          <div class="value" id="total-editoras">-</div>
+        </div>
+        <div class="stat-card" style="cursor:pointer;" onclick="document.querySelector('[data-target=\'usuarios\']').click()">
+          <h3>Total de UsuÃ¡rios</h3>
+          <div class="value" id="total-usuarios">-</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIVROS SECTION -->
+    <section id="livros" class="content-section" style="display: none;">
+      <div class="page-header">
+        <h1>Livros</h1>
+        <button class="btn" onclick="openLivroModal()">+ Novo Livro</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>TÃ­tulo</th>
+              <th>Autor</th>
+              <th>Editora</th>
+              <th>Ano</th>
+              <th>Categorias</th>
+              <th>AÃ§Ãµes</th>
+            </tr>
+          </thead>
+          <tbody id="livros-tbody">
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- AUTORES SECTION -->
+    <section id="autores" class="content-section" style="display: none;">
+      <div class="page-header">
+        <h1>Autores</h1>
+        <button class="btn" onclick="openAutorModal()">+ Novo Autor</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome Completo</th>
+              <th>Nacionalidade</th>
+              <th>Data de Nascimento</th>
+              <th>AÃ§Ãµes</th>
+            </tr>
+          </thead>
+          <tbody id="autores-tbody">
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CATEGORIAS SECTION -->
+    <section id="categorias" class="content-section" style="display: none;">
+      <div class="page-header">
+        <h1>Categorias</h1>
+        <button class="btn" onclick="openCategoriaModal()">+ Nova Categoria</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Categoria</th>
+              <th>DescriÃ§Ã£o</th>
+              <th>AÃ§Ãµes</th>
+            </tr>
+          </thead>
+          <tbody id="categorias-tbody">
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- EDITORAS SECTION -->
+    <section id="editoras" class="content-section" style="display: none;">
+      <div class="page-header">
+        <h1>Editoras</h1>
+        <button class="btn" onclick="openEditoraModal()">+ Nova Editora</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>PaÃ­s de Origem</th>
+              <th>FundaÃ§Ã£o</th>
+              <th>Site Oficial</th>
+              <th>AÃ§Ãµes</th>
+            </tr>
+          </thead>
+          <tbody id="editoras-tbody">
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- USUARIOS SECTION -->
+    <section id="usuarios" class="content-section" style="display: none;">
+      <div class="page-header">
+        <h1>Usuários</h1>
+        <button class="btn" onclick="openUsuarioModal()">+ Novo Usuário</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>AÃ§Ãµes</th>
+            </tr>
+          </thead>
+          <tbody id="usuarios-tbody">
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODALS -->
+  <div id="modal-livro" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-livro-title">Novo Livro</h2>
+        <button class="modal-close" onclick="closeModal('modal-livro')">&times;</button>
+      </div>
+      <form id="form-livro">
+        <input type="hidden" id="livro-id">
+        <div class="form-group">
+          <label>Título</label>
+          <input type="text" id="livro-titulo" required>
+        </div>
+        <div class="form-group">
+          <label>ID do Autor</label>
+          <input type="number" id="livro-autor" required>
+        </div>
+        <div class="form-group">
+          <label>ID da Editora</label>
+          <input type="number" id="livro-editora" required>
+        </div>
+        <div class="form-group">
+          <label>Ano de Publicação</label>
+          <input type="number" id="livro-ano" required>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('modal-livro')">Cancelar</button>
+          <button type="submit" class="btn">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-autor" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-autor-title">Novo Autor</h2>
+        <button class="modal-close" onclick="closeModal('modal-autor')">&times;</button>
+      </div>
+      <form id="form-autor">
+        <input type="hidden" id="autor-id">
+        <div class="form-group">
+          <label>Primeiro Nome</label>
+          <input type="text" id="autor-primeironome" required>
+        </div>
+        <div class="form-group">
+          <label>Sobrenome</label>
+          <input type="text" id="autor-sobrenome" required>
+        </div>
+        <div class="form-group">
+          <label>Nacionalidade</label>
+          <input type="text" id="autor-nacionalidade" required>
+        </div>
+        <div class="form-group">
+          <label>Data de Nascimento</label>
+          <input type="date" id="autor-nascimento" required>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('modal-autor')">Cancelar</button>
+          <button type="submit" class="btn">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-categoria" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-categoria-title">Nova Categoria</h2>
+        <button class="modal-close" onclick="closeModal('modal-categoria')">&times;</button>
+      </div>
+      <form id="form-categoria">
+        <input type="hidden" id="categoria-id">
+        <div class="form-group">
+          <label>Nome</label>
+          <input type="text" id="categoria-nome" required>
+        </div>
+        <div class="form-group">
+          <label>Descrição</label>
+          <input type="text" id="categoria-descricao" required>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('modal-categoria')">Cancelar</button>
+          <button type="submit" class="btn">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-editora" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-editora-title">Nova Editora</h2>
+        <button class="modal-close" onclick="closeModal('modal-editora')">&times;</button>
+      </div>
+      <form id="form-editora">
+        <input type="hidden" id="editora-id">
+        <div class="form-group">
+          <label>Nome</label>
+          <input type="text" id="editora-nome" required>
+        </div>
+        <div class="form-group">
+          <label>País Origem</label>
+          <input type="text" id="editora-pais" required>
+        </div>
+        <div class="form-group">
+          <label>Ano de Fundação</label>
+          <input type="number" id="editora-ano" required>
+        </div>
+        <div class="form-group">
+          <label>Site Oficial</label>
+          <input type="url" id="editora-site">
+        </div>
+        <div class="actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('modal-editora')">Cancelar</button>
+          <button type="submit" class="btn">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-usuario" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-usuario-title">Novo Usuário</h2>
+        <button class="modal-close" onclick="closeModal('modal-usuario')">&times;</button>
+      </div>
+      <form id="form-usuario">
+        <input type="hidden" id="usuario-id">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="usuario-username" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="usuario-email" required>
+        </div>
+        <div class="form-group">
+          <label>Senha</label>
+          <input type="password" id="usuario-password" required>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn btn-danger" onclick="closeModal('modal-usuario')">Cancelar</button>
+          <button type="submit" class="btn">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
+

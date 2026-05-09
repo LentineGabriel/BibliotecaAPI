@@ -81,7 +81,7 @@ builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions> , ConfigureSw
 
 builder.Services.AddSwaggerGen(c =>
 {
-    // coment·rios XML
+    // coment√°rios XML
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory , xmlFile);
     c.IncludeXmlComments(xmlPath);
@@ -196,8 +196,8 @@ builder.Services.AddScoped<ICreateLivroEstante , CreateLivroEstante>();
 #region JWT TOKEN
 var jwtSection = builder.Configuration.GetSection("JWT");
 
-// obtÈm a chave do ambiente
-var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? throw new InvalidOperationException("JWT_SECRET n„o definida!");
+// obt√©m a chave do ambiente
+var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? throw new InvalidOperationException("JWT_SECRET n√£o definida!");
 
 builder.Services.Configure<JwtSettings>(op =>
 {
@@ -205,11 +205,11 @@ builder.Services.Configure<JwtSettings>(op =>
     op.SecretKey = secretKey;
 });
 
-// validando tudo na inicializaÁ„o
+// validando tudo na inicializa√ß√£o
 builder.Services.AddOptions<JwtSettings>().Validate(x => !string.IsNullOrWhiteSpace(x.SecretKey) &&
                                                    !string.IsNullOrWhiteSpace(x.ValidIssuer) &&
                                                    !string.IsNullOrWhiteSpace(x.ValidAudience) &&
-                                                   x.TokenValidityInMinutes > 0 , "ConfiguraÁ„o JWT inv·lida!").ValidateOnStart();
+                                                   x.TokenValidityInMinutes > 0 , "Configura√ß√£o JWT inv√°lida!").ValidateOnStart();
 
 builder.Services.AddAuthentication(op =>
 {
@@ -233,10 +233,20 @@ builder.Services.AddAuthentication(op =>
 });
 #endregion
 #endregion
-#endregion
+  #endregion
 
-#region APP
-var app = builder.Build();
+  #region CORS
+  builder.Services.AddCors(options =>
+  {
+      options.AddPolicy("AllowAll",
+          policy => policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+  });
+  #endregion
+  
+  #region APP
+  var app = builder.Build();
 
 // seed de novos livros, autores, etc.
 using(var scope = app.Services.CreateScope())
@@ -262,7 +272,8 @@ if(app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseAuthentication();
+  app.UseCors("AllowAll");
+  app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
